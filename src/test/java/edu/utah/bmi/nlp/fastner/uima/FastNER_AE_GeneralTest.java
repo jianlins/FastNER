@@ -47,7 +47,7 @@ public class FastNER_AE_GeneralTest {
         runner.reInitTypeSystem("desc/type/customized");
         jCas = runner.initJCas();
 //      Set up the parameters
-        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, "conf/rules.xlsx",
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, "conf/rules.xlsx",
                 FastNER_AE_General.PARAM_SENTENCE_TYPE_NAME, "edu.utah.bmi.nlp.type.system.Sentence",
                 FastNER_AE_General.PARAM_MARK_PSEUDO, true,
                 FastNER_AE_General.PARAM_LOG_RULE_INFO, true};

@@ -10,7 +10,7 @@
         <vendor/>
         <configurationParameters>
             <configurationParameter>
-                <name>RuleFile</name>
+                <name>RuleFileOrString</name>
                 <type>String</type>
                 <multiValued>false</multiValued>
                 <mandatory>true</mandatory>
@@ -34,15 +34,21 @@
                 <mandatory>true</mandatory>
             </configurationParameter>
             <configurationParameter>
-                <name>ConceptCategoryFeatureName</name>
-                <type>String</type>
+                <name>ReplicationSupport</name>
+                <type>Boolean</type>
                 <multiValued>false</multiValued>
-                <mandatory>true</mandatory>
+                <mandatory>false</mandatory>
+            </configurationParameter>
+            <configurationParameter>
+                <name>MaxRepeatLength</name>
+                <type>Integer</type>
+                <multiValued>false</multiValued>
+                <mandatory>false</mandatory>
             </configurationParameter>
         </configurationParameters>
         <configurationParameterSettings>
             <nameValuePair>
-                <name>RuleFile</name>
+                <name>RuleFileOrString</name>
                 <value>
                     <string>conf/crule_test.csv</string>
                 </value>
@@ -66,9 +72,15 @@
                 </value>
             </nameValuePair>
             <nameValuePair>
-                <name>ConceptCategoryFeatureName</name>
+                <name>ReplicationSupport</name>
                 <value>
-                    <string>category</string>
+                    <boolean>true</boolean>
+                </value>
+            </nameValuePair>
+            <nameValuePair>
+                <name>MaxRepeatLength</name>
+                <value>
+                    <integer>30</integer>
                 </value>
             </nameValuePair>
         </configurationParameterSettings>

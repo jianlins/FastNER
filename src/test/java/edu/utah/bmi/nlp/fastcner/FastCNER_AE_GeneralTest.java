@@ -45,7 +45,7 @@ public class FastCNER_AE_GeneralTest {
         runner.reInitTypeSystem("desc/type/customized");
         jCas = runner.initJCas();
 //      Set up the parameters
-        configurationData = new Object[]{FastCNER_AE_General.PARAM_RULE_STR, "conf/crule_test.xlsx",
+        configurationData = new Object[]{FastCNER_AE_General.PARAM_RULE_FILE_OR_STR, "conf/crule_test.xlsx",
                 FastCNER_AE_General.PARAM_SENTENCE_TYPE_NAME, "edu.utah.bmi.nlp.type.system.Sentence",
                 FastCNER_AE_General.PARAM_MARK_PSEUDO, true,
                 FastCNER_AE_General.PARAM_LOG_RULE_INFO, true};

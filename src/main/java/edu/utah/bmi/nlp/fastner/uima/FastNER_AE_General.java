@@ -44,8 +44,8 @@ import java.util.*;
  */
 public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 
-    public static final String PARAM_RULE_STR = "RuleStr";
-    //    @ConfigurationParameter(name = PARAM_RULE_STR)
+    public static final String PARAM_RULE_FILE_OR_STR = "RuleFileOrString";
+    //    @ConfigurationParameter(name = PARAM_RULE_FILE_OR_STR)
 //    protected String ruleFileName;
     public static final String PARAM_SENTENCE_TYPE_NAME = "SentenceTypeName";
     //    @ConfigurationParameter(name = PARAM_SENTENCE_TYPE_NAME)
@@ -90,7 +90,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 //        }
         String ruleStr = "", sentenceTypeName = "", tokenTypeName = "";
         ruleStr = (String) (cont
-                .getConfigParameterValue(PARAM_RULE_STR));
+                .getConfigParameterValue(PARAM_RULE_FILE_OR_STR));
         Object obj;
         obj = cont.getConfigParameterValue(PARAM_SENTENCE_TYPE_NAME);
         if (obj == null)
