@@ -1,0 +1,26 @@
+FastNER (Fast Name Entity Recognition)
+Copyright © 2017 The Department of Biomedical Informatics, University of Utah
+
+This product includes software developed at
+The Department of Biomedical Informatics, University of Utah (http://bmi.utah.edu/).
+
+FastNER were developed under maven framework.
+Copyright © 2012-2017 The Apache Software Foundation, Licensed under the Apache License, Version 2.0.
+
+UIMA and UIMAFit are used in example codes. Their original distributions are not included.
+Copyright © 2012-2017 The Apache Software Foundation, Licensed under the Apache License, Version 2.0.
+
+JUnit is used in test cases. Its distribution is not included.
+Copyright © 2002-2016 JUnit, Licensed under Eclipse Public License 1.0.
+
+NLPCore (NLP Core Class Project) is used as library. Its distribution is not included.
+Copyright © 2017 The Department of Biomedical Informatics, University of Utah
+
+Apache POI -the Java API for Microsoft Documents is used as library. Its distribution is not included.
+Copyright © 2012-2017 The Apache Software Foundation, Licensed under the Apache License, Version 2.0.
+
+Apache Commons IO is used as library. Its distribution is not included.
+Copyright ©  2012-2017 The Apache Software Foundation, Licensed under the Apache License, Version 2.0.
+
+Apache Commons CSV is used as library. Its distribution is not included.
+Copyright ©  2012-2017 The Apache Software Foundation, Licensed under the Apache License, Version 2.0.
