@@ -1,0 +1,3 @@
+associated \( anorexia \)	0	Complication	ACTUAL
+fever	0	Concept	ACTUAL
+fever of \d+	0	Concept	ACTUAL

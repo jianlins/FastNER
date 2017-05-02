@@ -1,0 +1,8 @@
+@fastcner
+#The patient denies any problem with visual changes or hearing changes.
+any\s+(problem)	0.5	edu.utah.bmi.type.system.Sentence
+with\s+(visua)l change	0.5	edu.utah.bmi.type.system.Concept
+hearing) changes	0.5	edu.utah.bmi.type.system.Sentence
+he (pa)t	0.5	edu.utah.bmi.type.system.Token
+Temperature 9\d.\d	0.5	edu.utah.bmi.type.system.Token
+[T|t]emperature\s+[|\c+\s+]1\d\d[|.\d][|F|\s+F])[\p|\w]	1	edu.utah.bmi.type.system.Concept

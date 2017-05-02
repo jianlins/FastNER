@@ -1,0 +1,12 @@
+@fastcner
+#The patient denies any problem with visual changes or hearing changes.
+any\s+(problem)	0.5	PROBLEM
+with\s+(visual) change	0.5	VISUAL
+hearing) changes	0.5	PSEUDO_HEARING	PSEUDO
+hearing changes	0.5	HEARING
+
+he (pa)t	0.5	PROBLEM
+he att	0.5	PROBLEM
+T\s+1\d\d.\d[|F|\s+F]) 	1	edu.utah.bmi.type.system.Fever_present
+TT\s+\d+[|.\d] 	2	edu.utah.bmi.type.system.Fever_absent	PSEUDO
+[T|t]emperature\s+[|\c+\s+]1\d\d[|.\d][|F|\s+F])[\p|\w]	1	edu.utah.bmi.type.system.Fever_present

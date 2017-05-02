@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmlns:cas="http:///uima/cas.ecore" xmlns:core="http:///edu/utah/bmi/type/system.ecore"
+	xmlns:xmi="http://www.omg.org/XMI" 
+	xmlns:tcas="http:///uima/tcas.ecore" xmi:version="2.0">
+	<cas:NULL xmi:id="0" />
+	<cas:Sofa xmi:id="1" sofaNum="1" sofaID="_InitialView"
+		mimeType="text"
+		sofaString="The patient denies any problem with visual changes or hearing changes." />
+	<tcas:DocumentAnnotation xmi:id="8" sofa="1"
+		begin="0" end="70" language="x-unspecified" />
+	<core:Token xmi:id="10" sofa="1" begin="0" end="3"/>
+	<core:Token xmi:id="11" sofa="1" begin="4" end="11" />
+	<core:Token xmi:id="12" sofa="1" begin="12" end="18" />
+	<core:Token xmi:id="13" sofa="1" begin="19" end="22" />
+	<core:Token xmi:id="14" sofa="1" begin="23" end="30" />
+	<core:Token xmi:id="15" sofa="1" begin="31" end="35" />
+	<core:Token xmi:id="16" sofa="1" begin="36" end="42" />
+	<core:Token xmi:id="17" sofa="1" begin="43" end="50" />
+	<core:Token xmi:id="18" sofa="1" begin="51" end="53" />
+	<core:Token xmi:id="19" sofa="1" begin="54" end="61" />
+	<core:Token xmi:id="20" sofa="1" begin="62" end="69" />
+	<core:Sentence xmi:id="21" sofa="1"
+		begin="0" end="70"/>
+	<cas:View sofa="1"
+		members="8 10 11 12 13 14 15 16 17 18 19 20 21 22 23" />
+</xmi:XMI>
