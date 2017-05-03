@@ -53,8 +53,8 @@ public class FastCNER extends FastNER {
     /**
      * The span here is referring to a sentence span, or paragraph span or document span
      *
-     * @param span
-     * @return
+     * @param span input Span (a range of text for process)
+     * @return matched results
      */
     public HashMap<String, ArrayList<Span>> processSpan(Span span) {
         return ((FastCRules) fastRule).processSpan(span);

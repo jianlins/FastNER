@@ -172,11 +172,7 @@ public class FastCRules extends FastRuleWG {
         return processString(span.text, span.begin);
     }
 
-    /**
-     * Because the input parameters are different, this method is overridden.
-     *
-     * @param text
-     */
+
     public HashMap<String, ArrayList<Span>> processRules(String text) {
         // use the first "startposition" to remember the original start matching
         // position.
@@ -196,18 +192,7 @@ public class FastCRules extends FastRuleWG {
     }
 
 
-    /**
-     * Because FastCrules use different wildcard, processRules is overridden.
-     *
-     * @param textChars
-     * @param rule
-     * @param matchBegin
-     * @param matchEnd
-     * @param currentPosition
-     * @param matches         K: determinant
-     *                        V: position of the last token that matches the rule in the input
-     *                        ArrayList
-     */
+
     protected void processRules(String text, char[] textChars, HashMap rule, int matchBegin, int matchEnd, int currentPosition,
                                 HashMap<String, ArrayList<Span>> matches,
                                 char previousChar, boolean wildcard, char previousKey) {
@@ -278,25 +263,6 @@ public class FastCRules extends FastRuleWG {
         }
     }
 
-    /**
-     * \d   A digit
-     * \C   A capital letter
-     * \c   A lower case letter
-     * \s   A whitespace
-     * \n   A return
-     * \(   Beginning of capturing a group
-     * \)   End of capturing a group
-     * \p   A punctuation
-     * \+   An addition symbol (to distinguish the "+" after a wildcard)
-     * The wildcard plus "+": 1 or more wildcard
-     *
-     * @param textChars
-     * @param rule
-     * @param matchBegin
-     * @param matchEnd
-     * @param currentPosition
-     * @param matches
-     */
 
     protected void processWildCards(String text, char[] textChars, HashMap rule, int matchBegin, int matchEnd, int currentPosition, HashMap<String, ArrayList<Span>> matches, char previousChar, boolean wildcard, char previousKey) {
         char thisChar = textChars[currentPosition];
@@ -517,25 +483,7 @@ public class FastCRules extends FastRuleWG {
         }
     }
 
-    /**
-     * if reaches the end of one or more ruleStore, add all corresponding
-     * determinants into the results
-     * <p>
-     * The priority of multiple applicable ruleStore can be modified. This version
-     * uses the following three ruleStore:
-     * 1. if determinant spans overlap, choose the determinant with the widest
-     * span
-     * 2. else if prefer right determinant, choose the determinant with the
-     * largest end.
-     * 3. else if prefer left determinant, choose the determinant with the
-     * smallest begin.
-     *
-     * @param rule
-     * @param matches
-     * @param matchBegin
-     * @param currentPosition
-     */
-    @SuppressWarnings("unchecked")
+
     protected void addDeterminants(String text, HashMap rule, HashMap<String, ArrayList<Span>> matches,
                                    int matchBegin, int matchEnd, int currentPosition) {
         HashMap<Determinants, Integer> deterRule = (HashMap<Determinants, Integer>) rule.get(END);
@@ -602,7 +550,7 @@ public class FastCRules extends FastRuleWG {
      * Using "+" to support replications might slow down the performance of FastCRules,
      * try to avoid using it as much as possible.
      *
-     * @param support
+     * @param support support replications
      */
     public void setReplicationSupport(boolean support) {
         this.supportReplications = support;

@@ -24,14 +24,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
+ * <p>
  * This class is an extension of FastRule, so that it supports capturing group within rule
- * <p/>
+ * </p>
+ * <p>
  * Define a group as following format:
- * <p/>
- * token1 \( token2 token3 \) token4<TAB>Determinant
- * <p/>
+ * </p>
+ * <p>
+ * token1 \( token2 token3 \) token4&lt;TAB&gt;Determinant
+ * </p>
+ * <p>
  * The "token2 token3" will be considered within the group to be captured. When finding a match from token1-token4,
  * the report will only report token2-token3.
+ * </p>
  *
  * @author Jianlin Shi
  */
@@ -56,9 +61,7 @@ public class FastRuleWG extends FastRuleWOG {
     }
 
 
-    /**
-     * @param contextTokens
-     */
+
     public HashMap<String, ArrayList<Span>> processTokens(ArrayList<String> contextTokens) {
         // use the first "startposition" to remember the original start matching
         // position.
@@ -72,16 +75,7 @@ public class FastRuleWG extends FastRuleWOG {
         return matches;
     }
 
-    /**
-     * @param contextTokens
-     * @param rule
-     * @param matchBegin
-     * @param matchEnd
-     * @param currentPosition
-     * @param matches         K: determinant
-     *                        V: position of the last token that matches the rule in the input
-     *                        ArrayList
-     */
+
     protected void processTokens(ArrayList<String> contextTokens, HashMap rule, int matchBegin, int matchEnd, int currentPosition,
                                  HashMap<String, ArrayList<Span>> matches) {
         // when reach the end of the tunedcontext, end the iteration
@@ -129,16 +123,7 @@ public class FastRuleWG extends FastRuleWOG {
         return matches;
     }
 
-    /**
-     * @param contextTokens
-     * @param rule
-     * @param matchBegin
-     * @param matchEnd
-     * @param currentPosition
-     * @param matches         K: determinant
-     *                        V: position of the last token that matches the rule in the input
-     *                        ArrayList
-     */
+
     protected void processSpans(ArrayList<Span> contextTokens, HashMap rule, int matchBegin, int matchEnd, int currentPosition,
                                 HashMap<String, ArrayList<Span>> matches) {
         // when reach the end of the tunedcontext, end the iteration

@@ -47,9 +47,7 @@ public class FastRuleWOG extends FastRule {
         initiate(ruleStore);
     }
 
-    /**
-     * @param contextTokens *
-     */
+
     public HashMap<String, ArrayList<Span>> processTokens(ArrayList<String> contextTokens) {
         // use the first "startposition" to remember the original start matching
         // position.
@@ -63,15 +61,7 @@ public class FastRuleWOG extends FastRule {
         return matches;
     }
 
-    /**
-     * @param contextTokens
-     * @param rule
-     * @param matchBegin
-     * @param startPosition
-     * @param matches       K: determinant
-     *                      V: position of the last token that matches the rule in the input
-     *                      ArrayList
-     */
+
     protected void processRules(ArrayList<String> contextTokens, HashMap rule, int matchBegin, int startPosition,
                                 HashMap<String, ArrayList<Span>> matches) {
         // when reach the end of the tunedcontext, end the iteration
@@ -112,15 +102,7 @@ public class FastRuleWOG extends FastRule {
         return matches;
     }
 
-    /**
-     * @param contextTokens
-     * @param rule
-     * @param matchBegin
-     * @param currentPosition
-     * @param matches         K: determinant
-     *                        V: position of the last token that matches the rule in the input
-     *                        ArrayList
-     */
+
     protected void processSpans(ArrayList<Span> contextTokens, HashMap rule, int matchBegin, int currentPosition,
                                 HashMap<String, ArrayList<Span>> matches) {
         // when reach the end of the tunedcontext, end the iteration
@@ -150,24 +132,7 @@ public class FastRuleWOG extends FastRule {
     }
 
 
-    /**
-     * if reaches the end of one or more ruleStore, add all corresponding
-     * determinants into the results
-     * <p/>
-     * The priority of multiple applicable ruleStore can be modified. This version
-     * uses the following three ruleStore:
-     * 1. if determinant spans overlap, choose the determinant with the widest
-     * span
-     * 2. else if prefer right determinant, choose the determinant with the
-     * largest end.
-     * 3. else if prefer left determinant, choose the determinant with the
-     * smallest begin.
-     *
-     * @param rule
-     * @param matches
-     * @param matchBegin
-     * @param matchEnd
-     */
+
     @SuppressWarnings("unchecked")
     protected void addDeterminants(HashMap rule, HashMap<String, ArrayList<Span>> matches, int matchBegin, int matchEnd) {
         HashMap<String, Integer> deterRule = (HashMap<String, Integer>) rule.get(END);

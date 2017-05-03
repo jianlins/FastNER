@@ -30,7 +30,7 @@ import java.util.*;
  * process the rulesMap
  *
  * @author Jianlin Shi
- *         The results will be added to the input HashMap<String, ArrayList<Span>>, because there might be more than one applicable rule.
+ *         The results will be added to the input HashMap&lt;String, ArrayList&lt;Span&gt;&gt;, because there might be more than one applicable rule.
  *         -The Span ( @see Span#Span(int, int) ) stores the span information of the evidence support the corresponding Determinants
  *         -Determinants are defined in ContextValueSet.Determinants ( @see ContextValueSet#ContextValueSet()), which is corresponding
  *         to the last two elements in each rule defined in the rule CSV file.

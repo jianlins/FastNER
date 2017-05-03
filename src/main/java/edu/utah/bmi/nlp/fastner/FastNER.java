@@ -52,7 +52,8 @@ public class FastNER {
     /**
      * Automatically decide which FastRule will be initiated (whether supports group capture or not)
      *
-     * @param ruleStr
+     * @param ruleStr      rule file path or rule string
+     * @param caseSenstive  whether process text in a case-sensitive way
      */
     protected void initiate(String ruleStr, boolean caseSenstive) {
         typeDefinition = new LinkedHashMap<>();

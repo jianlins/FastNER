@@ -212,12 +212,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
     }
 
 
-    /**
-     * You will need to change to your own Type system. Also can use determinants to annotate different Annotations.
-     *
-     * @param jcas
-     * @param concepts
-     */
+
     protected void saveConcepts(JCas jcas, HashMap<String, ArrayList<Span>> concepts) {
         for (Map.Entry<String, ArrayList<Span>> entry : concepts.entrySet()) {
             for (Span span : entry.getValue()) {

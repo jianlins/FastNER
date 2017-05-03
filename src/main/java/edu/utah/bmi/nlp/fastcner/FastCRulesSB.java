@@ -153,16 +153,8 @@ public class FastCRulesSB extends FastCRules {
     }
 
 
-    /**
-     * This implementation is using recursion instead of looping--may be more efficient
-     * TODO it's buggish now. check the FastCNERTest.test8--It will build the map, but some innest End Map doesn't contain Determinant
-     *
-     * @param i
-     * @param rule
-     * @param crule
-     * @param parentMap
-     * @return
-     */
+    // TODO it's buggish now. check the FastCNERTest.test8--It will build the map, but some innest End Map doesn't contain Determinant
+
     protected HashMap buildOneStepRule(int i, Rule rule, char[] crule, HashMap parentMap) {
         HashMap ruleMap2 = new HashMap();
         if (i == crule.length) {
