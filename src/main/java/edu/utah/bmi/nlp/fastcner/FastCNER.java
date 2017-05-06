@@ -37,6 +37,11 @@ public class FastCNER extends FastNER {
         initiate(ruleFile, true);
     }
 
+    public FastCNER(String ruleFile, boolean constructRuleMap) {
+        // read ruleStore from ruleFile, initiate Patterns
+        initiate(ruleFile, true, constructRuleMap);
+    }
+
     public FastCNER(HashMap<Integer, Rule> ruleStore) {
         initiate(ruleStore);
 

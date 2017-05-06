@@ -17,8 +17,8 @@ package edu.utah.bmi.nlp.fastcner.uima;
 
 import edu.utah.bmi.nlp.core.SimpleParser;
 import edu.utah.bmi.nlp.core.Span;
+import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.fastcner.FastCNER;
-import edu.utah.bmi.nlp.fastner.TypeDefinition;
 import edu.utah.bmi.nlp.fastner.uima.FastNER_AE_General;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;

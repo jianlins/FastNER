@@ -18,6 +18,7 @@ package edu.utah.bmi.nlp.fastner;
 import edu.utah.bmi.nlp.core.DeterminantValueSet.Determinants;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
+import edu.utah.bmi.nlp.core.TypeDefinition;
 import org.apache.uima.jcas.tcas.Annotation;
 
 import java.util.ArrayList;
@@ -46,20 +47,28 @@ public class FastNER {
 
     public FastNER(String ruleFile, boolean caseSenstive) {
         this.caseSenstive = caseSenstive;
-        initiate(ruleFile, caseSenstive);
+        initiate(ruleFile, caseSenstive, true);
+    }
+
+    public FastNER(String ruleFile, boolean caseSenstive, boolean constructRuleMap) {
+        this.caseSenstive = caseSenstive;
+        initiate(ruleFile, caseSenstive, constructRuleMap);
     }
 
     /**
      * Automatically decide which FastRule will be initiated (whether supports group capture or not)
      *
      * @param ruleStr      rule file path or rule string
-     * @param caseSenstive  whether process text in a case-sensitive way
+     * @param caseSenstive whether process text in a case-sensitive way
      */
     protected void initiate(String ruleStr, boolean caseSenstive) {
-        typeDefinition = new LinkedHashMap<>();
-        fastRule = FastRuleFactory.createFastRule(this.getClass(), ruleStr, typeDefinition, "\t", caseSenstive);
+        initiate(ruleStr, caseSenstive, true);
     }
 
+    protected void initiate(String ruleStr, boolean caseSenstive, boolean constructRuleMap) {
+        typeDefinition = new LinkedHashMap<>();
+        fastRule = FastRuleFactory.createFastRule(this.getClass(), ruleStr, typeDefinition, "\t", caseSenstive, constructRuleMap);
+    }
 
     public HashMap<String, ArrayList<Span>> processStringList(ArrayList<String> tokens) {
         return fastRule.processTokens(tokens);

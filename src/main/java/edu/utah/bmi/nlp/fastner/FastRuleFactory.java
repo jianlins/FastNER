@@ -17,6 +17,7 @@
 package edu.utah.bmi.nlp.fastner;
 
 import edu.utah.bmi.nlp.core.Rule;
+import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.fastcner.FastCNER;
 import edu.utah.bmi.nlp.fastcner.FastCRules;
 import edu.utah.bmi.nlp.fastcner.FastCRulesSB;
@@ -34,9 +35,12 @@ public class FastRuleFactory {
 
     }
 
-
     public static FastRule createFastRule(Class fastNER, String ruleStr, LinkedHashMap<String, TypeDefinition> typeDefinition, String splitter, boolean caseSensitive) {
-        FastRule fastRule;
+        return createFastRule(fastNER, ruleStr, typeDefinition, splitter, caseSensitive);
+    }
+
+    public static FastRule createFastRule(Class fastNER, String ruleStr, LinkedHashMap<String, TypeDefinition> typeDefinition, String splitter, boolean caseSensitive, boolean constructRuleMap) {
+        FastRule fastRule = null;
         int strLength = ruleStr.trim().length();
         String testFileStr = ruleStr.trim().substring(strLength - 4).toLowerCase();
         HashMap<Integer, Rule> rules = new HashMap<>();
@@ -46,20 +50,22 @@ public class FastRuleFactory {
         } else {
             thisRuleType = IOUtil.readCSVString(ruleStr, rules, typeDefinition, splitter, caseSensitive, thisRuleType);
         }
-        if (thisRuleType[0] || fastNER== FastCNER.class) {
+        if (constructRuleMap) {
+            if (thisRuleType[0] || fastNER == FastCNER.class) {
 //            support square bracket
-            if (thisRuleType[2])
-                fastRule = new FastCRulesSB(rules);
-            else
-                fastRule = new FastCRules(rules);
-            if (thisRuleType[3])
-                ((FastCRules) fastRule).setReplicationSupport(true);
-        } else {
-//            support group
-            if (thisRuleType[1]) {
-                fastRule = new FastRuleWG(rules);
+                if (thisRuleType[2])
+                    fastRule = new FastCRulesSB(rules);
+                else
+                    fastRule = new FastCRules(rules);
+                if (thisRuleType[3])
+                    ((FastCRules) fastRule).setReplicationSupport(true);
             } else {
-                fastRule = new FastRuleWOG(rules);
+//            support group
+                if (thisRuleType[1]) {
+                    fastRule = new FastRuleWG(rules);
+                } else {
+                    fastRule = new FastRuleWOG(rules);
+                }
             }
         }
         return fastRule;

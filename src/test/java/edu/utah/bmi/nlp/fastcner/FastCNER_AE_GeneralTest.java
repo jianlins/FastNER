@@ -18,8 +18,8 @@ package edu.utah.bmi.nlp.fastcner;
 
 
 import edu.utah.bmi.nlp.fastcner.uima.FastCNER_AE_General;
-import edu.utah.bmi.nlp.fastner.TypeDefinition;
 import edu.utah.bmi.nlp.type.system.Concept;
+import edu.utah.bmi.nlp.type.system.ConceptBASE;
 import edu.utah.bmi.nlp.type.system.Token;
 import edu.utah.bmi.nlp.uima.AdaptableUIMACPERunner;
 import edu.utah.bmi.nlp.uima.ae.SimpleParser_AE;
@@ -28,6 +28,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FSIndex;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.InvalidXMLException;
 import org.junit.Before;
@@ -54,11 +55,9 @@ public class FastCNER_AE_GeneralTest {
     @Before
     public void setUp() {
         String typeDescriptor = "desc/type/All_Types";
-        runner = new AdaptableUIMACPERunner(typeDescriptor);
-        for (TypeDefinition typeDefinition : new FastCNER("conf/crule_test.xlsx").getTypeDefinition().values()) {
-            runner.addConceptType(typeDefinition.fullTypeName, typeDefinition.fullSuperTypeName);
-        }
-        runner.reInitTypeSystem("desc/type/customized");
+        runner = new AdaptableUIMACPERunner(typeDescriptor, "target/generated-test-sources/");
+        runner.addConceptTypes(new FastCNER("conf/crule_test.xlsx", true).getTypeDefinition().values());
+        runner.reInitTypeSystem("target/generated-test-sources/customized");
         jCas = runner.initJCas();
 //      Set up the parameters
         configurationData = new Object[]{FastCNER_AE_General.PARAM_RULE_FILE_OR_STR, "conf/crule_test.xlsx",
@@ -84,14 +83,32 @@ public class FastCNER_AE_GeneralTest {
 
         FSIndex annoIndex = jCas.getAnnotationIndex(Concept.type);
         Iterator annoIter = annoIndex.iterator();
-        ArrayList<Concept> concepts = new ArrayList<Concept>();
+        ArrayList<Annotation> concepts = new ArrayList<>();
         while (annoIter.hasNext()) {
-            concepts.add((Concept) annoIter.next());
-            System.out.println(concepts.get(concepts.size() - 1).getCoveredText());
+            Object anno = annoIter.next();
+//            System.out.println(anno.getClass().getCanonicalName());
+            concepts.add((Annotation) anno);
+//            System.out.println(concepts.get(concepts.size() - 1).getCoveredText());
         }
-        assertTrue("Didn't get the right number of concepts", concepts.size() == 4);
-        assertTrue("Didn't get the right concept: 'patient denies'", concepts.get(1).getCoveredText().equals("problem"));
+        assertTrue("Didn't get the right number of concepts", concepts.size() == 1);
+        assertTrue("Didn't get the right concept: 'hearing'", concepts.get(0).getCoveredText().equals("hearing"));
+        assertTrue("Didn't get the right concept type: 'hearing'",
+                concepts.get(0).getClass().getCanonicalName().equals("edu.utah.bmi.nlp.type.system.HEARING"));
 
+        annoIndex = jCas.getAnnotationIndex(ConceptBASE.type);
+        annoIter = annoIndex.iterator();
+        concepts = new ArrayList<>();
+        while (annoIter.hasNext()) {
+            Object anno = annoIter.next();
+//            System.out.println(anno.getClass().getCanonicalName());
+            concepts.add((Annotation) anno);
+//            System.out.println(concepts.get(concepts.size() - 1).getCoveredText());
+        }
+
+        assertTrue("Didn't get the right number of concepts", concepts.size() == 2);
+        assertTrue("Didn't get the right concept: 'pa'", concepts.get(0).getCoveredText().equals("pa"));
+        assertTrue("Didn't get the right concept type: 'pa'",
+                concepts.get(0).getClass().getCanonicalName().equals("edu.utah.bmi.nlp.type.system.PROBLEM"));
 
         annoIndex = jCas.getAnnotationIndex(Token.type);
         annoIter = annoIndex.iterator();

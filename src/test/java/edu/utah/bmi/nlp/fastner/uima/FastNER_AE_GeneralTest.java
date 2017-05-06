@@ -17,7 +17,6 @@
 package edu.utah.bmi.nlp.fastner.uima;
 
 import edu.utah.bmi.nlp.fastner.FastNER;
-import edu.utah.bmi.nlp.fastner.TypeDefinition;
 import edu.utah.bmi.nlp.type.system.Concept;
 import edu.utah.bmi.nlp.type.system.Token;
 import edu.utah.bmi.nlp.uima.AdaptableUIMACPERunner;
@@ -53,14 +52,10 @@ public class FastNER_AE_GeneralTest {
     @Before
     public void setUp() {
         String typeDescriptor = "desc/type/All_Types";
-        runner = new AdaptableUIMACPERunner(typeDescriptor);
-        for (TypeDefinition typeDefinition : new FastNER("conf/rules.xlsx").getTypeDefinition().values()) {
-            runner.addConceptType(typeDefinition.fullTypeName, typeDefinition.fullSuperTypeName);
-        }
-        for (TypeDefinition typeDefinition : new FastNER("conf/rules_g.tsv").getTypeDefinition().values()) {
-            runner.addConceptType(typeDefinition.fullTypeName, typeDefinition.fullSuperTypeName);
-        }
-        runner.reInitTypeSystem("desc/type/customized");
+        runner = new AdaptableUIMACPERunner(typeDescriptor, "target/generated-test-sources/");
+        runner.addConceptTypes(new FastNER("conf/rules.xlsx", true).getTypeDefinition().values());
+        runner.addConceptTypes(new FastNER("conf/rules_g.xlsx", true).getTypeDefinition().values());
+        runner.reInitTypeSystem("target/generated-test-sources/customized");
         jCas = runner.initJCas();
 //      Set up the parameters
         configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, "conf/rules.xlsx",
@@ -131,7 +126,7 @@ public class FastNER_AE_GeneralTest {
 
         String text = "a fever of 103.8 , tachycardia in the 130s-150s , and initial hypertensive in the 140s .";
         jCas.setDocumentText(text);
-        configurationData[1] = "conf/rules_g.tsv";
+        configurationData[1] = "conf/rules_g.xlsx";
         fastNER_AE = createEngine(FastNER_AE_General.class, configurationData);
 
         simpleParser_AE.process(jCas);

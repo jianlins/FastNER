@@ -22,6 +22,7 @@ import edu.utah.blulab.domainontology.Variable;
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.DeterminantValueSet.Determinants;
 import edu.utah.bmi.nlp.core.Rule;
+import edu.utah.bmi.nlp.core.TypeDefinition;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -33,7 +34,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -187,7 +191,7 @@ public class IOUtil {
     public static boolean[] readCSVFile(String csvFileName, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, CSVFormat csvFormat, boolean caseSensitive, boolean[] ruleSupports) {
         try {
             Iterable<CSVRecord> recordsIterator = CSVParser.parse(new File(csvFileName), StandardCharsets.UTF_8, csvFormat);
-            ruleSupports = readCSV(recordsIterator, rules, typeDefinition, csvFormat, caseSensitive, ruleSupports);
+            ruleSupports = readCSV(recordsIterator, rules, typeDefinition, caseSensitive, ruleSupports);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -208,7 +212,7 @@ public class IOUtil {
     public static boolean[] readCSVString(String csvString, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, CSVFormat csvFormat, boolean caseSensitive, boolean[] ruleSupports) {
         try {
             Iterable<CSVRecord> recordsIterator = CSVParser.parse(csvString, csvFormat);
-            ruleSupports = readCSV(recordsIterator, rules, typeDefinition, csvFormat, caseSensitive, ruleSupports);
+            ruleSupports = readCSV(recordsIterator, rules, typeDefinition, caseSensitive, ruleSupports);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -217,7 +221,8 @@ public class IOUtil {
         return ruleSupports;
     }
 
-    private static boolean[] readCSV(Iterable<CSVRecord> recordsIterator, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, CSVFormat csvFormat, boolean caseSensitive, boolean[] ruleSupports) {
+    private static boolean[] readCSV(Iterable<CSVRecord> recordsIterator, HashMap<Integer, Rule> rules,
+                                     LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive, boolean[] ruleSupports) {
         int id = 0;
         for (CSVRecord record : recordsIterator) {
             ArrayList<String> cells = new ArrayList<>();
@@ -243,14 +248,18 @@ public class IOUtil {
 //          new UIMA type definition with '@typeName superTypeName'
 //                or '@typeName superTypeName   newFeature1    newFeature2  newFeature3...'
                 cells.set(0, cells.get(0).substring(1));
-                typeDefinition.put(cells.get(0), new TypeDefinition(cells));
+                typeDefinition.put(getShortName(cells.get(0)), new TypeDefinition(cells));
             }
             return ruleSupports;
         }
         if (cells.size() > 2) {
-            if (cells.get(2).indexOf(".") == -1)
-                cells.set(2, checkNameSpace(cells.get(2)));
+//            if (cells.get(2).indexOf(".") == -1)
+//                cells.set(2, checkNameSpace(cells.get(2)));
             String rule = cells.get(0);
+            String conceptShortName = getShortName(cells.get(2).trim());
+            if (!typeDefinition.containsKey(conceptShortName)) {
+                typeDefinition.put(conceptShortName, new TypeDefinition(cells.get(2).trim(), DeterminantValueSet.defaultSuperTypeName, new ArrayList<>()));
+            }
             ruleSupports = addRule(rules, typeDefinition, new Rule(id, caseSensitive ? rule : rule.toLowerCase(), cells.get(2).trim(), Double.parseDouble(cells.get(1)), cells.size() > 3 ? Determinants.valueOf(cells.get(3)) : Determinants.ACTUAL), ruleSupports);
         } else
             System.out.println("Definition format error: line " + id + "\t\t" + cells);
@@ -298,9 +307,6 @@ public class IOUtil {
         }
 
         rules.put(rule.id, rule);
-        if (!typeDefinition.containsValue(rule.ruleName)) {
-            typeDefinition.put(rule.ruleName, new TypeDefinition(rule.ruleName, DeterminantValueSet.defaultSuperTypeName, new ArrayList<>()));
-        }
         return ruleSupports;
     }
 
@@ -318,6 +324,14 @@ public class IOUtil {
             return true;
         }
         return false;
+    }
+
+    private static String getShortName(String fullName) {
+        int dot = fullName.lastIndexOf(".");
+        if (dot != -1) {
+            fullName = fullName.substring(dot + 1);
+        }
+        return fullName;
     }
 }
 
