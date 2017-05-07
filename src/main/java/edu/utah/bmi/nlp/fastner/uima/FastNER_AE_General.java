@@ -44,237 +44,240 @@ import java.util.*;
  */
 public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 
-    public static final String PARAM_RULE_FILE_OR_STR = "RuleFileOrString";
-    //    @ConfigurationParameter(name = PARAM_RULE_FILE_OR_STR)
+	public static final String PARAM_RULE_FILE_OR_STR = "RuleFileOrString";
+	//    @ConfigurationParameter(name = PARAM_RULE_FILE_OR_STR)
 //    protected String ruleFileName;
-    public static final String PARAM_SENTENCE_TYPE_NAME = "SentenceTypeName";
-    //    @ConfigurationParameter(name = PARAM_SENTENCE_TYPE_NAME)
+	public static final String PARAM_SENTENCE_TYPE_NAME = "SentenceTypeName";
+	//    @ConfigurationParameter(name = PARAM_SENTENCE_TYPE_NAME)
 //    protected String sentenceTypeName;
-    public static final String PARAM_TOKEN_TYPE_NAME = "TokenTypeName";
+	public static final String PARAM_TOKEN_TYPE_NAME = "TokenTypeName";
 
-    public static final String PARAM_MARK_PSEUDO = "MarkPseudo";
+	public static final String PARAM_MARK_PSEUDO = "MarkPseudo";
 
-    public static final String PARAM_LOG_RULE_INFO = "LogRuleInfo";
+	public static final String PARAM_LOG_RULE_INFO = "LogRuleInfo";
 
-    public static final String PARAM_ENABLE_DEBUG = "EnableDebug";
+	public static final String PARAM_ENABLE_DEBUG = "EnableDebug";
 
-    public static final String PARAM_CASE_SENSITIVE = "CaseSensitive";
+	public static final String PARAM_CASE_SENSITIVE = "CaseSensitive";
 
-    //    @ConfigurationParameter(name = TOKEN_TYPE_NAME)
+	//    @ConfigurationParameter(name = TOKEN_TYPE_NAME)
 //    protected String tokenTypeName;
 //    public static final String PARAM_CONCEPT_TYPE_NAME = "conceptTypeName";
-    //    @ConfigurationParameter(name = CONCEPT_TYPE_NAME)
+	//    @ConfigurationParameter(name = CONCEPT_TYPE_NAME)
 //    protected String conceptTypeName;
 //    @ConfigurationParameter(name = CONCEPT_CATEGORY_FEATURE_NAME)
 //    protected String conceptCategoryFeatureName;
 
-    protected FastNER fastNER;
-    protected int sentenceTypeId = 0, tokenTypeId = 0;
-    //    according to different determinant, save the concept in different annotations
+	protected FastNER fastNER;
+	protected int sentenceTypeId = 0, tokenTypeId = 0;
+	//    according to different determinant, save the concept in different annotations
 //    need to make sure the corresponding types (descriptor and Java classes) are available.
-    protected HashMap<String, Constructor<? extends Annotation>> ConceptTypeClasses = new HashMap<String, Constructor<? extends Annotation>>();
-    protected Class<? extends Annotation> SentenceType, TokenType;
-    protected Constructor<? extends Annotation> SentenceTypeConstructor;
-    protected Constructor<? extends Annotation> TokenTypeConstructor;
-    protected HashMap<String, Class<? extends Concept>> ConceptTypes = new HashMap<>();
-    protected HashMap<String, Constructor<? extends Concept>> ConceptTypeConstructors = new HashMap<>();
-    protected boolean markPseudo = false, logRuleInfo = false;
-    protected boolean debug = false, caseSenstive = true;
+	protected HashMap<String, Constructor<? extends Annotation>> ConceptTypeClasses = new HashMap<String, Constructor<? extends Annotation>>();
+	protected Class<? extends Annotation> SentenceType, TokenType;
+	protected Constructor<? extends Annotation> SentenceTypeConstructor;
+	protected Constructor<? extends Annotation> TokenTypeConstructor;
+	protected HashMap<String, Class<? extends Concept>> ConceptTypes = new HashMap<>();
+	protected HashMap<String, Constructor<? extends Concept>> ConceptTypeConstructors = new HashMap<>();
+	protected boolean markPseudo = false, logRuleInfo = false;
+	protected boolean debug = false, caseSenstive = true;
 
 
-    public void initialize(UimaContext cont) {
+	public void initialize(UimaContext cont) {
 //        try {
 //            super.initialize(cont);
 //        } catch (Exception e) {
 //            System.err.println("super.initialize failed!");
 //        }
-        String ruleStr = "", sentenceTypeName = "", tokenTypeName = "";
-        ruleStr = (String) (cont
-                .getConfigParameterValue(PARAM_RULE_FILE_OR_STR));
-        Object obj;
-        obj = cont.getConfigParameterValue(PARAM_SENTENCE_TYPE_NAME);
-        if (obj == null)
-            sentenceTypeName = "edu.utah.bmi.nlp.type.system.Sentence";
-        else
-            sentenceTypeName = (String) obj;
+		String ruleStr = "", sentenceTypeName = "", tokenTypeName = "";
+		ruleStr = (String) (cont
+				.getConfigParameterValue(PARAM_RULE_FILE_OR_STR));
+		Object obj;
+		obj = cont.getConfigParameterValue(PARAM_SENTENCE_TYPE_NAME);
+		if (obj == null)
+			sentenceTypeName = "edu.utah.bmi.nlp.type.system.Sentence";
+		else
+			sentenceTypeName = (String) obj;
 
-        obj = cont.getConfigParameterValue(PARAM_TOKEN_TYPE_NAME);
-        if (obj == null)
-            tokenTypeName = "edu.utah.bmi.nlp.type.system.Token";
-        else
-            tokenTypeName = (String) obj;
+		obj = cont.getConfigParameterValue(PARAM_TOKEN_TYPE_NAME);
+		if (obj == null)
+			tokenTypeName = "edu.utah.bmi.nlp.type.system.Token";
+		else
+			tokenTypeName = (String) obj;
 
-        obj = cont.getConfigParameterValue(PARAM_MARK_PSEUDO);
-        if (obj != null && obj instanceof Boolean && (Boolean) obj != false)
-            markPseudo = true;
-        obj = cont.getConfigParameterValue(PARAM_LOG_RULE_INFO);
-        if (obj != null && obj instanceof Boolean && (Boolean) obj != false)
-            logRuleInfo = true;
+		obj = cont.getConfigParameterValue(PARAM_MARK_PSEUDO);
+		if (obj != null && obj instanceof Boolean && (Boolean) obj != false)
+			markPseudo = true;
+		obj = cont.getConfigParameterValue(PARAM_LOG_RULE_INFO);
+		if (obj != null && obj instanceof Boolean && (Boolean) obj != false)
+			logRuleInfo = true;
 
-        obj = cont.getConfigParameterValue(PARAM_ENABLE_DEBUG);
-        if (obj != null && obj instanceof Boolean && (Boolean) obj != false)
-            debug = true;
+		obj = cont.getConfigParameterValue(PARAM_ENABLE_DEBUG);
+		if (obj != null && obj instanceof Boolean && (Boolean) obj != false)
+			debug = true;
 
-        obj = cont.getConfigParameterValue(PARAM_CASE_SENSITIVE);
-        if (obj != null && obj instanceof Boolean && (Boolean) obj != true)
-            caseSenstive = false;
+		obj = cont.getConfigParameterValue(PARAM_CASE_SENSITIVE);
+		if (obj != null && obj instanceof Boolean && (Boolean) obj != true)
+			caseSenstive = false;
 
-        try {
-            SentenceType = Class.forName(sentenceTypeName).asSubclass(Annotation.class);
-            TokenType = Class.forName(tokenTypeName).asSubclass(Annotation.class);
-            TokenTypeConstructor = TokenType.getConstructor(new Class[]{JCas.class, int.class, int.class});
-            SentenceTypeConstructor = SentenceType.getConstructor(new Class[]{JCas.class, int.class, int.class});
+		try {
+			SentenceType = Class.forName(sentenceTypeName).asSubclass(Annotation.class);
+			TokenType = Class.forName(tokenTypeName).asSubclass(Annotation.class);
+			TokenTypeConstructor = TokenType.getConstructor(new Class[]{JCas.class, int.class, int.class});
+			SentenceTypeConstructor = SentenceType.getConstructor(new Class[]{JCas.class, int.class, int.class});
 
-            LinkedHashMap<String, TypeDefinition> conceptNames = initFastNER(cont, ruleStr);
-            for (Map.Entry<String, TypeDefinition> conceptTypeSuperTypePair : conceptNames.entrySet()) {
-                String fullTypeName = conceptTypeSuperTypePair.getValue().fullTypeName;
-                Class conceptTypeClass = Class.forName(fullTypeName).asSubclass(Class.forName(conceptTypeSuperTypePair.getValue().getFullSuperTypeName()));
-                ConceptTypes.put(conceptTypeSuperTypePair.getKey(), conceptTypeClass);
-                ConceptTypeConstructors.put(conceptTypeSuperTypePair.getKey(), ConceptTypes.get(conceptTypeSuperTypePair.getKey()).getConstructor(new Class[]{JCas.class, int.class, int.class}));
-            }
-        } catch (ClassNotFoundException e) {
-            System.err.println("You need to run this AE through AdaptableUIMACPERunner, " +
-                    "which can automatically generate unknown Type classes and type descriptors.\n" +
-                    "@see nlp-core project: edu.utah.bmi.uima.AdaptableUIMACPERunner");
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        sentenceTypeId = AnnotationOper.getTypeId(SentenceType);
-        tokenTypeId = AnnotationOper.getTypeId(TokenType);
-    }
+			LinkedHashMap<String, TypeDefinition> conceptNames = initFastNER(cont, ruleStr);
+			for (Map.Entry<String, TypeDefinition> conceptTypeSuperTypePair : conceptNames.entrySet()) {
+				String fullTypeName = conceptTypeSuperTypePair.getValue().fullTypeName;
+				Class conceptTypeClass = Class.forName(fullTypeName).asSubclass(Class.forName(conceptTypeSuperTypePair.getValue().getFullSuperTypeName()));
+				ConceptTypes.put(conceptTypeSuperTypePair.getKey(), conceptTypeClass);
+				ConceptTypeConstructors.put(conceptTypeSuperTypePair.getKey(), ConceptTypes.get(conceptTypeSuperTypePair.getKey()).getConstructor(new Class[]{JCas.class, int.class, int.class}));
+			}
+		} catch (ClassNotFoundException e) {
+			System.err.println("You need to run this AE through AdaptableUIMACPERunner, " +
+					"which can automatically generate unknown Type classes and type descriptors.\n" +
+					"@see nlp-core project: edu.utah.bmi.uima.AdaptableUIMACPERunner");
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		}
+		sentenceTypeId = AnnotationOper.getTypeId(SentenceType);
+		tokenTypeId = AnnotationOper.getTypeId(TokenType);
+	}
 
-    protected LinkedHashMap<String, TypeDefinition> initFastNER(UimaContext cont, String ruleStr) {
-        fastNER = new FastNER(ruleStr, caseSenstive);
-        return fastNER.getTypeDefinition();
-    }
+	protected LinkedHashMap<String, TypeDefinition> initFastNER(UimaContext cont, String ruleStr) {
+		fastNER = new FastNER(ruleStr, caseSenstive);
+		return fastNER.getTypeDefinitions();
+	}
 
 
-    @Override
-    public void process(JCas jcas) throws AnalysisEngineProcessException {
-        ArrayList<Annotation> sentences = new ArrayList<Annotation>();
-        ArrayList<Annotation> tokens = new ArrayList<Annotation>();
-        FSIndex annoIndex = jcas.getAnnotationIndex(sentenceTypeId);
-        Iterator annoIter = annoIndex.iterator();
+	@Override
+	public void process(JCas jcas) throws AnalysisEngineProcessException {
+		ArrayList<Annotation> sentences = new ArrayList<Annotation>();
+		ArrayList<Annotation> tokens = new ArrayList<Annotation>();
+		FSIndex annoIndex = jcas.getAnnotationIndex(sentenceTypeId);
+		Iterator annoIter = annoIndex.iterator();
 
-        while (annoIter.hasNext()) {
-            sentences.add((Annotation) annoIter.next());
-        }
+		while (annoIter.hasNext()) {
+			sentences.add((Annotation) annoIter.next());
+		}
 
-        // get token annotations
-        annoIndex = jcas.getAnnotationIndex(tokenTypeId);
-        annoIter = annoIndex.iterator();
-        while (annoIter.hasNext()) {
-            tokens.add((Annotation) annoIter.next());
-        }
+		// get token annotations
+		annoIndex = jcas.getAnnotationIndex(tokenTypeId);
+		annoIter = annoIndex.iterator();
+		while (annoIter.hasNext()) {
+			tokens.add((Annotation) annoIter.next());
+		}
 
-        if (sentences.size() > 0) {
-            // make sure all the annotations are in ascending order regarding span offset
-            Collections.sort(sentences, new AnnotationComparator());
-            Collections.sort(tokens, new AnnotationComparator());
+		if (sentences.size() > 0) {
+			// make sure all the annotations are in ascending order regarding span offset
+			Collections.sort(sentences, new AnnotationComparator());
+			Collections.sort(tokens, new AnnotationComparator());
 
 //     Construct annotation_id-annotation_id map, easier and faster to find related annotations.
-            TreeMap<Integer, TreeSet<Integer>> sentence2TokenMap = new TreeMap<Integer, TreeSet<Integer>>();
-            AnnotationOper.buildAnnoMap(sentences, tokens, sentence2TokenMap);
+			TreeMap<Integer, TreeSet<Integer>> sentence2TokenMap = new TreeMap<Integer, TreeSet<Integer>>();
+			AnnotationOper.buildAnnoMap(sentences, tokens, sentence2TokenMap);
 
 //        process each sentence that has at least one concept inside
-            for (Map.Entry<Integer, TreeSet<Integer>> sentence : sentence2TokenMap.entrySet()) {
-                int sentenceId = sentence.getKey();
-                TreeSet<Integer> sentenceTokenIds = sentence2TokenMap.get(sentenceId);
-                ArrayList<Annotation> tokensInThisSentence = new ArrayList<Annotation>();
-                for (int tokenId : sentenceTokenIds) {
-                    tokensInThisSentence.add(tokens.get(tokenId));
-                }
-                HashMap<String, ArrayList<Span>> concepts = fastNER.processAnnotationList(tokensInThisSentence);
+			for (Map.Entry<Integer, TreeSet<Integer>> sentence : sentence2TokenMap.entrySet()) {
+				int sentenceId = sentence.getKey();
+				TreeSet<Integer> sentenceTokenIds = sentence2TokenMap.get(sentenceId);
+				ArrayList<Annotation> tokensInThisSentence = new ArrayList<Annotation>();
+				for (int tokenId : sentenceTokenIds) {
+					tokensInThisSentence.add(tokens.get(tokenId));
+				}
+				HashMap<String, ArrayList<Span>> concepts = fastNER.processAnnotationList(tokensInThisSentence);
 //              store found concepts in annotation
-                if (concepts.size() > 0) {
-                    saveConcepts(jcas, concepts);
-                }
-            }
-        } else {
-            System.out.println("This document has not been sentence segmented. Use simple segmenter instead.");
-            String text = jcas.getDocumentText();
-            ArrayList<ArrayList<Span>> simpleSentences = SimpleParser.tokenizeDecimalSmartWSentences(text, true);
-            for (ArrayList<Span> sentence : simpleSentences) {
-                saveAnnotation(jcas, SentenceTypeConstructor, sentence.get(0).begin, sentence.get(sentence.size() - 1).end);
+				if (concepts.size() > 0) {
+					saveConcepts(jcas, concepts);
+				}
+			}
+		} else {
+			System.out.println("This document has not been sentence segmented. Use simple segmenter instead.");
+			String text = jcas.getDocumentText();
+			ArrayList<ArrayList<Span>> simpleSentences = SimpleParser.tokenizeDecimalSmartWSentences(text, true);
+			for (ArrayList<Span> sentence : simpleSentences) {
+				saveAnnotation(jcas, SentenceTypeConstructor, sentence.get(0).begin, sentence.get(sentence.size() - 1).end);
 //            System.out.println("Sentence: " + sentence.get(0).begin + "-" + sentence.get(sentence.size() - 1).end);
-                for (Span token : sentence) {
-                    saveAnnotation(jcas, TokenTypeConstructor, token.begin, token.end);
-                }
+				for (Span token : sentence) {
+					saveAnnotation(jcas, TokenTypeConstructor, token.begin, token.end);
+				}
 
-                HashMap<String, ArrayList<Span>> concepts = fastNER.processSpanList(sentence);
+				HashMap<String, ArrayList<Span>> concepts = fastNER.processSpanList(sentence);
 //              store found concepts in annotation
-                if (concepts.size() > 0) {
-                    saveConcepts(jcas, concepts);
-                }
-            }
-        }
-    }
+				if (concepts.size() > 0) {
+					saveConcepts(jcas, concepts);
+				}
+			}
+		}
+	}
 
 
-
-    protected void saveConcepts(JCas jcas, HashMap<String, ArrayList<Span>> concepts) {
-        for (Map.Entry<String, ArrayList<Span>> entry : concepts.entrySet()) {
-            for (Span span : entry.getValue()) {
+	protected void saveConcepts(JCas jcas, HashMap<String, ArrayList<Span>> concepts) {
+		for (Map.Entry<String, ArrayList<Span>> entry : concepts.entrySet()) {
+			for (Span span : entry.getValue()) {
 //                System.out.println(getSpanType(span));
-                String conceptTypeName = entry.getKey();
-                if (logRuleInfo) {
-                    String ruleInfor = getRuleInfo(span);
-                    if (getSpanType(span) == Determinants.ACTUAL) {
-                        saveAnnotation(jcas, ConceptTypeConstructors.get(conceptTypeName), span.begin, span.end, ruleInfor);
-                    } else if (markPseudo) {
-                        savePseudoConcept(jcas, span, ruleInfor);
-                    }
+				String conceptTypeName = entry.getKey();
+				if (logRuleInfo) {
+					String ruleInfor = getRuleInfo(span);
+					if (getSpanType(span) == Determinants.ACTUAL) {
+						saveAnnotation(jcas, ConceptTypeConstructors.get(conceptTypeName), span.begin, span.end, ruleInfor);
+					} else if (markPseudo) {
+						savePseudoConcept(jcas, span, ruleInfor);
+					}
 
-                } else {
-                    if (getSpanType(span) == Determinants.ACTUAL) {
-                        saveAnnotation(jcas, ConceptTypeConstructors.get(conceptTypeName), span.begin, span.end);
-                    } else if (markPseudo) {
-                        savePseudoConcept(jcas, span);
-                    }
-                }
-            }
-        }
-    }
+				} else {
+					if (getSpanType(span) == Determinants.ACTUAL) {
+						saveAnnotation(jcas, ConceptTypeConstructors.get(conceptTypeName), span.begin, span.end);
+					} else if (markPseudo) {
+						savePseudoConcept(jcas, span);
+					}
+				}
+			}
+		}
+	}
 
-    protected void savePseudoConcept(JCas jcas, Span span, String... rule) {
-        PseudoConcept concept = new PseudoConcept(jcas, span.begin, span.end);
-        concept.setCategory(getMatchedNEName(span));
-        if (rule.length > 0)
-            concept.setNote(rule[0]);
-        concept.addToIndexes();
-    }
+	protected void savePseudoConcept(JCas jcas, Span span, String... rule) {
+		PseudoConcept concept = new PseudoConcept(jcas, span.begin, span.end);
+		concept.setCategory(getMatchedNEName(span));
+		if (rule.length > 0)
+			concept.setNote(rule[0]);
+		concept.addToIndexes();
+	}
 
-    protected String getMatchedNEName(Span span) {
-        return fastNER.getMatchedNEName(span);
-    }
+	protected String getMatchedNEName(Span span) {
+		return fastNER.getMatchedNEName(span);
+	}
 
-    protected Determinants getSpanType(Span span) {
-        return fastNER.getMatchedNEType(span);
-    }
+	protected Determinants getSpanType(Span span) {
+		return fastNER.getMatchedNEType(span);
+	}
 
-    protected String getRuleInfo(Span span) {
-        return span.ruleId + ":\t" + fastNER.getMatchedRuleString(span).rule;
-    }
+	protected String getRuleInfo(Span span) {
+		return span.ruleId + ":\t" + fastNER.getMatchedRuleString(span).rule;
+	}
 
-    protected void saveAnnotation(JCas jcas, Constructor<? extends Annotation> annoConstructor, int begin, int end, String... rule) {
-        Annotation anno = null;
-        try {
-            anno = annoConstructor.newInstance(jcas, begin, end);
-            if (rule.length > 0 && anno instanceof ConceptBASE) {
+	protected void saveAnnotation(JCas jcas, Constructor<? extends Annotation> annoConstructor, int begin, int end, String... rule) {
+		Annotation anno = null;
+		try {
+			anno = annoConstructor.newInstance(jcas, begin, end);
+			if (rule.length > 0 && anno instanceof ConceptBASE) {
 //                Method method = ConceptBASE.class.getMethod("setComments")
 //                for (Method method : ConceptBASE.class.getMethods()) {
 //                    System.out.println(method.getName());
 //                }
-                ((ConceptBASE) anno).setNote(rule[0]);
-            }
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        anno.addToIndexes();
-    }
+				((ConceptBASE) anno).setNote(rule[0]);
+			}
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		anno.addToIndexes();
+	}
+
+	public static LinkedHashMap<String, TypeDefinition> getTypeDefinitions(String ruleFile, boolean caseSenstive) {
+		return new FastNER(ruleFile, caseSenstive, false).getTypeDefinitions();
+	}
 }

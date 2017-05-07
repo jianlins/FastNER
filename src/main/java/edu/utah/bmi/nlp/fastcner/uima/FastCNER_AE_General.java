@@ -72,7 +72,7 @@ public class FastCNER_AE_General extends FastNER_AE_General {
         if (debug) {
             fastNER.setDebug(true);
         }
-        return fastNER.getTypeDefinition();
+        return fastNER.getTypeDefinitions();
     }
 
     public void process(JCas jcas) throws AnalysisEngineProcessException {

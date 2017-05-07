@@ -105,7 +105,7 @@ public class FastNER {
         return fastRule.ruleStore.get(ruleId).type;
     }
 
-    public LinkedHashMap<String, TypeDefinition> getTypeDefinition() {
+    public LinkedHashMap<String, TypeDefinition> getTypeDefinitions() {
         return typeDefinition;
     }
 
