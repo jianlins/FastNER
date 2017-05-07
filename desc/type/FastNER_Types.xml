@@ -65,6 +65,11 @@
                     <rangeTypeName>uima.cas.String</rangeTypeName>
                 </featureDescription>
                 <featureDescription>
+                    <name>Certainty</name>
+                    <description/>
+                    <rangeTypeName>uima.cas.String</rangeTypeName>
+                </featureDescription>
+                <featureDescription>
                     <name>Temporality</name>
                     <description/>
                     <rangeTypeName>uima.cas.String</rangeTypeName>
