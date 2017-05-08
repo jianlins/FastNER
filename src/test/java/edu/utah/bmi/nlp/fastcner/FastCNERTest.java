@@ -459,4 +459,6 @@ public class FastCNERTest extends TestCase {
 		}
 		return true;
 	}
+
+
 }
