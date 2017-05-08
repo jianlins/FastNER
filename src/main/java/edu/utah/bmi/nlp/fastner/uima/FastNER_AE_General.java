@@ -15,10 +15,8 @@
  */
 package edu.utah.bmi.nlp.fastner.uima;
 
+import edu.utah.bmi.nlp.core.*;
 import edu.utah.bmi.nlp.core.DeterminantValueSet.Determinants;
-import edu.utah.bmi.nlp.core.SimpleParser;
-import edu.utah.bmi.nlp.core.Span;
-import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.fastner.FastNER;
 import edu.utah.bmi.nlp.type.system.Concept;
 import edu.utah.bmi.nlp.type.system.ConceptBASE;
@@ -29,6 +27,8 @@ import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.FSIndex;
+import org.apache.uima.examples.SourceDocumentInformation;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
@@ -43,6 +43,10 @@ import java.util.*;
  * @author Jianlin Shi
  */
 public class FastNER_AE_General extends JCasAnnotator_ImplBase {
+
+	//	a list of section names (can use short name if name space is "edu.utah.bmi.nlp.type.system."),
+// separated by "|", ",", or ";".
+	public static final String PARAM_INCLUDE_SECTIONS = "IncludeSections";
 
 	public static final String PARAM_RULE_FILE_OR_STR = "RuleFileOrString";
 	//    @ConfigurationParameter(name = PARAM_RULE_FILE_OR_STR)
@@ -69,10 +73,10 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 //    protected String conceptCategoryFeatureName;
 
 	protected FastNER fastNER;
-	protected int sentenceTypeId = 0, tokenTypeId = 0;
 	//    according to different determinant, save the concept in different annotations
 //    need to make sure the corresponding types (descriptor and Java classes) are available.
 	protected HashMap<String, Constructor<? extends Annotation>> ConceptTypeClasses = new HashMap<String, Constructor<? extends Annotation>>();
+	protected HashSet<Class> includeSections = new HashSet<>();
 	protected Class<? extends Annotation> SentenceType, TokenType;
 	protected Constructor<? extends Annotation> SentenceTypeConstructor;
 	protected Constructor<? extends Annotation> TokenTypeConstructor;
@@ -83,12 +87,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 
 
 	public void initialize(UimaContext cont) {
-//        try {
-//            super.initialize(cont);
-//        } catch (Exception e) {
-//            System.err.println("super.initialize failed!");
-//        }
-		String ruleStr = "", sentenceTypeName = "", tokenTypeName = "";
+		String ruleStr, sentenceTypeName, tokenTypeName;
 		ruleStr = (String) (cont
 				.getConfigParameterValue(PARAM_RULE_FILE_OR_STR));
 		Object obj;
@@ -103,6 +102,19 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 			tokenTypeName = "edu.utah.bmi.nlp.type.system.Token";
 		else
 			tokenTypeName = (String) obj;
+
+
+		obj = cont.getConfigParameterValue(PARAM_INCLUDE_SECTIONS);
+		if (obj == null)
+			includeSections.add(AnnotationOper.getTypeClass("org.apache.uima.examples.SourceDocumentInformation"));
+		else {
+			for (String sectionName : ((String) obj).split("[\\|,;]")) {
+				sectionName = sentenceTypeName.trim();
+				if (sectionName.length() > 0) {
+					includeSections.add(AnnotationOper.getTypeClass(DeterminantValueSet.checkNameSpace(sectionName)));
+				}
+			}
+		}
 
 		obj = cont.getConfigParameterValue(PARAM_MARK_PSEUDO);
 		if (obj != null && obj instanceof Boolean && (Boolean) obj != false)
@@ -140,8 +152,6 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 		}
-		sentenceTypeId = AnnotationOper.getTypeId(SentenceType);
-		tokenTypeId = AnnotationOper.getTypeId(TokenType);
 	}
 
 	protected LinkedHashMap<String, TypeDefinition> initFastNER(UimaContext cont, String ruleStr) {
@@ -150,69 +160,93 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 	}
 
 
-	@Override
 	public void process(JCas jcas) throws AnalysisEngineProcessException {
-		ArrayList<Annotation> sentences = new ArrayList<Annotation>();
-		ArrayList<Annotation> tokens = new ArrayList<Annotation>();
-		FSIndex annoIndex = jcas.getAnnotationIndex(sentenceTypeId);
+		IntervalST<String> sectionTree = indexInclusionSections(jcas);
+		LinkedHashMap<String, ArrayList<Annotation>> sentences = new LinkedHashMap<>();
+		ArrayList<Annotation> tokens = new ArrayList<>();
+		FSIndex annoIndex = jcas.getAnnotationIndex(SentenceType);
 		Iterator annoIter = annoIndex.iterator();
-
 		while (annoIter.hasNext()) {
-			sentences.add((Annotation) annoIter.next());
+			Annotation sentence = (Annotation) annoIter.next();
+			String sectionName = sectionTree.get(new Interval1D(sentence.getBegin(), sentence.getEnd()));
+			if (sectionName != null) {
+				if (!sentences.containsKey(sectionName))
+					sentences.put(sectionName, new ArrayList<>());
+				sentences.get(sectionName).add(sentence);
+			}
 		}
 
 		// get token annotations
-		annoIndex = jcas.getAnnotationIndex(tokenTypeId);
+		annoIndex = jcas.getAnnotationIndex(TokenType);
 		annoIter = annoIndex.iterator();
 		while (annoIter.hasNext()) {
 			tokens.add((Annotation) annoIter.next());
 		}
 
 		if (sentences.size() > 0) {
-			// make sure all the annotations are in ascending order regarding span offset
-			Collections.sort(sentences, new AnnotationComparator());
-			Collections.sort(tokens, new AnnotationComparator());
+			for (String sectionName : sentences.keySet()) {
+				// make sure all the annotations are in ascending order regarding span offset
+				Collections.sort(sentences.get(sectionName), new AnnotationComparator());
+				Collections.sort(tokens, new AnnotationComparator());
 
 //     Construct annotation_id-annotation_id map, easier and faster to find related annotations.
-			TreeMap<Integer, TreeSet<Integer>> sentence2TokenMap = new TreeMap<Integer, TreeSet<Integer>>();
-			AnnotationOper.buildAnnoMap(sentences, tokens, sentence2TokenMap);
+				TreeMap<Integer, TreeSet<Integer>> sentence2TokenMap = new TreeMap<Integer, TreeSet<Integer>>();
+				AnnotationOper.buildAnnoMap(sentences.get(sectionName), tokens, sentence2TokenMap);
 
 //        process each sentence that has at least one concept inside
-			for (Map.Entry<Integer, TreeSet<Integer>> sentence : sentence2TokenMap.entrySet()) {
-				int sentenceId = sentence.getKey();
-				TreeSet<Integer> sentenceTokenIds = sentence2TokenMap.get(sentenceId);
-				ArrayList<Annotation> tokensInThisSentence = new ArrayList<Annotation>();
-				for (int tokenId : sentenceTokenIds) {
-					tokensInThisSentence.add(tokens.get(tokenId));
-				}
-				HashMap<String, ArrayList<Span>> concepts = fastNER.processAnnotationList(tokensInThisSentence);
+				for (Map.Entry<Integer, TreeSet<Integer>> sentence : sentence2TokenMap.entrySet()) {
+					int sentenceId = sentence.getKey();
+					TreeSet<Integer> sentenceTokenIds = sentence2TokenMap.get(sentenceId);
+					ArrayList<Annotation> tokensInThisSentence = new ArrayList<Annotation>();
+					for (int tokenId : sentenceTokenIds) {
+						tokensInThisSentence.add(tokens.get(tokenId));
+					}
+					HashMap<String, ArrayList<Span>> concepts = fastNER.processAnnotationList(tokensInThisSentence);
 //              store found concepts in annotation
-				if (concepts.size() > 0) {
-					saveConcepts(jcas, concepts);
+					if (concepts.size() > 0) {
+						saveConcepts(jcas, concepts, sectionName);
+					}
 				}
 			}
 		} else {
-			System.out.println("This document has not been sentence segmented. Use simple segmenter instead.");
+
+			Collection<SourceDocumentInformation> docAnnotation = JCasUtil.select(jcas, SourceDocumentInformation.class);
+			if (docAnnotation != null && docAnnotation.size() > 0)
+				System.out.println("Document: " + docAnnotation.iterator().next().getUri() + " has not been properly sentence segmented. Use simple segmenter instead.");
+
 			String text = jcas.getDocumentText();
 			ArrayList<ArrayList<Span>> simpleSentences = SimpleParser.tokenizeDecimalSmartWSentences(text, true);
 			for (ArrayList<Span> sentence : simpleSentences) {
-				saveAnnotation(jcas, SentenceTypeConstructor, sentence.get(0).begin, sentence.get(sentence.size() - 1).end);
+				saveAnnotation(jcas, SentenceTypeConstructor, sentence.get(0).begin, sentence.get(sentence.size() - 1).end, null);
 //            System.out.println("Sentence: " + sentence.get(0).begin + "-" + sentence.get(sentence.size() - 1).end);
 				for (Span token : sentence) {
-					saveAnnotation(jcas, TokenTypeConstructor, token.begin, token.end);
+					saveAnnotation(jcas, TokenTypeConstructor, token.begin, token.end, null);
 				}
 
 				HashMap<String, ArrayList<Span>> concepts = fastNER.processSpanList(sentence);
 //              store found concepts in annotation
 				if (concepts.size() > 0) {
-					saveConcepts(jcas, concepts);
+					saveConcepts(jcas, concepts, null);
 				}
 			}
 		}
 	}
 
+	protected IntervalST<String> indexInclusionSections(JCas jCas) {
+		IntervalST<String> sectionTree = new IntervalST<>();
+		for (Class sectionClass : includeSections) {
+			FSIndex annoIndex = jCas.getAnnotationIndex(SentenceType);
+			Iterator annoIter = annoIndex.iterator();
+			while (annoIter.hasNext()) {
+				Annotation section = (Annotation) annoIter.next();
+				sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), section.getType().getShortName());
+			}
+		}
+		return sectionTree;
+	}
 
-	protected void saveConcepts(JCas jcas, HashMap<String, ArrayList<Span>> concepts) {
+
+	protected void saveConcepts(JCas jcas, HashMap<String, ArrayList<Span>> concepts, String sectionName) {
 		for (Map.Entry<String, ArrayList<Span>> entry : concepts.entrySet()) {
 			for (Span span : entry.getValue()) {
 //                System.out.println(getSpanType(span));
@@ -220,14 +254,14 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 				if (logRuleInfo) {
 					String ruleInfor = getRuleInfo(span);
 					if (getSpanType(span) == Determinants.ACTUAL) {
-						saveAnnotation(jcas, ConceptTypeConstructors.get(conceptTypeName), span.begin, span.end, ruleInfor);
+						saveAnnotation(jcas, ConceptTypeConstructors.get(conceptTypeName), span.begin, span.end, sectionName, ruleInfor);
 					} else if (markPseudo) {
 						savePseudoConcept(jcas, span, ruleInfor);
 					}
 
 				} else {
 					if (getSpanType(span) == Determinants.ACTUAL) {
-						saveAnnotation(jcas, ConceptTypeConstructors.get(conceptTypeName), span.begin, span.end);
+						saveAnnotation(jcas, ConceptTypeConstructors.get(conceptTypeName), span.begin, span.end, sectionName);
 					} else if (markPseudo) {
 						savePseudoConcept(jcas, span);
 					}
@@ -256,16 +290,16 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 		return span.ruleId + ":\t" + fastNER.getMatchedRuleString(span).rule;
 	}
 
-	protected void saveAnnotation(JCas jcas, Constructor<? extends Annotation> annoConstructor, int begin, int end, String... rule) {
+	protected void saveAnnotation(JCas jcas, Constructor<? extends Annotation> annoConstructor, int begin, int end, String sectionName, String... rule) {
 		Annotation anno = null;
 		try {
 			anno = annoConstructor.newInstance(jcas, begin, end);
-			if (rule.length > 0 && anno instanceof ConceptBASE) {
-//                Method method = ConceptBASE.class.getMethod("setComments")
-//                for (Method method : ConceptBASE.class.getMethods()) {
-//                    System.out.println(method.getName());
-//                }
-				((ConceptBASE) anno).setNote(rule[0]);
+			if (anno instanceof ConceptBASE) {
+				if (sectionName != null)
+					((ConceptBASE) anno).setSection(sectionName);
+				if (rule.length > 0) {
+					((ConceptBASE) anno).setNote(rule[0]);
+				}
 			}
 		} catch (InstantiationException e) {
 			e.printStackTrace();

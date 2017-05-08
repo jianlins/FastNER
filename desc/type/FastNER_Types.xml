@@ -60,6 +60,11 @@
                     <rangeTypeName>uima.cas.String</rangeTypeName>
                 </featureDescription>
                 <featureDescription>
+                    <name>Section</name>
+                    <description/>
+                    <rangeTypeName>uima.cas.String</rangeTypeName>
+                </featureDescription>
+                <featureDescription>
                     <name>Negation</name>
                     <description/>
                     <rangeTypeName>uima.cas.String</rangeTypeName>

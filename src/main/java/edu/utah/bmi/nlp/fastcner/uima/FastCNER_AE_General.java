@@ -15,21 +15,18 @@
  */
 package edu.utah.bmi.nlp.fastcner.uima;
 
-import edu.utah.bmi.nlp.core.SimpleParser;
-import edu.utah.bmi.nlp.core.Span;
-import edu.utah.bmi.nlp.core.TypeDefinition;
+import edu.utah.bmi.nlp.core.*;
 import edu.utah.bmi.nlp.fastcner.FastCNER;
 import edu.utah.bmi.nlp.fastner.uima.FastNER_AE_General;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.FSIndex;
+import org.apache.uima.examples.SourceDocumentInformation;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 
 /**
@@ -40,72 +37,87 @@ import java.util.LinkedHashMap;
 public class FastCNER_AE_General extends FastNER_AE_General {
 
 
-    public static final String PARAM_REPLICATION_SUPPORT = "ReplicationSupport";
-    protected boolean replicationSupport;
+	public static final String PARAM_REPLICATION_SUPPORT = "ReplicationSupport";
+	protected boolean replicationSupport;
 
-    public static final String PARAM_MAXREPEATLENGTH = "MaxRepeatLength";
-
-
-    protected int maxRepeatLength;
+	public static final String PARAM_MAXREPEATLENGTH = "MaxRepeatLength";
 
 
-    public void initialize(UimaContext cont) {
-        super.initialize(cont);
-    }
+	protected int maxRepeatLength;
 
-    protected LinkedHashMap<String, TypeDefinition> initFastNER(UimaContext cont, String ruleStr) {
-        Object obj;
 
-        obj = cont.getConfigParameterValue(PARAM_REPLICATION_SUPPORT);
-        if (obj == null)
-            replicationSupport = true;
-        else
-            replicationSupport = (Boolean) obj;
-        obj = cont.getConfigParameterValue(PARAM_MAXREPEATLENGTH);
-        if (obj == null)
-            maxRepeatLength = 50;
-        else
-            maxRepeatLength = (int) obj;
-        fastNER = new FastCNER(ruleStr);
-        ((FastCNER) fastNER).setReplicationSupport(replicationSupport);
-        ((FastCNER) fastNER).setMaxRepeatLength(maxRepeatLength);
-        if (debug) {
-            fastNER.setDebug(true);
-        }
-        return fastNER.getTypeDefinitions();
-    }
+	public void initialize(UimaContext cont) {
+		super.initialize(cont);
+	}
 
-    public void process(JCas jcas) throws AnalysisEngineProcessException {
-        ArrayList<Annotation> sentences = new ArrayList<>();
-        FSIndex annoIndex = jcas.getAnnotationIndex(sentenceTypeId);
-        Iterator annoIter = annoIndex.iterator();
+	protected LinkedHashMap<String, TypeDefinition> initFastNER(UimaContext cont, String ruleStr) {
+		Object obj;
 
-        while (annoIter.hasNext()) {
-            sentences.add((Annotation) annoIter.next());
-        }
-        if (sentences.size() > 0) {
-            for (Annotation sentence : sentences) {
-                HashMap<String, ArrayList<Span>> concepts = ((FastCNER) fastNER).processAnnotation(sentence);
+		obj = cont.getConfigParameterValue(PARAM_REPLICATION_SUPPORT);
+		if (obj == null)
+			replicationSupport = true;
+		else
+			replicationSupport = (Boolean) obj;
+		obj = cont.getConfigParameterValue(PARAM_MAXREPEATLENGTH);
+		if (obj == null)
+			maxRepeatLength = 50;
+		else
+			maxRepeatLength = (int) obj;
+		fastNER = new FastCNER(ruleStr);
+		((FastCNER) fastNER).setReplicationSupport(replicationSupport);
+		((FastCNER) fastNER).setMaxRepeatLength(maxRepeatLength);
+		if (debug) {
+			fastNER.setDebug(true);
+		}
+		return fastNER.getTypeDefinitions();
+	}
+
+	public void process(JCas jcas) throws AnalysisEngineProcessException {
+		IntervalST<String> sectionTree = indexInclusionSections(jcas);
+
+		LinkedHashMap<String, ArrayList<Annotation>> sentences = new LinkedHashMap<>();
+		FSIndex annoIndex = jcas.getAnnotationIndex(SentenceType);
+		Iterator annoIter = annoIndex.iterator();
+		while (annoIter.hasNext()) {
+			Annotation sentence = (Annotation) annoIter.next();
+			String sectionName = sectionTree.get(new Interval1D(sentence.getBegin(), sentence.getEnd()));
+			if (sectionName != null) {
+				if (!sentences.containsKey(sectionName))
+					sentences.put(sectionName, new ArrayList<>());
+				sentences.get(sectionName).add(sentence);
+			}
+		}
+		if (sentences.size() > 0) {
+			for (String sectionName : sentences.keySet()) {
+				for (Annotation sentence : sentences.get(sectionName)) {
+					HashMap<String, ArrayList<Span>> concepts = ((FastCNER) fastNER).processAnnotation(sentence);
 //              store found concepts in annotation
-                if (concepts.size() > 0) {
-                    saveConcepts(jcas, concepts);
-                }
-            }
-        } else {
-            System.out.println("This document has not been sentence segmented. Use simple segmenter instead.");
-            String text = jcas.getDocumentText();
-            ArrayList<ArrayList<Span>> simpleSentences = SimpleParser.tokenizeDecimalSmartWSentences(text, true);
-            for (ArrayList<Span> sentence : simpleSentences) {
-                Span sentenceSpan = new Span(sentence.get(0).begin, sentence.get(sentence.size() - 1).end);
-                sentenceSpan.text = text.substring(sentenceSpan.begin, sentenceSpan.end);
-                saveAnnotation(jcas, SentenceTypeConstructor, sentenceSpan.begin, sentenceSpan.end);
-                HashMap<String, ArrayList<Span>> concepts = ((FastCNER) fastNER).processSpan(sentenceSpan);
+					if (concepts.size() > 0) {
+						saveConcepts(jcas, concepts, sectionName);
+					}
+				}
+			}
+		} else {
+			Collection<SourceDocumentInformation> docAnnotation = JCasUtil.select(jcas, SourceDocumentInformation.class);
+			if (docAnnotation != null && docAnnotation.size() > 0)
+				System.out.println("Document: " + docAnnotation.iterator().next().getUri() + " has not been properly sentence segmented. Use simple segmenter instead.");
+
+			String text = jcas.getDocumentText();
+			ArrayList<ArrayList<Span>> simpleSentences = SimpleParser.tokenizeDecimalSmartWSentences(text, true);
+			for (ArrayList<Span> sentence : simpleSentences) {
+				Span sentenceSpan = new Span(sentence.get(0).begin, sentence.get(sentence.size() - 1).end);
+				sentenceSpan.text = text.substring(sentenceSpan.begin, sentenceSpan.end);
+				saveAnnotation(jcas, SentenceTypeConstructor, sentenceSpan.begin, sentenceSpan.end, null);
+				for (Span token : sentence) {
+					saveAnnotation(jcas, TokenTypeConstructor, token.begin, token.end, null);
+				}
+				HashMap<String, ArrayList<Span>> concepts = ((FastCNER) fastNER).processSpan(sentenceSpan);
 //              store found concepts in annotation
-                if (concepts.size() > 0) {
-                    saveConcepts(jcas, concepts);
-                }
-            }
-        }
-    }
+				if (concepts.size() > 0) {
+					saveConcepts(jcas, concepts, null);
+				}
+			}
+		}
+	}
 
 }
