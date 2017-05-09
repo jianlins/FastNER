@@ -235,11 +235,11 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 	protected IntervalST<String> indexInclusionSections(JCas jCas) {
 		IntervalST<String> sectionTree = new IntervalST<>();
 		for (Class sectionClass : includeSections) {
-			FSIndex annoIndex = jCas.getAnnotationIndex(SentenceType);
+			FSIndex annoIndex = jCas.getAnnotationIndex(sectionClass);
 			Iterator annoIter = annoIndex.iterator();
 			while (annoIter.hasNext()) {
 				Annotation section = (Annotation) annoIter.next();
-				sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), section.getType().getShortName());
+				sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionClass.getSimpleName());
 			}
 		}
 		return sectionTree;
