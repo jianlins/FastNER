@@ -20,8 +20,10 @@ package edu.utah.bmi.nlp.fastcner;
 import edu.utah.bmi.nlp.fastcner.uima.FastCNER_AE_General;
 import edu.utah.bmi.nlp.type.system.Concept;
 import edu.utah.bmi.nlp.type.system.ConceptBASE;
+import edu.utah.bmi.nlp.type.system.Sentence;
 import edu.utah.bmi.nlp.type.system.Token;
 import edu.utah.bmi.nlp.uima.AdaptableUIMACPERunner;
+import edu.utah.bmi.nlp.uima.ae.AnnotationPrinter;
 import edu.utah.bmi.nlp.uima.ae.SimpleParser_AE;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -48,7 +50,7 @@ import static org.junit.Assert.assertTrue;
  * Created by Jianlin Shi on 4/26/16.
  */
 public class FastCNER_AE_GeneralTest {
-	private AnalysisEngine fastCNER_AE, simpleParser_AE;
+	private AnalysisEngine fastCNER_AE, simpleParser_AE, annoprinter;
 	private AdaptableUIMACPERunner runner;
 	private JCas jCas;
 	private Object[] configurationData;
@@ -69,6 +71,7 @@ public class FastCNER_AE_GeneralTest {
 			fastCNER_AE = createEngine(FastCNER_AE_General.class,
 					configurationData);
 			simpleParser_AE = createEngine(SimpleParser_AE.class, new Object[]{});
+			annoprinter=createEngine(AnnotationPrinter.class,new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, Sentence.class.getCanonicalName()});
 		} catch (ResourceInitializationException e) {
 			e.printStackTrace();
 		}
@@ -80,6 +83,7 @@ public class FastCNER_AE_GeneralTest {
 		String text = "The patient denies any problem with visual changes or hearing changes.";
 		jCas.setDocumentText(text);
 		simpleParser_AE.process(jCas);
+		annoprinter.process(jCas);
 		fastCNER_AE.process(jCas);
 
 		FSIndex annoIndex = jCas.getAnnotationIndex(Concept.type);
@@ -117,6 +121,7 @@ public class FastCNER_AE_GeneralTest {
 		ArrayList<Token> tokens = new ArrayList<Token>();
 		while (annoIter.hasNext()) {
 			tokens.add((Token) annoIter.next());
+			System.out.println(tokens.get(tokens.size()-1).getCoveredText());
 		}
 		assertTrue("Didn't get the right number of concepts", tokens.size() == 11);
 		assertTrue("Didn't get the right token: 'The'", tokens.get(0).getBegin() == 0 && tokens.get(0).getEnd() == 3 && text.substring(0, 3).equals(tokens.get(0).getCoveredText()));

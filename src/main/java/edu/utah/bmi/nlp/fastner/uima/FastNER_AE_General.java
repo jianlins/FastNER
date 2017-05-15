@@ -169,11 +169,13 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 		while (annoIter.hasNext()) {
 			Annotation sentence = (Annotation) annoIter.next();
 			String sectionName = sectionTree.get(new Interval1D(sentence.getBegin(), sentence.getEnd()));
-			if (sectionName != null) {
-				if (!sentences.containsKey(sectionName))
-					sentences.put(sectionName, new ArrayList<>());
-				sentences.get(sectionName).add(sentence);
-			}
+			if (sectionName == null)
+				sectionName = SourceDocumentInformation.class.getSimpleName();
+
+			if (!sentences.containsKey(sectionName))
+				sentences.put(sectionName, new ArrayList<>());
+			sentences.get(sectionName).add(sentence);
+
 		}
 
 		// get token annotations
