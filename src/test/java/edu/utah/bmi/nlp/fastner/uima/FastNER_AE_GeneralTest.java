@@ -17,6 +17,7 @@
 package edu.utah.bmi.nlp.fastner.uima;
 
 import edu.utah.bmi.nlp.type.system.Concept;
+import edu.utah.bmi.nlp.type.system.SectionBody;
 import edu.utah.bmi.nlp.type.system.Token;
 import edu.utah.bmi.nlp.uima.AdaptableUIMACPERunner;
 import edu.utah.bmi.nlp.uima.ae.SimpleParser_AE;
@@ -140,5 +141,35 @@ public class FastNER_AE_GeneralTest {
 		for (Concept concept : concepts) {
 			System.out.println(concept.getBegin() + "-" + concept.getEnd() + "\t" + concept.getType().getShortName() + ": >" + concept.getCoveredText() + "<");
 		}
+	}
+
+//	test section scope
+	@Test
+	public void test3() throws ResourceInitializationException, AnalysisEngineProcessException {
+		String text = "HISTORY: a fever of 103.8 , tachycardia in the 130s-150s , and initial hypertensive in the 140s .\nIMPRESSION: no fever currently.";
+		jCas.reset();
+		jCas.setDocumentText(text);
+		SectionBody sectionBody = new SectionBody(jCas, text.indexOf("a fever of 103.8"), text.indexOf("IMPRESSION") - 1);
+		sectionBody.addToIndexes();
+		configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, "@fastner\nfever\t0\tEntity\tACTUAL",
+				FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "SectionBody",
+				FastNER_AE_General.PARAM_MARK_PSEUDO, true,
+				FastNER_AE_General.PARAM_LOG_RULE_INFO, true};
+		fastNER_AE = createEngine(FastNER_AE_General.class,
+				configurationData);
+		simpleParser_AE.process(jCas);
+		fastNER_AE.process(jCas);
+		FSIndex annoIndex = jCas.getAnnotationIndex(Concept.type);
+		Iterator annoIter = annoIndex.iterator();
+		ArrayList<Concept> concepts = new ArrayList<Concept>();
+		while (annoIter.hasNext()) {
+			concepts.add((Concept) annoIter.next());
+		}
+		for (Concept concept : concepts) {
+			System.out.println(concept.getType().getShortName()+concept.getBegin() + "-" + concept.getEnd() + "\t" +  concept.getSection()+ ": >" + concept.getCoveredText() + "<");
+		}
+
+
+
 	}
 }

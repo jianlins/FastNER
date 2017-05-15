@@ -24,7 +24,7 @@
     <vendor/>
     <imports>
         <import location="FastNER_Types.xml"></import>
-        <import location="FastContext_Types.xml"></import>
+        <import location="Section_Types.xml"></import>
         <import name="org.apache.uima.examples.SourceDocumentInformation"/>
     </imports>
 </typeSystemDescription>

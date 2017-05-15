@@ -35,7 +35,7 @@ import java.util.LinkedHashMap;
 public class FastNER {
     protected FastRule fastRule;
     protected boolean caseSenstive = false;
-    protected LinkedHashMap<String, TypeDefinition> typeDefinition;
+    protected LinkedHashMap<String, TypeDefinition> typeDefinition=new LinkedHashMap<>();
 
     protected FastNER() {
     }

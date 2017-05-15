@@ -106,10 +106,10 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 
 		obj = cont.getConfigParameterValue(PARAM_INCLUDE_SECTIONS);
 		if (obj == null)
-			includeSections.add(AnnotationOper.getTypeClass("org.apache.uima.examples.SourceDocumentInformation"));
+			includeSections.add(SourceDocumentInformation.class);
 		else {
 			for (String sectionName : ((String) obj).split("[\\|,;]")) {
-				sectionName = sentenceTypeName.trim();
+				sectionName = sectionName.trim();
 				if (sectionName.length() > 0) {
 					includeSections.add(AnnotationOper.getTypeClass(DeterminantValueSet.checkNameSpace(sectionName)));
 				}
