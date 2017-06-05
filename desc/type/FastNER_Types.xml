@@ -45,9 +45,21 @@
             </features>
         </typeDescription>
         <typeDescription>
-            <name>edu.utah.bmi.nlp.type.system.ConceptBASE</name>
+            <name>edu.utah.bmi.nlp.type.system.EntityBASE</name>
             <description/>
             <supertypeName>uima.tcas.Annotation</supertypeName>
+            <features>
+                <featureDescription>
+                    <name>Note</name>
+                    <description/>
+                    <rangeTypeName>uima.cas.String</rangeTypeName>
+                </featureDescription>
+            </features>
+        </typeDescription>
+        <typeDescription>
+            <name>edu.utah.bmi.nlp.type.system.ConceptBASE</name>
+            <description/>
+            <supertypeName>edu.utah.bmi.nlp.type.system.EntityBASE</supertypeName>
             <features>
                 <featureDescription>
                     <name>Category</name>
@@ -86,11 +98,6 @@
                 </featureDescription>
                 <featureDescription>
                     <name>Annotator</name>
-                    <description/>
-                    <rangeTypeName>uima.cas.String</rangeTypeName>
-                </featureDescription>
-                <featureDescription>
-                    <name>Note</name>
                     <description/>
                     <rangeTypeName>uima.cas.String</rangeTypeName>
                 </featureDescription>

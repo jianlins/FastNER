@@ -26,7 +26,7 @@
         <typeDescription>
             <name>edu.utah.bmi.nlp.type.system.Context</name>
             <description/>
-            <supertypeName>uima.tcas.Annotation</supertypeName>
+            <supertypeName>edu.utah.bmi.nlp.type.system.EntityBASE</supertypeName>
             <features>
                 <featureDescription>
                     <name>ModifierName</name>
