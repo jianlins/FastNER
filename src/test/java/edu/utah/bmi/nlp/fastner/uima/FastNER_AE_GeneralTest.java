@@ -20,6 +20,7 @@ import edu.utah.bmi.nlp.type.system.Concept;
 import edu.utah.bmi.nlp.type.system.SectionBody;
 import edu.utah.bmi.nlp.type.system.Token;
 import edu.utah.bmi.nlp.uima.AdaptableUIMACPERunner;
+import edu.utah.bmi.nlp.uima.ae.AnnotationPrinter;
 import edu.utah.bmi.nlp.uima.ae.SimpleParser_AE;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -44,7 +45,7 @@ import static org.junit.Assert.assertTrue;
  * @author Jianlin Shi on 4/30/17.
  */
 public class FastNER_AE_GeneralTest {
-	private AnalysisEngine fastNER_AE, simpleParser_AE;
+	private AnalysisEngine fastNER_AE, simpleParser_AE, annotationPrinter;
 	private AdaptableUIMACPERunner runner;
 	private JCas jCas;
 	private Object[] configurationData;
@@ -66,6 +67,7 @@ public class FastNER_AE_GeneralTest {
 			fastNER_AE = createEngine(FastNER_AE_General.class,
 					configurationData);
 			simpleParser_AE = createEngine(SimpleParser_AE.class, new Object[]{});
+			annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "Concept"});
 		} catch (ResourceInitializationException e) {
 			e.printStackTrace();
 		}
@@ -143,7 +145,7 @@ public class FastNER_AE_GeneralTest {
 		}
 	}
 
-//	test section scope
+	//	test section scope
 	@Test
 	public void test3() throws ResourceInitializationException, AnalysisEngineProcessException {
 		String text = "HISTORY: a fever of 103.8 , tachycardia in the 130s-150s , and initial hypertensive in the 140s .\nIMPRESSION: no fever currently.";
@@ -166,10 +168,32 @@ public class FastNER_AE_GeneralTest {
 			concepts.add((Concept) annoIter.next());
 		}
 		for (Concept concept : concepts) {
-			System.out.println(concept.getType().getShortName()+concept.getBegin() + "-" + concept.getEnd() + "\t" +  concept.getSection()+ ": >" + concept.getCoveredText() + "<");
+			System.out.println(concept.getType().getShortName() + concept.getBegin() + "-" + concept.getEnd() + "\t" + concept.getSection() + ": >" + concept.getCoveredText() + "<");
 		}
+	}
 
+	@Test
+	public void testPseudo() throws ResourceInitializationException, AnalysisEngineProcessException {
+		String text = "Exam was done yesterday. Positive for pulmonary emboli protocol. No further treatment needed.";
+		jCas.reset();
+		jCas.setDocumentText(text);
+		SectionBody sectionBody = new SectionBody(jCas, text.indexOf("Positive"), text.indexOf(" No ") - 1);
+		sectionBody.addToIndexes();
+		String rule = "@fastner\n" +
+				"emboli	0	Concept	ACTUAL\n" +
+				"emboli protocol	0	Concept	PSEUDO";
+		configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, rule,
+				FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "SectionBody",
+				FastNER_AE_General.PARAM_MARK_PSEUDO, true,
+				FastNER_AE_General.PARAM_LOG_RULE_INFO, true,
+				FastNER_AE_General.PARAM_ENABLE_DEBUG,true};
+		fastNER_AE = createEngine(FastNER_AE_General.class,
+				configurationData);
+		simpleParser_AE.process(jCas);
+		fastNER_AE.process(jCas);
 
-
+		annotationPrinter.process(jCas);
+		annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "PseudoConcept"});
+		annotationPrinter.process(jCas);
 	}
 }

@@ -69,6 +69,8 @@ public class FastCNER_AE_General extends FastNER_AE_General {
 		if (debug) {
 			fastNER.setDebug(true);
 		}
+		if (markPseudo)
+			fastNER.setRemovePseudo(false);
 		return fastNER.getTypeDefinitions();
 	}
 

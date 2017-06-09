@@ -156,6 +156,9 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 
 	protected LinkedHashMap<String, TypeDefinition> initFastNER(UimaContext cont, String ruleStr) {
 		fastNER = new FastNER(ruleStr, caseSenstive);
+		fastNER.setDebug(debug);
+		if (markPseudo)
+			fastNER.setRemovePseudo(false);
 		return fastNER.getTypeDefinitions();
 	}
 

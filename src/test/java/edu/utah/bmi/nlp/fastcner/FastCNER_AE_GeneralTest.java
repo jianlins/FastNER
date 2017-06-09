@@ -111,7 +111,7 @@ public class FastCNER_AE_GeneralTest {
 //            System.out.println(concepts.get(concepts.size() - 1).getCoveredText());
 		}
 
-		assertTrue("Didn't get the right number of concepts", concepts.size() == 2);
+		assertTrue("Didn't get the right number of concepts", concepts.size() == 3);
 		assertTrue("Didn't get the right concept: 'pa'", concepts.get(0).getCoveredText().equals("pa"));
 		assertTrue("Didn't get the right concept type: 'pa'",
 				concepts.get(0).getClass().getCanonicalName().equals("edu.utah.bmi.nlp.type.system.PROBLEM"));

@@ -36,134 +36,138 @@ import java.util.*;
  *         to the last two elements in each rule defined in the rule CSV file.
  */
 public abstract class FastRule {
-    protected boolean debug = false;
-    protected HashMap rulesMap = new HashMap();
-    protected final Determinants END = Determinants.END;
-    public HashMap<Integer, Rule> ruleStore = new HashMap<>();
+	protected boolean debug = false;
+	protected boolean removePseudo = true;
+	protected HashMap rulesMap = new HashMap();
+	protected final Determinants END = Determinants.END;
+	public HashMap<Integer, Rule> ruleStore = new HashMap<>();
 
-    public FastRule() {
+	public FastRule() {
 
-    }
+	}
 
-    public FastRule(HashMap<Integer, Rule> ruleStore) {
-        initiate(ruleStore);
-    }
+	public FastRule(HashMap<Integer, Rule> ruleStore) {
+		initiate(ruleStore);
+	}
 
-    public void initiate(String ruleStr, String splitter, boolean caseSensitive) {
-        ruleStore = IOUtil.parseRuleStr(ruleStr, splitter, caseSensitive);
-        initiate(ruleStore);
-    }
+	public void initiate(String ruleStr, String splitter, boolean caseSensitive) {
+		ruleStore = IOUtil.parseRuleStr(ruleStr, splitter, caseSensitive);
+		initiate(ruleStore);
+	}
 
-    public void initiate(HashMap<Integer, Rule> ruleStore) {
-        this.ruleStore = ruleStore;
-        for (Map.Entry<Integer, Rule> ent : ruleStore.entrySet()) {
-            addRule(ent.getValue());
-        }
-    }
-
-
-    protected boolean addRule(Rule rule) {
-        // use to store the HashMap sub-chain that have the key chain that meet
-        // the rule[]
-        ArrayList<HashMap> rules_tmp = new ArrayList<HashMap>();
-        HashMap rule1 = rulesMap;
-        HashMap rule2 = new HashMap();
-        HashMap rule_t;
-        String[] ruleContent = rule.rule.split("\\s+");
-        int length = ruleContent.length;
-        int i = 0;
-        rules_tmp.add(rulesMap);
-        while (i < length && rule1 != null && rule1.containsKey(ruleContent[i])) {
-            rule1 = (HashMap) rule1.get(ruleContent[i]);
-            i++;
-        }
-        // if the rule has been included
-        if (i > length)
-            return false;
-        // start with the determinant, construct the last descendant HashMap
-        // <Determinant, null>
-        if (i == length) {
-            if (rule1.containsKey(END)) {
-                ((HashMap) rule1.get(END)).put(rule.ruleName, rule.id);
-            } else {
-                rule2.put(rule.ruleName, rule.id);
-                rule1.put(END, rule2.clone());
-            }
-            return true;
-        } else {
-            rule2.put(rule.ruleName, rule.id);
-            rule2.put(END, rule2.clone());
-            rule2.remove(rule.ruleName);
-            // filling the HashMap chain which ruleStore doesn't have the key chain
-            for (int j = length - 1; j > i; j--) {
-                rule_t = (HashMap) rule2.clone();
-                rule2.clear();
-                rule2.put(ruleContent[j], rule_t);
-            }
-        }
-        rule1.put(ruleContent[i], rule2.clone());
-        return true;
-    }
-
-    public HashMap<String, ArrayList<Span>> processString(String text, int begin, int end) {
-        String sentence = text.substring(begin, end);
-        return processString(sentence);
-    }
-
-    public HashMap<String, ArrayList<Span>> processString(String text) {
-        ArrayList<Span> tokens = SimpleParser.tokenize2Spans(text, false);
-        return processSpans(tokens);
-    }
-
-    protected abstract HashMap<String, ArrayList<Span>> processTokens(ArrayList<String> tokens);
-
-    protected abstract HashMap<String, ArrayList<Span>> processSpans(ArrayList<Span> tokens);
-
-    protected void removePseudoMatches(HashMap<String, ArrayList<Span>> matches) {
-        for (Map.Entry<String, ArrayList<Span>> entry : matches.entrySet()) {
-            Iterator<Span> spanIterator = entry.getValue().iterator();
-            while (spanIterator.hasNext()) {
-                Span thisSpan = spanIterator.next();
-                if (ruleStore.get(thisSpan.ruleId).type == Determinants.PSEUDO)
-                    spanIterator.remove();
-            }
-        }
-    }
-
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public void setDebug(boolean debug) {
-        this.debug = debug;
-    }
+	public void initiate(HashMap<Integer, Rule> ruleStore) {
+		this.ruleStore = ruleStore;
+		for (Map.Entry<Integer, Rule> ent : ruleStore.entrySet()) {
+			addRule(ent.getValue());
+		}
+	}
 
 
-    public String getRuleString(int ruleId) {
-        return ruleStore.get(ruleId).rule;
-    }
+	protected boolean addRule(Rule rule) {
+		// use to store the HashMap sub-chain that have the key chain that meet
+		// the rule[]
+		ArrayList<HashMap> rules_tmp = new ArrayList<HashMap>();
+		HashMap rule1 = rulesMap;
+		HashMap rule2 = new HashMap();
+		HashMap rule_t;
+		String[] ruleContent = rule.rule.split("\\s+");
+		int length = ruleContent.length;
+		int i = 0;
+		rules_tmp.add(rulesMap);
+		while (i < length && rule1 != null && rule1.containsKey(ruleContent[i])) {
+			rule1 = (HashMap) rule1.get(ruleContent[i]);
+			i++;
+		}
+		// if the rule has been included
+		if (i > length)
+			return false;
+		// start with the determinant, construct the last descendant HashMap
+		// <Determinant, null>
+		if (i == length) {
+			if (rule1.containsKey(END)) {
+				((HashMap) rule1.get(END)).put(rule.ruleName, rule.id);
+			} else {
+				rule2.put(rule.ruleName, rule.id);
+				rule1.put(END, rule2.clone());
+			}
+			return true;
+		} else {
+			rule2.put(rule.ruleName, rule.id);
+			rule2.put(END, rule2.clone());
+			rule2.remove(rule.ruleName);
+			// filling the HashMap chain which ruleStore doesn't have the key chain
+			for (int j = length - 1; j > i; j--) {
+				rule_t = (HashMap) rule2.clone();
+				rule2.clear();
+				rule2.put(ruleContent[j], rule_t);
+			}
+		}
+		rule1.put(ruleContent[i], rule2.clone());
+		return true;
+	}
 
-    public Rule getRule(int pos) {
-        return ruleStore.get(pos);
-    }
+	public HashMap<String, ArrayList<Span>> processString(String text, int begin, int end) {
+		String sentence = text.substring(begin, end);
+		return processString(sentence);
+	}
 
-    public void printRulesMap() {
-        printEmbededMap(rulesMap, "");
-    }
+	public HashMap<String, ArrayList<Span>> processString(String text) {
+		ArrayList<Span> tokens = SimpleParser.tokenize2Spans(text, false);
+		return processSpans(tokens);
+	}
 
-    private void printEmbededMap(HashMap<Object, Object> ruleMap, String offset) {
-        for (Map.Entry<Object, Object> ent : ruleMap.entrySet()) {
-            System.out.println(offset + "key: " + ent.getKey());
-            if (ent.getValue().getClass() == HashMap.class) {
-                printEmbededMap((HashMap<Object, Object>) ent.getValue(), offset + "\t");
-            } else {
-                System.out.println(offset + "pair: " + ent.getKey() + "->" + ent.getValue());
-            }
+	protected abstract HashMap<String, ArrayList<Span>> processTokens(ArrayList<String> tokens);
 
-        }
-    }
+	protected abstract HashMap<String, ArrayList<Span>> processSpans(ArrayList<Span> tokens);
 
-    public HashMap<Integer, Rule> getRuleStore() {
-        return ruleStore;
-    }
+	protected void removePseudoMatches(HashMap<String, ArrayList<Span>> matches) {
+		for (Map.Entry<String, ArrayList<Span>> entry : matches.entrySet()) {
+			Iterator<Span> spanIterator = entry.getValue().iterator();
+			while (spanIterator.hasNext()) {
+				Span thisSpan = spanIterator.next();
+				if (ruleStore.get(thisSpan.ruleId).type == Determinants.PSEUDO)
+					spanIterator.remove();
+			}
+		}
+	}
+
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+
+	public void setRemovePseudo(boolean removePseudo) {
+		this.removePseudo = removePseudo;
+	}
+
+	public String getRuleString(int ruleId) {
+		return ruleStore.get(ruleId).rule;
+	}
+
+	public Rule getRule(int pos) {
+		return ruleStore.get(pos);
+	}
+
+	public void printRulesMap() {
+		printEmbededMap(rulesMap, "");
+	}
+
+	private void printEmbededMap(HashMap<Object, Object> ruleMap, String offset) {
+		for (Map.Entry<Object, Object> ent : ruleMap.entrySet()) {
+			System.out.println(offset + "key: " + ent.getKey());
+			if (ent.getValue().getClass() == HashMap.class) {
+				printEmbededMap((HashMap<Object, Object>) ent.getValue(), offset + "\t");
+			} else {
+				System.out.println(offset + "pair: " + ent.getKey() + "->" + ent.getValue());
+			}
+
+		}
+	}
+
+	public HashMap<Integer, Rule> getRuleStore() {
+		return ruleStore;
+	}
 }
