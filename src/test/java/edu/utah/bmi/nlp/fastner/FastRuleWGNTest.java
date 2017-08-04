@@ -34,9 +34,9 @@ public class FastRuleWGNTest {
 
     @Test
     public void processTokens() throws Exception {
-        String text = "Exam was done yesterday. Positive for pulmonary emboli protocol. No further treatment needed.";
+        String text = "Exam was done 4 yesterday. Positive for pulmonary emboli protocol. No further treatment needed.";
         String rule = "@fastner\n" +
-                "was done	0	Concept	ACTUAL";
+                "was done \\> 3	0	Concept	ACTUAL";
         ArrayList<String> tokens = new ArrayList<>();
         tokens.addAll(Arrays.asList(text.split("[\\s\\.]+")));
         System.out.println(tokens);
@@ -55,9 +55,9 @@ public class FastRuleWGNTest {
     @Test
     public void processSpans() throws Exception {
 
-        String text = "Exam was done yesterday. Positive for pulmonary emboli protocol. No further treatment needed.";
+        String text = "Exam was done 5 yesterday. Positive for pulmonary emboli protocol. No further treatment needed.";
         String rule = "@fastner\n" +
-                "pulmonary emboli protocol	0	Concept	ACTUAL\n";
+                "was done \\< 6 \\> 3	0	Concept	ACTUAL";
         ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
 
         fastNER = new FastNER(rule);

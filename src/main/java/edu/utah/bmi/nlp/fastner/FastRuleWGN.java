@@ -94,8 +94,13 @@ public class FastRuleWGN extends FastRuleWOG {
             }
             if (rule.containsKey("\\>") && NumberUtils.isNumber(thisToken)) {
                 processNumerics(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get("\\>"),
-                        currentPosition, matchEnd, currentPosition, matches,
+                        matchBegin, matchEnd, currentPosition, matches,
                         thisToken, true);
+            }
+            if (rule.containsKey("\\<") && NumberUtils.isNumber(thisToken)) {
+                processNumerics(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get("\\<"),
+                        matchBegin, matchEnd, currentPosition, matches,
+                        thisToken, false);
             }
         } else if (currentPosition == contextTokens.size() && rule.containsKey(END)) {
             // if no () is used in this definition, use the whole rule string
@@ -117,23 +122,23 @@ public class FastRuleWGN extends FastRuleWOG {
 //                if has a rule like "\> 3 \< 4"
                 if (((HashMap) rule.get(ruleValue)).containsKey("\\<")) {
                     processNumerics(contextTokens, getText, getBegin, getEnd, (HashMap) ((HashMap) rule.get(ruleValue)).get("\\<"),
-                            currentPosition, matchEnd, currentPosition, matches,
+                            matchBegin, matchEnd, currentPosition, matches,
                             numericToken, false);
                 }
 //                if followed by ordinary rule elements
                 process(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get(ruleValue),
-                        currentPosition, matchEnd, currentPosition + 1, matches);
+                        matchBegin, matchEnd, currentPosition + 1, matches);
 
             } else if (num < ruleNumValue) {
                 //                if has a rule like "\< 6 \> 4"
                 if (((HashMap) rule.get(ruleValue)).containsKey("\\>")) {
                     processNumerics(contextTokens, getText, getBegin, getEnd, (HashMap) ((HashMap) rule.get(ruleValue)).get("\\>"),
-                            currentPosition, matchEnd, currentPosition, matches,
+                            matchBegin, matchEnd, currentPosition, matches,
                             numericToken, true);
                 }
 //                if followed by ordinary rule elements
                 process(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get(ruleValue),
-                        currentPosition, matchEnd, currentPosition + 1, matches);
+                        matchBegin, matchEnd, currentPosition + 1, matches);
 
             }
         }

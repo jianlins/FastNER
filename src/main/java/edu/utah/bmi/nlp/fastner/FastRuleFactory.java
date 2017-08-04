@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
 
 /**
  * @author Jianlin Shi
- *         Created on 3/5/17.
+ * Created on 3/5/17.
  */
 public class FastRuleFactory {
 
@@ -44,7 +44,7 @@ public class FastRuleFactory {
         int strLength = ruleStr.trim().length();
         String testFileStr = ruleStr.trim().substring(strLength - 4).toLowerCase();
         HashMap<Integer, Rule> rules = new HashMap<>();
-        boolean[] thisRuleType = new boolean[]{false, false, false, false};
+        boolean[] thisRuleType = new boolean[]{false, false, false, false, false};
         if (testFileStr.equals(".tsv") || testFileStr.equals(".csv") || testFileStr.equals("xlsx") || testFileStr.equals(".owl")) {
             thisRuleType = IOUtil.readAgnosticFile(ruleStr, rules, typeDefinition, caseSensitive, thisRuleType);
         } else {
@@ -60,8 +60,10 @@ public class FastRuleFactory {
                 if (thisRuleType[3])
                     ((FastCRules) fastRule).setReplicationSupport(true);
             } else {
+                if (thisRuleType[4]) {
+                    fastRule = new FastRuleWGN(rules);
 //            support group
-                if (thisRuleType[1]) {
+                } else if (thisRuleType[1]) {
                     fastRule = new FastRuleWG(rules);
                 } else {
                     fastRule = new FastRuleWOG(rules);

@@ -310,6 +310,11 @@ public class IOUtil {
             ruleSupports[3] = true;
         }
 
+//        support numeric handler
+        if (ruleSupports[4] == false && ((rule.rule.indexOf("\\>") != -1)|| (rule.rule.indexOf("\\<") != -1) )){
+            ruleSupports[4] = true;
+        }
+
         rules.put(rule.id, rule);
         return ruleSupports;
     }
