@@ -28,6 +28,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -229,6 +230,9 @@ public class IOUtil {
             for (String cell : record) {
                 cells.add(cell);
             }
+//          to be back compatible
+            if (!cells.get(0).startsWith("@") && cells.size()>1 && !NumberUtils.isNumber(cells.get(1)))
+                cells.add(1, "1");
             ruleSupports = parseCells(cells, id, rules, typeDefinition, caseSensitive, ruleSupports);
             id++;
         }

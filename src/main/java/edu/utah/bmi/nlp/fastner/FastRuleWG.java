@@ -22,6 +22,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * <p>
@@ -43,122 +45,64 @@ import java.util.HashMap;
 public class FastRuleWG extends FastRuleWOG {
 //    fields are defined in abstract class
 
-	public FastRuleWG() {
 
-	}
+    public FastRuleWG() {
 
-	public FastRuleWG(String ruleStr) {
+    }
+
+    public FastRuleWG(String ruleStr) {
 //        support read from OWl file, TSV file or OWL file directory
-		super(ruleStr);
-	}
-
-	public FastRuleWG(String ruleStr, boolean caseSensitive) {
-		super(ruleStr, caseSensitive);
-	}
-
-	public FastRuleWG(HashMap<Integer, Rule> ruleStore) {
-		super(ruleStore);
-	}
+        super(ruleStr);
 
 
-	public HashMap<String, ArrayList<Span>> processTokens(ArrayList<String> contextTokens) {
-		// use the first "startposition" to remember the original start matching
-		// position.
-		// use the 2nd one to remember the start position in which recursion.
-		HashMap<String, ArrayList<Span>> matches = new HashMap<String, ArrayList<Span>>();
-		for (int i = 0; i < contextTokens.size(); i++) {
-			// System.out.println(contextTokens.get(i));
-			processTokens(contextTokens, rulesMap, i, 0, i, matches);
-		}
-		if (removePseudo)
-			removePseudoMatches(matches);
-		return matches;
-	}
+    }
 
+    public FastRuleWG(String ruleStr, boolean caseSensitive) {
+        super(ruleStr, caseSensitive);
+    }
 
-	protected void processTokens(ArrayList<String> contextTokens, HashMap rule, int matchBegin, int matchEnd, int currentPosition,
-								 HashMap<String, ArrayList<Span>> matches) {
-		// when reach the end of the tunedcontext, end the iteration
-		if (currentPosition < contextTokens.size()) {
-			// start processing the tunedcontext tokens
-			String thisToken = contextTokens.get(currentPosition);
+    public FastRuleWG(HashMap<Integer, Rule> ruleStore) {
+        super(ruleStore);
+    }
+
+    protected void process(ArrayList<?> contextTokens,
+                           BiFunction<ArrayList, Integer, String> getText,
+                           BiFunction<ArrayList, Integer, Integer> getBegin,
+                           BiFunction<ArrayList, Integer, Integer> getEnd,
+                           HashMap rule, int matchBegin, int matchEnd, int currentPosition,
+                           HashMap<String, ArrayList<Span>> matches) {
+        // when reach the end of the tunedcontext, end the iteration
+        if (currentPosition < contextTokens.size()) {
+            // start processing the tunedcontext tokens
+            String thisToken = getText.apply(contextTokens, currentPosition);
 //			System.out.println("thisToken-"+thisToken);
-			if (rule.containsKey("\\w+")) {
-				processTokens(contextTokens, (HashMap) rule.get("\\w+"), matchBegin, matchEnd, currentPosition + 1, matches);
-			}
-			// if the end of a rule is met
-			if (rule.containsKey(END)) {
-				// if no () is used in this definition, use the whole rule string
-				addDeterminants(rule, matches, matchBegin, matchEnd == 0 ? currentPosition - 1 : matchEnd);
-			}
-			// if the current token match the element of a rule
-			if (rule.containsKey(thisToken)) {
-				processTokens(contextTokens, (HashMap) rule.get(thisToken), matchBegin, matchEnd, currentPosition + 1, matches);
-			}
-			if (rule.containsKey("\\d+") && StringUtils.isNumeric(thisToken)) {
-				processTokens(contextTokens, (HashMap) rule.get("\\d+"), matchBegin, matchEnd, currentPosition + 1, matches);
-			}
-			if (rule.containsKey("\\(")) {
-				processTokens(contextTokens, (HashMap) rule.get("\\("), currentPosition, matchEnd, currentPosition, matches);
-			}
-			if (rule.containsKey("\\)")) {
-				processTokens(contextTokens, (HashMap) rule.get("\\)"), matchBegin, currentPosition - 1, currentPosition, matches);
-			}
-		} else if (currentPosition == contextTokens.size() && rule.containsKey(END)) {
-			// if no () is used in this definition, use the whole rule string
-			addDeterminants(rule, matches, matchBegin, matchEnd == 0 ? currentPosition - 1 : matchEnd);
-		}
-	}
-
-	public HashMap<String, ArrayList<Span>> processSpans(ArrayList<Span> contextTokens) {
-		// use the first "startposition" to remember the original start matching
-		// position.
-		// use the 2nd one to remember the start position in which recursion.
-		HashMap<String, ArrayList<Span>> matches = new HashMap<String, ArrayList<Span>>();
-		for (int i = 0; i < contextTokens.size(); i++) {
-//            System.out.println(contextTokens.get(i));
-			processSpans(contextTokens, rulesMap, i, 0, i, matches);
-		}
-		if (removePseudo)
-			removePseudoMatches(matches);
-		return matches;
-	}
-
-
-	protected void processSpans(ArrayList<Span> contextTokens, HashMap rule, int matchBegin, int matchEnd, int currentPosition,
-								HashMap<String, ArrayList<Span>> matches) {
-		// when reach the end of the tunedcontext, end the iteration
-		if (currentPosition < contextTokens.size()) {
-			// start processing the tunedcontext tokens
-			String thisToken = contextTokens.get(currentPosition).text;
-//			System.out.println("thisToken-"+thisToken);
-			if (rule.containsKey("\\w+")) {
-				processSpans(contextTokens, (HashMap) rule.get("\\w+"), matchBegin, matchEnd, currentPosition + 1, matches);
-			}
-			// if the end of a rule is met
-			if (rule.containsKey(END)) {
-				// if no () is used in this definition, use the whole rule string
-				addDeterminants(rule, matches, contextTokens.get(matchBegin).begin, contextTokens.get(matchEnd == 0 ? currentPosition - 1 : matchEnd).end);
-			}
-			// if the current token match the element of a rule
-			if (rule.containsKey(thisToken)) {
-				processSpans(contextTokens, (HashMap) rule.get(thisToken), matchBegin, matchEnd, currentPosition + 1, matches);
-			}
-			if (rule.containsKey("\\d+") && NumberUtils.isNumber(thisToken)) {
-				processSpans(contextTokens, (HashMap) rule.get("\\d+"), matchBegin, matchEnd, currentPosition + 1, matches);
-			}
-			if (rule.containsKey("\\(")) {
-				processSpans(contextTokens, (HashMap) rule.get("\\("), currentPosition, matchEnd, currentPosition, matches);
-			}
-			if (rule.containsKey("\\)")) {
-				processSpans(contextTokens, (HashMap) rule.get("\\)"), matchBegin, currentPosition - 1, currentPosition, matches);
-			}
-		} else if (currentPosition == contextTokens.size() && rule.containsKey(END)) {
-			// if no () is used in this definition, use the whole rule string
-			matchEnd = matchEnd == 0 ? currentPosition - 1 : matchEnd;
-			addDeterminants(rule, matches, contextTokens.get(matchBegin).begin, contextTokens.get(matchEnd).end);
-		}
-	}
+            if (rule.containsKey("\\w+")) {
+                process(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get("\\w+"), matchBegin, matchEnd, currentPosition + 1, matches);
+            }
+            // if the end of a rule is met
+            if (rule.containsKey(END)) {
+                // if no () is used in this definition, use the whole rule string
+                addDeterminants(rule, matches, getBegin.apply(contextTokens, matchBegin), getEnd.apply(contextTokens, (matchEnd == 0 ? currentPosition - 1 : matchEnd)));
+            }
+            // if the current token match the element of a rule
+            if (rule.containsKey(thisToken)) {
+                process(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get(thisToken), matchBegin, matchEnd, currentPosition + 1, matches);
+            }
+            if (rule.containsKey("\\d+") && NumberUtils.isNumber(thisToken)) {
+                process(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get("\\d+"), matchBegin, matchEnd, currentPosition + 1, matches);
+            }
+            if (rule.containsKey("\\(")) {
+                process(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get("\\("), currentPosition, matchEnd, currentPosition, matches);
+            }
+            if (rule.containsKey("\\)")) {
+                process(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get("\\)"), matchBegin, currentPosition - 1, currentPosition, matches);
+            }
+        } else if (currentPosition == contextTokens.size() && rule.containsKey(END)) {
+            // if no () is used in this definition, use the whole rule string
+            matchEnd = matchEnd == 0 ? currentPosition - 1 : matchEnd;
+            addDeterminants(rule, matches, getBegin.apply(contextTokens, matchBegin), getEnd.apply(contextTokens, matchEnd));
+        }
+    }
 
 
 }

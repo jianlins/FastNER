@@ -196,4 +196,30 @@ public class FastNER_AE_GeneralTest {
 		annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "PseudoConcept"});
 		annotationPrinter.process(jCas);
 	}
+
+
+	@Test
+	public void testGroup() throws ResourceInitializationException, AnalysisEngineProcessException {
+		String text = "Exam was done yesterday. Positive for pulmonary emboli protocol. No further treatment needed.";
+		jCas.reset();
+		jCas.setDocumentText(text);
+		SectionBody sectionBody = new SectionBody(jCas, text.indexOf("Positive"), text.indexOf(" No ") - 1);
+		sectionBody.addToIndexes();
+		String rule = "@fastner\n" +
+				"emboli \\( protocol \\)	0	Concept	ACTUAL";
+		configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, rule,
+				FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "SectionBody",
+				FastNER_AE_General.PARAM_MARK_PSEUDO, true,
+				FastNER_AE_General.PARAM_LOG_RULE_INFO, true,
+				FastNER_AE_General.PARAM_ENABLE_DEBUG,true};
+		fastNER_AE = createEngine(FastNER_AE_General.class,
+				configurationData);
+		simpleParser_AE.process(jCas);
+		fastNER_AE.process(jCas);
+
+		annotationPrinter.process(jCas);
+		annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "PseudoConcept"});
+		annotationPrinter.process(jCas);
+	}
+
 }
