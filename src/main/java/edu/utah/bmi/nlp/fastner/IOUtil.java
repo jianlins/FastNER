@@ -127,12 +127,14 @@ public class IOUtil {
     }
 
     public static boolean[] readAgnosticFile(String agnosticFileName, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive) {
-        boolean[] thisRuleType = new boolean[]{false, false, false, false};
+        boolean[] thisRuleType = new boolean[]{false, false, false, false, false};
         readAgnosticFile(agnosticFileName, rules, typeDefinition, caseSensitive, thisRuleType);
         return thisRuleType;
     }
 
-    public static boolean[] readAgnosticFile(String agnosticFileName, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive, boolean[] thisRuleType) {
+    public static boolean[] readAgnosticFile(String agnosticFileName, HashMap<Integer, Rule> rules,
+                                             LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive,
+                                             boolean[] thisRuleType) {
         File agnosticFile = new File(agnosticFileName);
 
         if (agnosticFile.exists()) {
@@ -231,7 +233,7 @@ public class IOUtil {
                 cells.add(cell);
             }
 //          to be back compatible
-            if (!cells.get(0).startsWith("@") && cells.size()>1 && !NumberUtils.isNumber(cells.get(1)))
+            if (!cells.get(0).startsWith("@") && cells.size() > 1 && !NumberUtils.isNumber(cells.get(1)))
                 cells.add(1, "1");
             ruleSupports = parseCells(cells, id, rules, typeDefinition, caseSensitive, ruleSupports);
             id++;
@@ -256,15 +258,23 @@ public class IOUtil {
             }
             return ruleSupports;
         }
-        if (cells.size() > 2) {
+        if (cells.size() >= 2) {
 //            if (cells.get(2).indexOf(".") == -1)
 //                cells.set(2, checkNameSpace(cells.get(2)));
             String rule = cells.get(0);
-            String conceptShortName = getShortName(cells.get(2).trim());
-            if (!typeDefinition.containsKey(conceptShortName)) {
-                typeDefinition.put(conceptShortName, new TypeDefinition(cells.get(2).trim(), DeterminantValueSet.defaultSuperTypeName, new ArrayList<>()));
+            if (NumberUtils.isNumber(cells.get(1))) {
+                String conceptShortName = getShortName(cells.get(2).trim());
+                if (!typeDefinition.containsKey(conceptShortName)) {
+                    typeDefinition.put(conceptShortName, new TypeDefinition(cells.get(2).trim(), DeterminantValueSet.defaultSuperTypeName, new ArrayList<>()));
+                }
+                ruleSupports = addRule(rules, typeDefinition, new Rule(id, caseSensitive ? rule : rule.toLowerCase(), cells.get(2).trim(), Double.parseDouble(cells.get(1)), cells.size() > 3 ? Determinants.valueOf(cells.get(3)) : Determinants.ACTUAL), ruleSupports);
+            } else {
+                String conceptShortName = getShortName(cells.get(1).trim());
+                if (!typeDefinition.containsKey(conceptShortName)) {
+                    typeDefinition.put(conceptShortName, new TypeDefinition(cells.get(1).trim(), DeterminantValueSet.defaultSuperTypeName, new ArrayList<>()));
+                }
+                ruleSupports = addRule(rules, typeDefinition, new Rule(id, caseSensitive ? rule : rule.toLowerCase(), cells.get(1).trim(), 0d, cells.size() > 2 ? Determinants.valueOf(cells.get(2)) : Determinants.ACTUAL), ruleSupports);
             }
-            ruleSupports = addRule(rules, typeDefinition, new Rule(id, caseSensitive ? rule : rule.toLowerCase(), cells.get(2).trim(), Double.parseDouble(cells.get(1)), cells.size() > 3 ? Determinants.valueOf(cells.get(3)) : Determinants.ACTUAL), ruleSupports);
         } else
             System.out.println("Definition format error: line " + id + "\t\t" + cells);
         return ruleSupports;
@@ -311,7 +321,7 @@ public class IOUtil {
         }
 
 //        support numeric handler
-        if (ruleSupports[4] == false && ((rule.rule.indexOf("\\>") != -1)|| (rule.rule.indexOf("\\<") != -1) )){
+        if (ruleSupports[4] == false && ((rule.rule.indexOf("\\>") != -1) || (rule.rule.indexOf("\\<") != -1))) {
             ruleSupports[4] = true;
         }
 

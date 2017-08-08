@@ -26,7 +26,7 @@ import java.util.function.BiFunction;
 /**
  * <p>
  * This class is an extension of FastRuleWG with quantitative conditional support.
- * For instance, a rule "\> 3" will match any number greater than 3.
+ * For instance, a rule "&#47;&gt; 3" will match any number greater than 3.
  * </p>
  *
  * @author Jianlin Shi
