@@ -29,10 +29,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
@@ -173,14 +170,8 @@ public class IOUtil {
                 ArrayList<String> cells = new ArrayList<>();
                 while (cellIterator.hasNext()) {
                     Cell cell = cellIterator.next();
-                    switch (cell.getCellTypeEnum()) {
-                        case NUMERIC:
-                            cells.add(cell.getNumericCellValue() + "");
-                            break;
-                        default:
-                            cells.add(cell.getStringCellValue());
-                            break;
-                    }
+                    cell.setCellType(CellType.STRING);
+                    cells.add(cell.getStringCellValue());
                 }
                 ruleSupports = parseCells(cells, id, rules, typeDefinition, caseSensitive, ruleSupports);
                 id++;
