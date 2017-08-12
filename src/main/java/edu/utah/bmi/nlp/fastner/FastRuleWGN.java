@@ -129,7 +129,7 @@ public class FastRuleWGN extends FastRuleWOG {
                 process(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get(ruleValue),
                         matchBegin, matchEnd, currentPosition + 1, matches);
 
-            } else if (num < ruleNumValue) {
+            } else if (!greaterThan && num < ruleNumValue) {
                 //                if has a rule like "\< 6 \> 4"
                 if (((HashMap) rule.get(ruleValue)).containsKey("\\>")) {
                     processNumerics(contextTokens, getText, getBegin, getEnd, (HashMap) ((HashMap) rule.get(ruleValue)).get("\\>"),
