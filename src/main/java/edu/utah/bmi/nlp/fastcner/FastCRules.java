@@ -113,8 +113,7 @@ public class FastCRules extends FastRuleWG {
 		}
 		// if the rule has been included
 		if (i == length && rule1.containsKey(END) && rule1.get(END) == determinant) {
-			if (debug)
-				System.out.println("This rule has been included");
+			logger.info("This rule has been included");
 			return false;
 		}
 		// start with the determinant, construct the last descendant HashMap
@@ -143,18 +142,17 @@ public class FastCRules extends FastRuleWG {
 //      map rule to score;
 		setScore(rule.id, rule.score);
 
-//      System.out.println("rule length="+rule.length+" \ti="+i);
 		rule1.put(crule[i], rule2.clone());
 		return true;
 	}
 
 	public HashMap<String, ArrayList<Span>> processTokens(ArrayList<String> contextTokens) {
-		System.out.println("This method is not used in character-based ruleStore");
+		logger.finest("This method is not used in character-based ruleStore");
 		return null;
 	}
 
 	public HashMap<String, ArrayList<Span>> processSpans(ArrayList<Span> contextTokens) {
-		System.out.println("This method is not used in character-based ruleStore");
+		logger.finest("This method is not used in character-based ruleStore");
 		return null;
 	}
 
@@ -177,13 +175,10 @@ public class FastCRules extends FastRuleWG {
 		// use the first "startposition" to remember the original start matching
 		// position.
 		// use the 2nd one to remember the start position in which recursion.
-//        System.out.println(">"+text+"<");
 		HashMap<String, ArrayList<Span>> matches = new HashMap<>();
 		char[] textChars = text.toCharArray();
 		for (int i = 0; i < textChars.length; i++) {
-			// System.out.println(contextTokens.get(i));
 			char previousChar = i > 0 ? textChars[i - 1] : ' ';
-//            System.out.println(">"+text.substring(i)+"<");
 			processRules(text, textChars, rulesMap, i, 0, i, matches, previousChar, false, ' ');
 		}
 		if (removePseudo)
@@ -198,11 +193,7 @@ public class FastCRules extends FastRuleWG {
 								char previousChar, boolean wildcard, char previousKey) {
 		// when reach the end of the tunedcontext, end the iteration
 		if (currentPosition < textChars.length) {
-			// start processing the tunedcontext tokens
 			char thisChar = textChars[currentPosition];
-//			System.out.println("thisToken-"+thisToken);
-//            System.out.println("key:"+rule.keySet());
-//            System.out.println(rule.values());
 
 			if (rule.containsKey('\\')) {
 				processWildCards(text, textChars, (HashMap) rule.get('\\'), matchBegin, matchEnd, currentPosition, matches, previousChar, true, '\\');
@@ -459,7 +450,6 @@ public class FastCRules extends FastRuleWG {
 						while ((isWhitespace(thisChar) || (int) thisChar == 160 || WildCardChecker.isSpecialChar(thisChar)) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
 							currentPosition++;
 							currentRepeats++;
-							//                                System.out.println(textChars.length+":"+currentPosition);
 							if (currentPosition == textChars.length)
 								break;
 							thisChar = textChars[currentPosition];
@@ -489,15 +479,13 @@ public class FastCRules extends FastRuleWG {
 		HashMap<Determinants, Integer> deterRule = (HashMap<Determinants, Integer>) rule.get(END);
 		int end = matchEnd == 0 ? currentPosition : matchEnd;
 		Span currentSpan = new Span(matchBegin + offset, end + offset, text.substring(matchBegin, end));
-		if (debug)
-			System.out.println("Try to addDeterminants: " + currentSpan.begin + ", " + currentSpan.end + "\t" + currentSpan.text);
+		logger.finest("Try to addDeterminants: " + currentSpan.begin + ", " + currentSpan.end + "\t" + currentSpan.text);
 		ArrayList<Span> currentSpanList = new ArrayList<Span>();
 		for (Object key : deterRule.keySet()) {
 			int rulePos = deterRule.get(key);
 			double score = getScore(rulePos);
 			currentSpan.ruleId = rulePos;
-			if (debug)
-				System.out.println("\t\tRule Id: " + rulePos + "\t" + getRule(rulePos).type + "\t" + getRuleString(rulePos));
+			logger.finest("\t\tRule Id: " + rulePos + "\t" + getRule(rulePos).type + "\t" + getRuleString(rulePos));
 //          If needed, implement your own selection ruleStore and score updating logic below
 			if (matches.containsKey(key)) {
 //              because the ruleStore are all processed at the same time from the input left to the input right,
@@ -509,12 +497,9 @@ public class FastCRules extends FastRuleWG {
 				if (overlappedPos != null) {
 					int pos = (int) overlappedPos;
 					Span overlappedSpan = currentSpanList.get(pos);
-					if (debug)
-						System.out.println("\t\tOverlapped with: " + overlappedSpan.begin + ", " + overlappedSpan.end + "\t" + text.substring(overlappedSpan.begin, overlappedSpan.end));
+					logger.finest("\t\tOverlapped with: " + overlappedSpan.begin + ", " + overlappedSpan.end + "\t" + text.substring(overlappedSpan.begin, overlappedSpan.end));
 					if (!compareSpan(currentSpan, overlappedSpan)) {
-						if (debug) {
-							System.out.println("\t\tSkip this span ...");
-						}
+						logger.finest("\t\tSkip this span ...");
 						continue;
 					}
 					currentSpanList.set(pos, currentSpan);
@@ -573,8 +558,7 @@ public class FastCRules extends FastRuleWG {
 	}
 
 	protected boolean compareScorePrior(Span a, Span b) {
-		if (debug)
-			System.out.println("\t\tcurrent " + a.ruleId + " score: " + getScore(a.ruleId) + "\t---\toverlapped " + b.ruleId + " score: " + getScore(b.ruleId));
+		logger.finest("\t\tcurrent " + a.ruleId + " score: " + getScore(a.ruleId) + "\t---\toverlapped " + b.ruleId + " score: " + getScore(b.ruleId));
 		if (getScore(a) < 0)
 			return true;
 		if (getScore(b) < 0)

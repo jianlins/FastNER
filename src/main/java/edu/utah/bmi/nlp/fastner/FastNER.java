@@ -130,10 +130,6 @@ public class FastNER {
 		return fastRule.ruleStore.get(matchedSpan.ruleId);
 	}
 
-	public void setDebug(boolean debug) {
-		fastRule.setDebug(debug);
-	}
-
 	public void setRemovePseudo(boolean removePseudo) {
 		fastRule.setRemovePseudo(removePseudo);
 	}

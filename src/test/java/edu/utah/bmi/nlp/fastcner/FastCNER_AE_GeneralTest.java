@@ -18,6 +18,7 @@ package edu.utah.bmi.nlp.fastcner;
 
 
 import edu.utah.bmi.nlp.fastcner.uima.FastCNER_AE_General;
+import edu.utah.bmi.nlp.fastner.FastRule;
 import edu.utah.bmi.nlp.type.system.Concept;
 import edu.utah.bmi.nlp.type.system.ConceptBASE;
 import edu.utah.bmi.nlp.type.system.Sentence;
@@ -37,9 +38,12 @@ import org.apache.uima.util.InvalidXMLException;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngine;
 import static org.junit.Assert.assertTrue;
@@ -50,6 +54,7 @@ import static org.junit.Assert.assertTrue;
  * Created by Jianlin Shi on 4/26/16.
  */
 public class FastCNER_AE_GeneralTest {
+	public static Logger logger = Logger.getLogger(FastCNER_AE_GeneralTest.class.getCanonicalName());
 	private AnalysisEngine fastCNER_AE, simpleParser_AE, annoprinter;
 	private AdaptableUIMACPERunner runner;
 	private JCas jCas;
@@ -57,6 +62,15 @@ public class FastCNER_AE_GeneralTest {
 
 	@Before
 	public void setUp() {
+        if (System.getProperty("java.util.logging.config.file") == null &&
+                new File("logging.properties").exists()) {
+            System.setProperty("java.util.logging.config.file", "logging.properties");
+        }
+        try {
+            LogManager.getLogManager().readConfiguration();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 		String typeDescriptor = "desc/type/All_Types";
 		runner = new AdaptableUIMACPERunner(typeDescriptor, "target/generated-test-sources/");
 		runner.addConceptTypes(new FastCNER("conf/crule_test.xlsx", true).getTypeDefinitions().values());
@@ -91,9 +105,9 @@ public class FastCNER_AE_GeneralTest {
 		ArrayList<Annotation> concepts = new ArrayList<>();
 		while (annoIter.hasNext()) {
 			Object anno = annoIter.next();
-//            System.out.println(anno.getClass().getCanonicalName());
+			logger.finest(anno.getClass().getCanonicalName());
 			concepts.add((Annotation) anno);
-//            System.out.println(concepts.get(concepts.size() - 1).getCoveredText());
+			logger.finest(concepts.get(concepts.size() - 1).getCoveredText());
 		}
 		assertTrue("Didn't get the right number of concepts", concepts.size() == 1);
 		assertTrue("Didn't get the right concept: 'hearing'", concepts.get(0).getCoveredText().equals("hearing"));
@@ -106,9 +120,9 @@ public class FastCNER_AE_GeneralTest {
 		while (annoIter.hasNext()) {
 			Annotation anno = (Annotation) annoIter.next();
 			TOP obj = jCas.getJfsFromCaddr(anno.getAddress());
-			//            System.out.println(anno.getClass().getCanonicalName());
+			logger.finest(anno.getClass().getCanonicalName());
 			concepts.add(anno);
-//            System.out.println(concepts.get(concepts.size() - 1).getCoveredText());
+			logger.finest(concepts.get(concepts.size() - 1).getCoveredText());
 		}
 
 		assertTrue("Didn't get the right number of concepts", concepts.size() == 3);
@@ -121,7 +135,7 @@ public class FastCNER_AE_GeneralTest {
 		ArrayList<Token> tokens = new ArrayList<Token>();
 		while (annoIter.hasNext()) {
 			tokens.add((Token) annoIter.next());
-			System.out.println(tokens.get(tokens.size()-1).getCoveredText());
+			logger.finest(tokens.get(tokens.size()-1).getCoveredText());
 		}
 		assertTrue("Didn't get the right number of concepts", tokens.size() == 11);
 		assertTrue("Didn't get the right token: 'The'", tokens.get(0).getBegin() == 0 && tokens.get(0).getEnd() == 3 && text.substring(0, 3).equals(tokens.get(0).getCoveredText()));

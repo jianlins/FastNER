@@ -27,6 +27,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 
 /**
@@ -35,7 +36,6 @@ import java.util.*;
  * @author Jianlin Shi
  */
 public class FastCNER_AE_General extends FastNER_AE_General {
-
 
 	public static final String PARAM_REPLICATION_SUPPORT = "ReplicationSupport";
 	protected boolean replicationSupport;
@@ -48,6 +48,7 @@ public class FastCNER_AE_General extends FastNER_AE_General {
 
 	public void initialize(UimaContext cont) {
 		super.initialize(cont);
+
 	}
 
 	protected LinkedHashMap<String, TypeDefinition> initFastNER(UimaContext cont, String ruleStr) {
@@ -66,9 +67,6 @@ public class FastCNER_AE_General extends FastNER_AE_General {
 		fastNER = new FastCNER(ruleStr);
 		((FastCNER) fastNER).setReplicationSupport(replicationSupport);
 		((FastCNER) fastNER).setMaxRepeatLength(maxRepeatLength);
-		if (debug) {
-			fastNER.setDebug(true);
-		}
 		if (markPseudo)
 			fastNER.setRemovePseudo(false);
 		return fastNER.getTypeDefinitions();
@@ -107,7 +105,7 @@ public class FastCNER_AE_General extends FastNER_AE_General {
 		} else {
 			Collection<SourceDocumentInformation> docAnnotation = JCasUtil.select(jcas, SourceDocumentInformation.class);
 			if (docAnnotation != null && docAnnotation.size() > 0)
-				System.out.println("Document: " + docAnnotation.iterator().next().getUri() + " has not been properly sentence segmented. Use simple segmenter instead.");
+				logger.info("Document: " + docAnnotation.iterator().next().getUri() + " has not been properly sentence segmented. Use simple segmenter instead.");
 
 			String text = jcas.getDocumentText();
 			ArrayList<ArrayList<Span>> simpleSentences = SimpleParser.tokenizeDecimalSmartWSentences(text, true);

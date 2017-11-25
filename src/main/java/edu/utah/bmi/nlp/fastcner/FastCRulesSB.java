@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * This class extend FastCRules to support square brackets (not support nested square brackets)
@@ -30,7 +31,7 @@ import java.util.Map;
  * Square brackets are used to provide logic OR expression, always use together with "|"
  *
  * @author Jianlin Shi
- *         Created on 5/27/16.
+ * Created on 5/27/16.
  */
 public class FastCRulesSB extends FastCRules {
 
@@ -143,8 +144,7 @@ public class FastCRulesSB extends FastCRules {
             cleanSet.add(subRule.toString());
         }
         for (StringBuilder subRule : ruleStringBuilders) {
-            if (debug)
-                System.out.println(subRule.toString() + "\t" + rule.ruleName);
+            logger.logp(Level.FINEST, getClass().getCanonicalName(), "expandSB", subRule.toString() + "\t" + rule.ruleName);
             Rule newRule = new Rule(rule.id, subRule.toString(), rule.ruleName, rule.score, rule.type);
             expandedRules.add(newRule);
         }

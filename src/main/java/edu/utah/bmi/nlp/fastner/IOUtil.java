@@ -77,8 +77,6 @@ public class IOUtil {
                                 continue;
                             }
 //                            TODO enable annotating at variable name level and/or semantic type level
-//                            String nameEntityClass = var.getVarName();
-//                            System.out.println("variable name: " + var.getVarName());
                             String nameEntityClass = term.getSemanticType().get(0);
                             nameEntityClass = nameEntityClass.replaceAll(" +", "_").toUpperCase();
                             ruleSupports = addRule(rules, typeDefinition, new Rule(++id, caseSensitive ? preferredTerm : preferredTerm.toLowerCase(), nameEntityClass, 0, Determinants.ACTUAL), ruleSupports);

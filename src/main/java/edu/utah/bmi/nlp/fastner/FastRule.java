@@ -21,8 +21,12 @@ import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.SimpleParser;
 import edu.utah.bmi.nlp.core.Span;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 /**
  * This is an abstract class, which implements initiation methods and processTokens abstract method.
@@ -37,7 +41,9 @@ import java.util.function.BiFunction;
  * to the last two elements in each rule defined in the rule CSV file.
  */
 public abstract class FastRule {
-    protected boolean debug = false;
+
+    public static Logger logger = Logger.getLogger(FastRule.class.getCanonicalName());
+
     protected boolean removePseudo = true;
     protected HashMap rulesMap = new HashMap();
     protected final Determinants END = Determinants.END;
@@ -55,12 +61,14 @@ public abstract class FastRule {
     }
 
     public void initiate(String ruleStr, String splitter, boolean caseSensitive) {
+        initLogger();
         ruleStore = IOUtil.parseRuleStr(ruleStr, splitter, caseSensitive);
         initiate(ruleStore);
     }
 
 
     public void initiate(HashMap<Integer, Rule> ruleStore) {
+        initLogger();
         this.ruleStore = ruleStore;
         for (Map.Entry<Integer, Rule> ent : ruleStore.entrySet()) {
             addRule(ent.getValue());
@@ -68,6 +76,17 @@ public abstract class FastRule {
         initiateFunctions();
     }
 
+    protected void initLogger(){
+        if (System.getProperty("java.util.logging.config.file") == null &&
+                new File("logging.properties").exists()) {
+            System.setProperty("java.util.logging.config.file", "logging.properties");
+        }
+        try {
+            LogManager.getLogManager().readConfiguration();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     protected void initiateFunctions() {
         getSpanEnd = (list, id) -> ((Span) list.get(id)).getEnd();
         getSpanBegin = (list, id) -> ((Span) list.get(id)).getBegin();
@@ -144,14 +163,6 @@ public abstract class FastRule {
                     spanIterator.remove();
             }
         }
-    }
-
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
 
     public void setRemovePseudo(boolean removePseudo) {
