@@ -33,6 +33,7 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -101,7 +102,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
             System.setProperty("java.util.logging.config.file", "logging.properties");
         }
         try {
-            LogManager.getLogManager().readConfiguration();
+            LogManager.getLogManager().readConfiguration(new FileInputStream(new File("logging.properties")));
         } catch (IOException e) {
             e.printStackTrace();
         }
