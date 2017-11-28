@@ -239,9 +239,9 @@ public class FastCRules extends FastRuleWG {
 		} else if (currentPosition == textChars.length && rule.containsKey('\\') && ((HashMap) rule.get('\\')).containsKey('e')) {
 			HashMap deterRule = ((HashMap) ((HashMap) rule.get('\\')).get('e'));
 			if (matchEnd == 0)
-				addDeterminants(text, rule, matches, matchBegin, currentPosition, currentPosition);
+				addDeterminants(text, deterRule, matches, matchBegin, currentPosition, currentPosition);
 			else
-				addDeterminants(text, rule, matches, matchBegin, matchEnd, currentPosition);
+				addDeterminants(text, deterRule, matches, matchBegin, matchEnd, currentPosition);
 		} else if (currentPosition == textChars.length && rule.containsKey(')')) {
 			HashMap deterRule = (HashMap) rule.get(')');
 			if (deterRule.containsKey(END)) {
