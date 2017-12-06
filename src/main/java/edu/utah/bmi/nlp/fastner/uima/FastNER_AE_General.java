@@ -130,7 +130,11 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
             for (String sectionName : ((String) obj).split("[\\|,;]")) {
                 sectionName = sectionName.trim();
                 if (sectionName.length() > 0) {
-                    includeSections.add(AnnotationOper.getTypeClass(DeterminantValueSet.checkNameSpace(sectionName)));
+                    Class cls = AnnotationOper.getTypeClass(DeterminantValueSet.checkNameSpace(sectionName));
+                    if (cls != null)
+                        includeSections.add(cls);
+                    else
+                        logger.warning("Undefined Section: " + sectionName);
                 }
             }
         }
@@ -150,7 +154,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
         if (obj != null && obj instanceof Boolean && (Boolean) obj != true)
             caseSenstive = false;
 
-        try{
+        try {
             SentenceType = Class.forName(sentenceTypeName).asSubclass(Annotation.class);
             TokenType = Class.forName(tokenTypeName).asSubclass(Annotation.class);
             TokenTypeConstructor = TokenType.getConstructor(new Class[]{JCas.class, int.class, int.class});
