@@ -497,7 +497,8 @@ public class FastCRules extends FastRuleWG {
 				if (overlappedPos != null) {
 					int pos = (int) overlappedPos;
 					Span overlappedSpan = currentSpanList.get(pos);
-					logger.finest("\t\tOverlapped with: " + overlappedSpan.begin + ", " + overlappedSpan.end + "\t" + text.substring(overlappedSpan.begin, overlappedSpan.end));
+					logger.finest("\t\tOverlapped with: " + overlappedSpan.begin + ", " + overlappedSpan.end + "\t" +
+							text.substring(overlappedSpan.begin-offset, overlappedSpan.end-offset));
 					if (!compareSpan(currentSpan, overlappedSpan)) {
 						logger.finest("\t\tSkip this span ...");
 						continue;
