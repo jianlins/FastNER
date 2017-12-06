@@ -18,9 +18,7 @@ package edu.utah.bmi.nlp.fastner.uima;
 import edu.utah.bmi.nlp.core.*;
 import edu.utah.bmi.nlp.core.DeterminantValueSet.Determinants;
 import edu.utah.bmi.nlp.fastner.FastNER;
-import edu.utah.bmi.nlp.type.system.Concept;
-import edu.utah.bmi.nlp.type.system.ConceptBASE;
-import edu.utah.bmi.nlp.type.system.PseudoConcept;
+import edu.utah.bmi.nlp.type.system.*;
 import edu.utah.bmi.nlp.uima.common.AnnotationComparator;
 import edu.utah.bmi.nlp.uima.common.AnnotationOper;
 import org.apache.uima.UimaContext;
@@ -84,7 +82,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
     //    according to different determinant, save the concept in different annotations
 //    need to make sure the corresponding types (descriptor and Java classes) are available.
     protected HashMap<String, Constructor<? extends Annotation>> ConceptTypeClasses = new HashMap<String, Constructor<? extends Annotation>>();
-    protected HashSet<Class> includeSections = new HashSet<>();
+    protected HashSet<String> includeSections = new HashSet<>();
     protected Class<? extends Annotation> SentenceType, TokenType;
     protected Constructor<? extends Annotation> SentenceTypeConstructor;
     protected Constructor<? extends Annotation> TokenTypeConstructor;
@@ -125,17 +123,11 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 
         obj = cont.getConfigParameterValue(PARAM_INCLUDE_SECTIONS);
         if (obj == null || ((String) obj).trim().length() == 0)
-            includeSections.add(SourceDocumentInformation.class);
+            includeSections.add("SourceDocumentInformation");
         else {
             for (String sectionName : ((String) obj).split("[\\|,;]")) {
                 sectionName = sectionName.trim();
-                if (sectionName.length() > 0) {
-                    Class cls = AnnotationOper.getTypeClass(DeterminantValueSet.checkNameSpace(sectionName));
-                    if (cls != null)
-                        includeSections.add(cls);
-                    else
-                        logger.warning("Undefined Section: " + sectionName);
-                }
+                includeSections.add(sectionName);
             }
         }
 
@@ -272,13 +264,21 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 
     protected IntervalST<String> indexInclusionSections(JCas jCas) {
         IntervalST<String> sectionTree = new IntervalST<>();
-        for (Class sectionClass : includeSections) {
-            FSIndex annoIndex = jCas.getAnnotationIndex(sectionClass);
-            Iterator annoIter = annoIndex.iterator();
-            while (annoIter.hasNext()) {
-                Annotation section = (Annotation) annoIter.next();
-                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionClass.getSimpleName());
-            }
+        FSIndex annoIndex = jCas.getAnnotationIndex(SectionBody.class);
+        Iterator annoIter = annoIndex.iterator();
+        while (annoIter.hasNext()) {
+            Annotation section = (Annotation) annoIter.next();
+            String sectionName = section.getType().getShortName();
+            if (includeSections.contains(sectionName))
+                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), section.getType().getShortName());
+        }
+        annoIndex = jCas.getAnnotationIndex(SectionHeader.class);
+        annoIter = annoIndex.iterator();
+        while (annoIter.hasNext()) {
+            Annotation section = (Annotation) annoIter.next();
+            String sectionName = section.getType().getShortName();
+            if (includeSections.contains(sectionName))
+                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), section.getType().getShortName());
         }
         return sectionTree;
     }
