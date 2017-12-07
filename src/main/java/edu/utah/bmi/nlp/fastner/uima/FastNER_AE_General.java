@@ -270,7 +270,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
             Annotation section = (Annotation) annoIter.next();
             String sectionName = section.getType().getShortName();
             if (includeSections.contains(sectionName))
-                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), section.getType().getShortName());
+                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()),sectionName);
         }
         annoIndex = jCas.getAnnotationIndex(SectionHeader.class);
         annoIter = annoIndex.iterator();
