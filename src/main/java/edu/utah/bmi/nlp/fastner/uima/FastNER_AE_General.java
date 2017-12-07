@@ -46,7 +46,7 @@ import java.util.logging.Logger;
  * @author Jianlin Shi
  */
 public class FastNER_AE_General extends JCasAnnotator_ImplBase {
-    public static Logger logger = Logger.getLogger(FastNER_AE_General.class.getCanonicalName());
+    public static Logger logger = IOUtil.getLogger(FastNER_AE_General.class);
 
 
     //	a list of section names (can use short name if name space is "edu.utah.bmi.nlp.type.system."),
@@ -95,15 +95,6 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 
 
     public void initialize(UimaContext cont) {
-        if (System.getProperty("java.util.logging.config.file") == null &&
-                new File("logging.properties").exists()) {
-            System.setProperty("java.util.logging.config.file", "logging.properties");
-        }
-        try {
-            LogManager.getLogManager().readConfiguration(new FileInputStream(new File("logging.properties")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         String ruleStr, sentenceTypeName, tokenTypeName;
         ruleStr = (String) (cont
                 .getConfigParameterValue(PARAM_RULE_FILE_OR_STR));

@@ -38,6 +38,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.logging.Logger;
 
 import static edu.utah.bmi.nlp.core.DeterminantValueSet.checkNameSpace;
 
@@ -45,6 +46,7 @@ import static edu.utah.bmi.nlp.core.DeterminantValueSet.checkNameSpace;
  * @author Jianlin Shi on 4/20/16.
  */
 public class IOUtil {
+    public static Logger logger= edu.utah.bmi.nlp.core.IOUtil.getLogger(IOUtil.class);
 
     public static HashMap<Integer, Rule> parseRuleStr(String ruleStr, String splitter, boolean caseSensitive) {
         HashMap<Integer, Rule> rules = new HashMap<>();
@@ -100,7 +102,7 @@ public class IOUtil {
                             }
                         }
                     } else {
-                        System.out.println("Current FastRule does not support complex NER:\n\t" + logicExpression);
+                        logger.info("Current FastRule does not support complex NER:\n\t" + logicExpression);
                     }
                 }
             }
@@ -265,7 +267,7 @@ public class IOUtil {
                 ruleSupports = addRule(rules, typeDefinition, new Rule(id, caseSensitive ? rule : rule.toLowerCase(), cells.get(1).trim(), 0d, cells.size() > 2 ? Determinants.valueOf(cells.get(2)) : Determinants.ACTUAL), ruleSupports);
             }
         } else
-            System.out.println("Definition format error: line " + id + "\t\t" + cells);
+            logger.info("Definition format error: line " + id + "\t\t" + cells);
         return ruleSupports;
     }
 
@@ -286,7 +288,7 @@ public class IOUtil {
             if (definition.length > 2) {
                 definition[2] = checkNameSpace(definition[2]);
             } else if (!rule.trim().startsWith("#")) {
-                System.out.println("Definition format error: line " + id + "\t\t" + rule);
+                logger.info("Definition format error: line " + id + "\t\t" + rule);
                 continue;
             }
             rules.put(id, new Rule(id, definition[0], definition[2].trim(), Double.parseDouble(definition[1]), determinant));

@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  */
 public abstract class FastRule {
 
-    public static Logger logger = Logger.getLogger(FastRule.class.getCanonicalName());
+    public static Logger logger = edu.utah.bmi.nlp.core.IOUtil.getLogger(FastRule.class);
 
     protected boolean removePseudo = true;
     protected HashMap rulesMap = new HashMap();
@@ -61,14 +61,12 @@ public abstract class FastRule {
     }
 
     public void initiate(String ruleStr, String splitter, boolean caseSensitive) {
-        initLogger();
         ruleStore = IOUtil.parseRuleStr(ruleStr, splitter, caseSensitive);
         initiate(ruleStore);
     }
 
 
     public void initiate(HashMap<Integer, Rule> ruleStore) {
-        initLogger();
         this.ruleStore = ruleStore;
         for (Map.Entry<Integer, Rule> ent : ruleStore.entrySet()) {
             addRule(ent.getValue());
@@ -76,17 +74,7 @@ public abstract class FastRule {
         initiateFunctions();
     }
 
-    protected void initLogger(){
-        if (System.getProperty("java.util.logging.config.file") == null &&
-                new File("logging.properties").exists()) {
-            System.setProperty("java.util.logging.config.file", "logging.properties");
-        }
-        try {
-            LogManager.getLogManager().readConfiguration();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
     protected void initiateFunctions() {
         getSpanEnd = (list, id) -> ((Span) list.get(id)).getEnd();
         getSpanBegin = (list, id) -> ((Span) list.get(id)).getBegin();
@@ -183,11 +171,11 @@ public abstract class FastRule {
 
     private void printEmbededMap(HashMap<Object, Object> ruleMap, String offset) {
         for (Map.Entry<Object, Object> ent : ruleMap.entrySet()) {
-            System.out.println(offset + "key: " + ent.getKey());
+            logger.finer(offset + "key: " + ent.getKey());
             if (ent.getValue().getClass() == HashMap.class) {
                 printEmbededMap((HashMap<Object, Object>) ent.getValue(), offset + "\t");
             } else {
-                System.out.println(offset + "pair: " + ent.getKey() + "->" + ent.getValue());
+                logger.finer(offset + "pair: " + ent.getKey() + "->" + ent.getValue());
             }
 
         }
