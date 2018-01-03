@@ -30,13 +30,9 @@ import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 
@@ -176,16 +172,19 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 
 
     public void process(JCas jcas) throws AnalysisEngineProcessException {
-        IntervalST<String> sectionTree = indexInclusionSections(jcas);
+        IntervalST<String> sectionTree = new IntervalST<>();
+        int totalSections = indexSections(jcas, sectionTree);
         LinkedHashMap<String, ArrayList<Annotation>> sentences = new LinkedHashMap<>();
         ArrayList<Annotation> tokens = new ArrayList<>();
         FSIndex annoIndex = jcas.getAnnotationIndex(SentenceType);
         Iterator annoIter = annoIndex.iterator();
+        int totalSentences = 0;
         while (annoIter.hasNext()) {
             Annotation sentence = (Annotation) annoIter.next();
+            totalSentences++;
             String sectionName = sectionTree.get(new Interval1D(sentence.getBegin(), sentence.getEnd()));
             if (sectionName == null) {
-                if (sectionTree.size() == 0)
+                if (totalSections == 0)
                     sectionName = SourceDocumentInformation.class.getSimpleName();
                 else
                     continue;
@@ -204,7 +203,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
             tokens.add((Annotation) annoIter.next());
         }
 
-        if (sentences.size() > 0) {
+        if (totalSentences > 0) {
             for (String sectionName : sentences.keySet()) {
                 // make sure all the annotations are in ascending order regarding span offset
                 Collections.sort(sentences.get(sectionName), new AnnotationComparator());
@@ -253,25 +252,29 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
         }
     }
 
-    protected IntervalST<String> indexInclusionSections(JCas jCas) {
-        IntervalST<String> sectionTree = new IntervalST<>();
+    protected int indexSections(JCas jCas, IntervalST<String> sectionTree) {
+        int totalSections = 0;
         FSIndex annoIndex = jCas.getAnnotationIndex(SectionBody.class);
         Iterator annoIter = annoIndex.iterator();
         while (annoIter.hasNext()) {
             Annotation section = (Annotation) annoIter.next();
             String sectionName = section.getType().getShortName();
-            if (includeSections.contains(sectionName))
-                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()),sectionName);
+            if (includeSections.contains(sectionName)) {
+                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
+            }
+            totalSections++;
         }
         annoIndex = jCas.getAnnotationIndex(SectionHeader.class);
         annoIter = annoIndex.iterator();
         while (annoIter.hasNext()) {
             Annotation section = (Annotation) annoIter.next();
             String sectionName = section.getType().getShortName();
-            if (includeSections.contains(sectionName))
-                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), section.getType().getShortName());
+            if (includeSections.contains(sectionName)) {
+                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
+            }
+            totalSections++;
         }
-        return sectionTree;
+        return totalSections;
     }
 
 
