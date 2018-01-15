@@ -109,9 +109,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 
 
         obj = cont.getConfigParameterValue(PARAM_INCLUDE_SECTIONS);
-        if (obj == null || ((String) obj).trim().length() == 0)
-            includeSections.add("SourceDocumentInformation");
-        else {
+        if (obj != null && ((String) obj).trim().length() > 0) {
             for (String sectionName : ((String) obj).split("[\\|,;]")) {
                 sectionName = sectionName.trim();
                 includeSections.add(sectionName);
@@ -254,6 +252,8 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 
     protected int indexSections(JCas jCas, IntervalST<String> sectionTree) {
         int totalSections = 0;
+        if (includeSections.size() == 0)
+            return 0;
         FSIndex annoIndex = jCas.getAnnotationIndex(SectionBody.class);
         Iterator annoIter = annoIndex.iterator();
         while (annoIter.hasNext()) {

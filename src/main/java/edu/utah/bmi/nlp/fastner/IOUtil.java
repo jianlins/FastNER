@@ -46,7 +46,7 @@ import static edu.utah.bmi.nlp.core.DeterminantValueSet.checkNameSpace;
  * @author Jianlin Shi on 4/20/16.
  */
 public class IOUtil {
-    public static Logger logger= edu.utah.bmi.nlp.core.IOUtil.getLogger(IOUtil.class);
+    public static Logger logger = edu.utah.bmi.nlp.core.IOUtil.getLogger(IOUtil.class);
 
     public static HashMap<Integer, Rule> parseRuleStr(String ruleStr, String splitter, boolean caseSensitive) {
         HashMap<Integer, Rule> rules = new HashMap<>();
@@ -173,7 +173,8 @@ public class IOUtil {
                     cell.setCellType(CellType.STRING);
                     cells.add(cell.getStringCellValue());
                 }
-                ruleSupports = parseCells(cells, id, rules, typeDefinition, caseSensitive, ruleSupports);
+                if (cells.size() > 0)
+                    ruleSupports = parseCells(cells, id, rules, typeDefinition, caseSensitive, ruleSupports);
                 id++;
             }
         } catch (IOException e) {
