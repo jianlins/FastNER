@@ -486,7 +486,7 @@ public class FastCRules extends FastRuleWG {
                 sb.append("\n");
             }
             logger.warning("Rule definition error ----matched begin > matched end\n" +
-                    "check the following rules: ");
+                    "check the following rules: \n"+sb.toString());
         }
         Span currentSpan = new Span(matchBegin + offset, end + offset, text.substring(matchBegin, end));
         logger.finest("Try to addDeterminants: " + currentSpan.begin + ", " + currentSpan.end + "\t" + currentSpan.text);
