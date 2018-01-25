@@ -198,11 +198,11 @@ public class FastCRules extends FastRuleWG {
             if (rule.containsKey('\\')) {
                 processWildCards(text, textChars, (HashMap) rule.get('\\'), matchBegin, matchEnd, currentPosition, matches, previousChar, true, '\\');
             }
-            if (rule.containsKey('(')) {
+            if (rule.containsKey('(') && previousKey!='\\') {
                 processRules(text, textChars, (HashMap) rule.get('('), currentPosition, matchEnd, currentPosition, matches,
                         previousChar, false, '(');
             }
-            if (rule.containsKey(')')) {
+            if (rule.containsKey(')') && previousKey!='\\') {
                 processRules(text, textChars, (HashMap) rule.get(')'), matchBegin, currentPosition, currentPosition, matches,
                         previousChar, false, ')');
 
@@ -486,7 +486,14 @@ public class FastCRules extends FastRuleWG {
                 sb.append("\n");
             }
             logger.warning("Rule definition error ----matched begin > matched end\n" +
-                    "check the following rules: \n"+sb.toString());
+                    "check the following rules: \n" + sb.toString());
+            int snippetBegin = matchBegin - 100;
+            snippetBegin = snippetBegin < 0 ? 0 : snippetBegin;
+            int snippetEnd = end + 100;
+            snippetEnd = snippetEnd > text.length() ? text.length() : snippetEnd;
+            logger.warning("try to match span: " + text.substring(snippetBegin, end) + "<*>"
+                    + text.substring(end, matchBegin) + "<*>" + text.substring(matchBegin, snippetEnd));
+
         }
         Span currentSpan = new Span(matchBegin + offset, end + offset, text.substring(matchBegin, end));
         logger.finest("Try to addDeterminants: " + currentSpan.begin + ", " + currentSpan.end + "\t" + currentSpan.text);

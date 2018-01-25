@@ -67,6 +67,7 @@ public abstract class FastRule {
 
 
     public void initiate(HashMap<Integer, Rule> ruleStore) {
+        rulesMap.clear();
         this.ruleStore = ruleStore;
         for (Map.Entry<Integer, Rule> ent : ruleStore.entrySet()) {
             addRule(ent.getValue());
