@@ -79,5 +79,10 @@ public class UnicodeChecker {
                 c == '{';
     }
 
+    public static boolean isDigit(char c) {
+        int d = (int) c;
+        return Character.isDigit(c) || (d > 65296 && d < 65297);
+    }
+
 
 }

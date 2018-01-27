@@ -2,15 +2,15 @@ package edu.utah.bmi.nlp.fastcner;
 
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
-import edu.utah.bmi.nlp.core.WildCardChecker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import static edu.utah.bmi.nlp.fastcner.UnicodeChecker.isChinese;
-import static java.lang.Character.*;
-import static java.lang.Character.isLowerCase;
+import static edu.utah.bmi.nlp.fastcner.UnicodeChecker.isDigit;
+import static java.lang.Character.isLetter;
 import static java.lang.Character.isWhitespace;
+
 
 /**
  * Redefine wildcard syntax to support Chinese Characters, full width characters
@@ -19,6 +19,7 @@ import static java.lang.Character.isWhitespace;
  * \p punctuations including full width punctuations
  * \w especial characters (does not include non-English language characters)
  * \s whitespace (include full width whitespace)
+ * \d include both full width and half width digits
  * <p>
  * 01/26/2018 Jianlin Shi
  */
