@@ -21,6 +21,7 @@ import edu.utah.bmi.nlp.fastner.FastRuleWG;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 import static java.lang.Character.*;
 
@@ -147,12 +148,14 @@ public class FastCRules extends FastRuleWG {
     }
 
     public HashMap<String, ArrayList<Span>> processTokens(ArrayList<String> contextTokens) {
-        logger.finest("This method is not used in character-based ruleStore");
+        if (logger.isLoggable(Level.FINEST))
+            logger.finest("This method is not used in character-based ruleStore");
         return null;
     }
 
     public HashMap<String, ArrayList<Span>> processSpans(ArrayList<Span> contextTokens) {
-        logger.finest("This method is not used in character-based ruleStore");
+        if (logger.isLoggable(Level.FINEST))
+            logger.finest("This method is not used in character-based ruleStore");
         return null;
     }
 
@@ -198,11 +201,11 @@ public class FastCRules extends FastRuleWG {
             if (rule.containsKey('\\')) {
                 processWildCards(text, textChars, (HashMap) rule.get('\\'), matchBegin, matchEnd, currentPosition, matches, previousChar, true, '\\');
             }
-            if (rule.containsKey('(') && previousKey!='\\') {
+            if (rule.containsKey('(') && previousKey != '\\') {
                 processRules(text, textChars, (HashMap) rule.get('('), currentPosition, matchEnd, currentPosition, matches,
                         previousChar, false, '(');
             }
-            if (rule.containsKey(')') && previousKey!='\\') {
+            if (rule.containsKey(')') && previousKey != '\\') {
                 processRules(text, textChars, (HashMap) rule.get(')'), matchBegin, currentPosition, currentPosition, matches,
                         previousChar, false, ')');
 
@@ -496,13 +499,15 @@ public class FastCRules extends FastRuleWG {
 
         }
         Span currentSpan = new Span(matchBegin + offset, end + offset, text.substring(matchBegin, end));
-        logger.finest("Try to addDeterminants: " + currentSpan.begin + ", " + currentSpan.end + "\t" + currentSpan.text);
+        if (logger.isLoggable(Level.FINEST))
+            logger.finest("Try to addDeterminants: " + currentSpan.begin + ", " + currentSpan.end + "\t" + currentSpan.text);
         ArrayList<Span> currentSpanList = new ArrayList<Span>();
         for (Object key : deterRule.keySet()) {
             int rulePos = deterRule.get(key);
             double score = getScore(rulePos);
             currentSpan.ruleId = rulePos;
-            logger.finest("\t\tRule Id: " + rulePos + "\t" + getRule(rulePos).type + "\t" + getRuleString(rulePos));
+            if (logger.isLoggable(Level.FINEST))
+                logger.finest("\t\tRule Id: " + rulePos + "\t" + getRule(rulePos).type + "\t" + getRuleString(rulePos));
 //          If needed, implement your own selection ruleStore and score updating logic below
             if (matches.containsKey(key)) {
 //              because the ruleStore are all processed at the same time from the input left to the input right,
@@ -511,29 +516,31 @@ public class FastCRules extends FastRuleWG {
                 IntervalST<Integer> overlapChecker = overlapCheckers.get(key);
 
 
-                Object overlappedPos = overlapChecker.get(new Interval1D(currentSpan.begin, currentSpan.end));
+                Object overlappedPos = overlapChecker.get(new Interval1D(currentSpan.begin, currentSpan.end - 1));
 
                 if (overlappedPos != null) {
                     int pos = (int) overlappedPos;
                     Span overlappedSpan = currentSpanList.get(pos);
-                    logger.finest("\t\tOverlapped with: " + overlappedSpan.begin + ", " + overlappedSpan.end + "\t" +
-                            text.substring(overlappedSpan.begin - offset, overlappedSpan.end - offset));
+                    if (logger.isLoggable(Level.FINEST))
+                        logger.finest("\t\tOverlapped with: " + overlappedSpan.begin + ", " + overlappedSpan.end + "\t" +
+                                text.substring(overlappedSpan.begin - offset, overlappedSpan.end - offset));
                     if (!compareSpan(currentSpan, overlappedSpan)) {
-                        logger.finest("\t\tSkip this span ...");
+                        if (logger.isLoggable(Level.FINEST))
+                            logger.finest("\t\tSkip this span ...");
                         continue;
                     }
                     currentSpanList.set(pos, currentSpan);
-                    overlapChecker.remove(new Interval1D(overlappedSpan.begin, overlappedSpan.end));
-                    overlapChecker.put(new Interval1D(currentSpan.begin, currentSpan.end), pos);
+                    overlapChecker.remove(new Interval1D(overlappedSpan.begin, overlappedSpan.end - 1));
+                    overlapChecker.put(new Interval1D(currentSpan.begin, currentSpan.end - 1), pos);
                 } else {
-                    overlapChecker.put(new Interval1D(currentSpan.begin, currentSpan.end), currentSpanList.size());
+                    overlapChecker.put(new Interval1D(currentSpan.begin, currentSpan.end - 1), currentSpanList.size());
                     currentSpanList.add(currentSpan);
                 }
             } else {
                 currentSpanList.add(currentSpan);
                 matches.put((String) key, currentSpanList);
                 IntervalST<Integer> overlapChecker = new IntervalST<Integer>();
-                overlapChecker.put(new Interval1D(currentSpan.begin, currentSpan.end), 0);
+                overlapChecker.put(new Interval1D(currentSpan.begin, currentSpan.end - 1), 0);
                 overlapCheckers.put((String) key, overlapChecker);
             }
         }
@@ -578,7 +585,8 @@ public class FastCRules extends FastRuleWG {
     }
 
     protected boolean compareScorePrior(Span a, Span b) {
-        logger.finest("\t\tcurrent " + a.ruleId + " score: " + getScore(a.ruleId) + "\t---\toverlapped " + b.ruleId + " score: " + getScore(b.ruleId));
+        if (logger.isLoggable(Level.FINEST))
+            logger.finest("\t\tcurrent " + a.ruleId + " score: " + getScore(a.ruleId) + "\t---\toverlapped " + b.ruleId + " score: " + getScore(b.ruleId));
         if (getScore(a) < 0)
             return true;
         if (getScore(b) < 0)

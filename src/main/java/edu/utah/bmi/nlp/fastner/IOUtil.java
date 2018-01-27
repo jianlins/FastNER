@@ -41,6 +41,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import static edu.utah.bmi.nlp.core.DeterminantValueSet.checkNameSpace;
+import static edu.utah.bmi.nlp.fastcner.UnicodeChecker.isChinese;
 
 /**
  * @author Jianlin Shi on 4/20/16.
@@ -124,7 +125,7 @@ public class IOUtil {
     }
 
     public static boolean[] readAgnosticFile(String agnosticFileName, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive) {
-        boolean[] thisRuleType = new boolean[]{false, false, false, false, false};
+        boolean[] thisRuleType = new boolean[]{false, false, false, false, false, false};
         readAgnosticFile(agnosticFileName, rules, typeDefinition, caseSensitive, thisRuleType);
         return thisRuleType;
     }
@@ -315,6 +316,10 @@ public class IOUtil {
 //        support numeric handler
         if (ruleSupports[4] == false && ((rule.rule.indexOf("\\>") != -1) || (rule.rule.indexOf("\\<") != -1))) {
             ruleSupports[4] = true;
+        }
+
+        if (ruleSupports[5] == false && isChinese(rule.rule.toCharArray()[0])) {
+            ruleSupports[5] = true;
         }
 
         rules.put(rule.id, rule);

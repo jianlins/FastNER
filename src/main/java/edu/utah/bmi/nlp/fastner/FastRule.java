@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -172,10 +173,11 @@ public abstract class FastRule {
 
     private void printEmbededMap(HashMap<Object, Object> ruleMap, String offset) {
         for (Map.Entry<Object, Object> ent : ruleMap.entrySet()) {
-            logger.finer(offset + "key: " + ent.getKey());
+            if (logger.isLoggable(Level.FINER))
+                logger.finer(offset + "key: " + ent.getKey());
             if (ent.getValue().getClass() == HashMap.class) {
                 printEmbededMap((HashMap<Object, Object>) ent.getValue(), offset + "\t");
-            } else {
+            } else if (logger.isLoggable(Level.FINER)){
                 logger.finer(offset + "pair: " + ent.getKey() + "->" + ent.getValue());
             }
 
