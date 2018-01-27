@@ -242,7 +242,7 @@ public class IOUtil {
         if (cells.get(0).startsWith("@")) {
 //          Rule type should be defined in the 1st line that starting with '@':  '@fastner' or '@fastcner'
             if (cells.size() == 1) {
-                ruleSupports[0] = checkFastCRule(cells.get(0));
+                ruleSupports = checkFastCRule(cells.get(0));
             } else if (cells.size() > 1) {
 //          new UIMA type definition with '@typeName superTypeName'
 //                or '@typeName superTypeName   newFeature1    newFeature2  newFeature3...'
@@ -327,19 +327,22 @@ public class IOUtil {
     }
 
     /**
-     * Rule type should be defined in the 1st line that starting with '@':  '@fastner' or '@fastcner'
+     * Rule type should be defined in the 1st line that starting with '@':  '@fastner' or '@fastcner' or '@fastcnercn'
      *
      * @param ruleString input String that contains rule definitions
      * @return if the rule is for FastCNER
      */
-    private static boolean checkFastCRule(String ruleString) {
+    private static boolean[] checkFastCRule(String ruleString) {
         int begin = ruleString.indexOf("@");
         int end = ruleString.indexOf("\n", begin);
+        boolean[] ruleSupports = new boolean[]{false, false, false, false, false, false};
         String definition = ruleString.substring(begin, end == -1 ? ruleString.length() : end).toLowerCase();
-        if (definition.indexOf("fastc") != -1) {
-            return true;
+        if (definition.indexOf("fastcnercn") != -1) {
+            ruleSupports[5] = true;
+        } else if (definition.indexOf("fastcner") != -1) {
+            ruleSupports[0]=true;
         }
-        return false;
+        return ruleSupports;
     }
 
     private static String getShortName(String fullName) {

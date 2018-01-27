@@ -501,8 +501,9 @@ public class FastCRules extends FastRuleWG {
         Span currentSpan = new Span(matchBegin + offset, end + offset, text.substring(matchBegin, end));
         if (logger.isLoggable(Level.FINEST))
             logger.finest("Try to addDeterminants: " + currentSpan.begin + ", " + currentSpan.end + "\t" + currentSpan.text);
-        ArrayList<Span> currentSpanList = new ArrayList<Span>();
+
         for (Object key : deterRule.keySet()) {
+            ArrayList<Span> currentSpanList = new ArrayList<>();
             int rulePos = deterRule.get(key);
             double score = getScore(rulePos);
             currentSpan.ruleId = rulePos;
@@ -514,10 +515,7 @@ public class FastCRules extends FastRuleWG {
 //                it becomes more efficient to compare the overlaps
                 currentSpanList = matches.get(key);
                 IntervalST<Integer> overlapChecker = overlapCheckers.get(key);
-
-
                 Object overlappedPos = overlapChecker.get(new Interval1D(currentSpan.begin, currentSpan.end - 1));
-
                 if (overlappedPos != null) {
                     int pos = (int) overlappedPos;
                     Span overlappedSpan = currentSpanList.get(pos);

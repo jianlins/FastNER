@@ -80,4 +80,28 @@ public class FastCRulesCNTest {
     }
 
 
+    @Test
+    public void testSetting(){
+        String input="患者血压123/88mmHg，呼吸3.0次/分。";
+        String rule="@fastcnercn\n" +
+//                "\\b(\\a\t0\ttbegin\n" +
+//                "\\a\\e\t2\ttend\n" +
+                "\\C\t0\ttbegin\n" +
+                "\\C\t2\ttend\n" +
+                "\\d+\t0\ttbegin\n" +
+                "\\d+\t2\ttend\n" +
+                "\\p+\t0\ttbegin\n" +
+                "\\p+\t2\ttend\n" +
+                "\\d+/\\d+\t0\ttbegin\n" +
+                "\\d+/\\d+\t2\ttend\n" +
+                "\\d+.\\d+\t0\ttbegin\n" +
+                "\\d+.\\d+\t2\ttend";
+        FastCNER fcrp=new FastCNER(rule);
+        HashMap<String, ArrayList<Span>> res = fcrp.processString(input);
+        fcrp.printRulesMap();
+        for(Map.Entry<String,ArrayList<Span>>entry:res.entrySet()){
+            System.out.println(entry.getKey()+"\n"+entry.getValue());
+        }
+    }
+
 }

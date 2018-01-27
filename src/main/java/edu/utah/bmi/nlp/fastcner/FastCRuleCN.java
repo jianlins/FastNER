@@ -14,6 +14,7 @@ import static java.lang.Character.isWhitespace;
 
 /**
  * Redefine wildcard syntax to support Chinese Characters, full width characters
+ * use @fastcnercn in the rule to specify
  * \C Chinese Character
  * \c alphabetic letter
  * \p punctuations including full width punctuations
