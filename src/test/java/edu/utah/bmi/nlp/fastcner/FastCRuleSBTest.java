@@ -30,13 +30,13 @@ import java.util.Map;
  * @author Jianlin Shi
  *         Created on 6/2/16.
  */
-public class FastCRulesSBTest {
+public class FastCRuleSBTest {
 
 
     @Test
     public void expandSB() throws Exception {
-        FastCRulesSB fcruleSB = new FastCRulesSB("src/test/resources/ruleStore/crule_test.tsv");
-        fcruleSB = new FastCRulesSB("conf/crule_test.xlsx");
+        FastCRuleSB fcruleSB = new FastCRuleSB("src/test/resources/ruleStore/crule_test.tsv");
+        fcruleSB = new FastCRuleSB("conf/crule_test.xlsx");
         ArrayList<Rule> rules=fcruleSB.expandSB(new Rule(1,"ab[c|d]e[f|g|h]","R1", 1.5, DeterminantValueSet.Determinants.ACTUAL));
         for(Map.Entry<Integer,Rule> ent:fcruleSB.ruleStore.entrySet()){
             System.out.println(ent.getValue());
@@ -50,7 +50,7 @@ public class FastCRulesSBTest {
     public void test() {
         HashMap<Integer,Rule>rules=new HashMap<>();
         rules.put(1,new Rule(1,"ab\\[c|d\\]e[f|g|h]","R1", 1.5, DeterminantValueSet.Determinants.ACTUAL));
-        FastCRulesSB fcruleSB = new FastCRulesSB(rules);
+        FastCRuleSB fcruleSB = new FastCRuleSB(rules);
         fcruleSB.printRulesMap();
 //        fcruleSB.addRule(fcruleSB.ruleStore.get(0));
     }

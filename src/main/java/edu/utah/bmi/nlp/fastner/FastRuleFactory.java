@@ -16,15 +16,21 @@
 
 package edu.utah.bmi.nlp.fastner;
 
+import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.fastcner.FastCNER;
+import edu.utah.bmi.nlp.fastcner.FastCRule;
 import edu.utah.bmi.nlp.fastcner.FastCRuleCN;
-import edu.utah.bmi.nlp.fastcner.FastCRules;
-import edu.utah.bmi.nlp.fastcner.FastCRulesSB;
+import edu.utah.bmi.nlp.fastcner.FastCRuleSB;
+import org.apache.commons.lang3.math.NumberUtils;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+
+import static edu.utah.bmi.nlp.core.DeterminantValueSet.getShortName;
 
 /**
  * @author Jianlin Shi
@@ -40,6 +46,116 @@ public class FastRuleFactory {
         return createFastRule(fastNER, ruleStr, typeDefinition, splitter, caseSensitive);
     }
 
+    public static Object[] buildRuleStore(String ruleStr, LinkedHashMap<String, TypeDefinition> typeDefinition,
+                                          boolean caseSensitive, boolean constructRuleMap) {
+        Object[] output = new Object[3];
+        HashMap<Integer, Rule> rules = new HashMap<>();
+        int strLength = ruleStr.trim().length();
+        String testFileStr = ruleStr.trim().substring(strLength - 4).toLowerCase();
+        File agnosticFile = new File(ruleStr);
+        String ruleType;
+        String concatenated;
+        ArrayList<ArrayList<String>> allCells = new ArrayList<>();
+        if (testFileStr.equals(".owl")) {
+            concatenated = OWLUtil.readOwlFile(ruleStr, allCells, caseSensitive);
+            ruleType = getRuleType(concatenated);
+        } else if (agnosticFile.exists() && agnosticFile.isDirectory()) {
+            concatenated = OWLUtil.readOwlDirectory(ruleStr, allCells, caseSensitive);
+            ruleType = getRuleType(concatenated);
+        } else {
+            edu.utah.bmi.nlp.core.IOUtil ioUtil = new edu.utah.bmi.nlp.core.IOUtil(ruleStr);
+            for (ArrayList<String> cells : ioUtil.getInitiations()) {
+                if (cells.get(1).startsWith("@CONCEPT_FEATURES")) {
+                    String conceptName = cells.get(1).trim();
+                    String conceptShortName = getShortName(conceptName);
+                    if (typeDefinition!=null && !typeDefinition.containsKey(conceptShortName)) {
+                        typeDefinition.put(conceptShortName, new TypeDefinition(cells.subList(1, cells.size())));
+                    }
+                } else if (Character.isUpperCase(cells.get(1).charAt(1))) {
+//                  back compatibility
+                    String conceptName = cells.get(1).substring(1);
+                    String conceptShortName = getShortName(conceptName);
+                    if (typeDefinition!=null && !typeDefinition.containsKey(conceptShortName)) {
+                        if (cells.size() > 3)
+                            typeDefinition.put(conceptShortName, new TypeDefinition(conceptName, cells.get(2), cells.subList(3, cells.size())));
+                        else
+                            typeDefinition.put(conceptShortName, new TypeDefinition(conceptName, cells.get(2), new ArrayList<String>()));
+                    }
+
+                } else if (cells.size() > 3) {
+                    System.err.println("Unrecognized rule initialization: " + cells);
+                }
+            }
+            allCells = ioUtil.getRuleCells();
+            ruleType = getRuleType(ioUtil);
+            concatenated = ioUtil.getConcatenatedRuleStr();
+        }
+        for (ArrayList<String> cells : allCells) {
+            int id = Integer.parseInt(cells.get(0));
+            String rule = cells.get(1);
+            String conceptName;
+            double score = 0;
+            DeterminantValueSet.Determinants determinant = DeterminantValueSet.Determinants.ACTUAL;
+            if (NumberUtils.isNumber(cells.get(2))) {
+                conceptName = cells.get(3).trim();
+                score = Double.parseDouble(cells.get(2));
+                if (cells.size() > 4)
+                    determinant = DeterminantValueSet.Determinants.valueOf(cells.get(4));
+            } else {
+                conceptName = cells.get(2).trim();
+                if (cells.size() > 3)
+                    determinant = DeterminantValueSet.Determinants.valueOf(cells.get(3));
+            }
+            String conceptShortName = getShortName(conceptName);
+            if (typeDefinition!=null && !typeDefinition.containsKey(conceptName)) {
+                typeDefinition.put(conceptShortName, new TypeDefinition(conceptName, DeterminantValueSet.defaultSuperTypeName, new ArrayList<>()));
+            }
+            if (constructRuleMap)
+                rules.put(id, new Rule(id, caseSensitive ? rule : rule.toLowerCase(), conceptName, score, determinant));
+        }
+        output[0] = rules;
+        output[1] = ruleType;
+        output[2] = concatenated;
+        return output;
+    }
+
+    public static FastRule createFastRule(Class fastNER, String ruleStr, LinkedHashMap<String, TypeDefinition> typeDefinition,
+                                          boolean caseSensitive, boolean constructRuleMap) {
+        FastRule fastRule = null;
+        Object[] output = buildRuleStore(ruleStr, typeDefinition, caseSensitive, constructRuleMap);
+        String ruleType = (String) output[1];
+        String concatenated = (String) output[2];
+        boolean supportReplication = concatenated.indexOf("+") != -1 ? true : false;
+        if (constructRuleMap) {
+            HashMap<Integer, Rule> rules = (HashMap<Integer, Rule>) output[0];
+            switch (ruleType) {
+                case "FastCRuleCN":
+                    fastRule = new FastCRuleCN(rules);
+                    ((FastCRule) fastRule).setReplicationSupport(supportReplication);
+                    break;
+                case "FastCRuleSB":
+                    fastRule = new FastCRuleSB(rules);
+                    ((FastCRule) fastRule).setReplicationSupport(supportReplication);
+                    break;
+                case "FastCRule":
+                    fastRule = new FastCRule(rules);
+                    ((FastCRule) fastRule).setReplicationSupport(supportReplication);
+                    break;
+                case "FastRuleWGN":
+                    fastRule = new FastRuleWGN(rules);
+                    break;
+                case "FastRuleWG":
+                    fastRule = new FastRuleWG(rules);
+                    break;
+                default:
+                    fastRule = new FastRuleWOG(rules);
+                    break;
+            }
+        }
+        return fastRule;
+    }
+
+    @Deprecated
     public static FastRule createFastRule(Class fastNER, String ruleStr, LinkedHashMap<String, TypeDefinition> typeDefinition, String splitter, boolean caseSensitive, boolean constructRuleMap) {
         FastRule fastRule = null;
         int strLength = ruleStr.trim().length();
@@ -58,11 +174,11 @@ public class FastRuleFactory {
                     fastRule = new FastCRuleCN(rules);
 //            support square bracket
                 } else if (thisRuleType[2])
-                    fastRule = new FastCRulesSB(rules);
+                    fastRule = new FastCRuleSB(rules);
                 else
-                    fastRule = new FastCRules(rules);
+                    fastRule = new FastCRule(rules);
                 if (thisRuleType[3])
-                    ((FastCRules) fastRule).setReplicationSupport(true);
+                    ((FastCRule) fastRule).setReplicationSupport(true);
             } else {
                 if (thisRuleType[4]) {
                     fastRule = new FastRuleWGN(rules);
@@ -77,5 +193,52 @@ public class FastRuleFactory {
         return fastRule;
     }
 
+    private static String getRuleType(String concatenated) {
+        String ruleType = "";
+        for (char ch : concatenated.toCharArray()) {
+            if (Character.UnicodeScript.of(ch) == Character.UnicodeScript.HAN) {
+                ruleType = "FastCRuleCN";
+                break;
+            }
+        }
+        if (ruleType.length() == 0) {
+            if (concatenated.indexOf("[") != -1 && concatenated.indexOf("]") != -1) {
+                ruleType = "FastCRuleSB";
+            } else if (concatenated.indexOf("\\a") != -1 || concatenated.indexOf("\\d") != -1 || concatenated.indexOf("\\s") != -1) {
+                ruleType = "FastCRule";
+            } else if (concatenated.indexOf("\\>") != -1 || concatenated.indexOf("\\<") != -1) {
+                ruleType = "FastRuleWGN";
+            } else if (concatenated.indexOf("(") != -1 || concatenated.indexOf(")") != -1) {
+                ruleType = "FastRuleWG";
+            } else {
+                ruleType = "FastRuleWOG";
+            }
+        }
+        return ruleType;
+    }
 
+    private static String getRuleType(edu.utah.bmi.nlp.core.IOUtil ioUtil) {
+        String ruleType = "";
+        String concatenated = ioUtil.getConcatenatedRuleStr();
+        if (ioUtil.settings.containsKey("fastcnercn")) {
+            ruleType = "FastCRuleCN";
+        } else if (ioUtil.settings.containsKey("fastcner")) {
+            if (concatenated.indexOf("[") != -1 && concatenated.indexOf("]") != -1) {
+                ruleType = "FastCRuleSB";
+            } else {
+                ruleType = "FastCRule";
+            }
+        } else if (ioUtil.settings.containsKey("fastner")) {
+            if (concatenated.indexOf("\\>") != -1 || concatenated.indexOf("\\<") != -1) {
+                ruleType = "FastRuleWGN";
+            } else if (concatenated.indexOf("(") != -1 || concatenated.indexOf(")") != -1) {
+                ruleType = "FastRuleWG";
+            } else {
+                ruleType = "FastRuleWOG";
+            }
+        } else {
+            ruleType = getRuleType(concatenated);
+        }
+        return ruleType;
+    }
 }

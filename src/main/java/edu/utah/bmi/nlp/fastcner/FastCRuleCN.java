@@ -24,7 +24,7 @@ import static java.lang.Character.isWhitespace;
  * <p>
  * 01/26/2018 Jianlin Shi
  */
-public class FastCRuleCN extends FastCRulesSB {
+public class FastCRuleCN extends FastCRuleSB {
 
     public FastCRuleCN() {
     }

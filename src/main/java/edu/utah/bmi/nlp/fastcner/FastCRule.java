@@ -47,20 +47,20 @@ import static java.lang.Character.*;
  * <p>
  * The wildcard plus "+": 1 or more wildcard
  * <p>
- * NOTE: FastCRules is slightly different to FastCRules when handling replicates.
- * FastCRules uses loops (usually is much faster)
+ * NOTE: FastCRule is slightly different to FastCRule when handling replicates.
+ * FastCRule uses loops (usually is much faster)
  * <p>
  * Because it use loops, it doesn't check any other possible ruleStore that might match the replicates at the same time.
  * The rule like "\\c+w" won't work as expected: the rule will be matched all the way to "w" when checking "\\c+".
  * </p>
- * FastCRules uses iterations.
- * Once FastCRules is fully tested and compared with FastCRules, FastCRules might be deprecated.
+ * FastCRule uses iterations.
+ * Once FastCRule is fully tested and compared with FastCRule, FastCRule might be deprecated.
  *
  * @author Jianlin Shi
  */
 //TODO need to support | (e.g. to detect MR #146-55-23-5)
 
-public class FastCRules extends FastRuleWG {
+public class FastCRule extends FastRuleWG {
     //  other  fields are defined in abstract class
     protected HashMap<Integer, Double> scores = new HashMap<Integer, Double>();
     protected final Determinants END = Determinants.END;
@@ -75,16 +75,16 @@ public class FastCRules extends FastRuleWG {
     protected HashMap<String, IntervalST> overlapCheckers = new HashMap<>();
 
 
-    protected FastCRules() {
+    protected FastCRule() {
     }
 
 
-    public FastCRules(String ruleStr) {
+    public FastCRule(String ruleStr) {
 //        support read from OWl file, TSV file or OWL file directory
         super(ruleStr);
     }
 
-    public FastCRules(HashMap<Integer, Rule> ruleStore) {
+    public FastCRule(HashMap<Integer, Rule> ruleStore) {
         initiate(ruleStore);
     }
 
@@ -507,6 +507,7 @@ public class FastCRules extends FastRuleWG {
             int rulePos = deterRule.get(key);
             double score = getScore(rulePos);
             currentSpan.ruleId = rulePos;
+            currentSpan.score=score;
             if (logger.isLoggable(Level.FINEST))
                 logger.finest("\t\tRule Id: " + rulePos + "\t" + getRule(rulePos).type + "\t" + getRuleString(rulePos));
 //          If needed, implement your own selection ruleStore and score updating logic below
@@ -557,7 +558,7 @@ public class FastCRules extends FastRuleWG {
     }
 
     /**
-     * Using "+" to support replications might slow down the performance of FastCRules,
+     * Using "+" to support replications might slow down the performance of FastCRule,
      * try to avoid using it as much as possible.
      *
      * @param support support replications

@@ -59,7 +59,7 @@ public class FastNER_AE_GeneralTest {
         String typeDescriptor = "desc/type/All_Types";
         runner = new AdaptableUIMACPERunner(typeDescriptor, "target/generated-test-sources/");
         runner.addConceptTypes(FastNER_AE_General.getTypeDefinitions("conf/rules.xlsx", true).values());
-        runner.addConceptTypes(FastNER_AE_General.getTypeDefinitions("conf/rules_g.xlsx", true).values());
+        runner.addConceptTypes(FastNER_AE_General.getTypeDefinitions("conf/rules_g.tsv", true).values());
         runner.addConceptType(new TypeDefinition("Impression", "SectionBody"));
         runner.reInitTypeSystem("target/generated-test-sources/customized");
         jCas = runner.initJCas();

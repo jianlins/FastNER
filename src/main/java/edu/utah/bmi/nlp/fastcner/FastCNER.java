@@ -48,7 +48,7 @@ public class FastCNER extends FastNER {
     }
 
     protected void initiate(HashMap<Integer, Rule> ruleStore) {
-        fastRule = new FastCRulesSB(ruleStore);
+        fastRule = new FastCRuleSB(ruleStore);
     }
 
     public HashMap<String, ArrayList<Span>> processString(String text) {
@@ -62,7 +62,7 @@ public class FastCNER extends FastNER {
      * @return matched results
      */
     public HashMap<String, ArrayList<Span>> processSpan(Span span) {
-        return ((FastCRules) fastRule).processSpan(span);
+        return ((FastCRule) fastRule).processSpan(span);
     }
 
     public HashMap<String, ArrayList<Span>> processAnnotation(Annotation sentence) {
@@ -72,20 +72,20 @@ public class FastCNER extends FastNER {
 
 
     public void setReplicationSupport(boolean support) {
-        ((FastCRules) fastRule).setReplicationSupport(support);
+        ((FastCRule) fastRule).setReplicationSupport(support);
     }
 
     public void setCompareMethod(String method) {
-        ((FastCRules) fastRule).setCompareMethod(method);
+        ((FastCRule) fastRule).setCompareMethod(method);
     }
 
     public void setSpecialCharacterSupport(Boolean scSupport) {
-        ((FastCRules) fastRule).setSpecialCharacterSupport(scSupport);
+        ((FastCRule) fastRule).setSpecialCharacterSupport(scSupport);
     }
 
 
     public void setMaxRepeatLength(int maxRepeatLength) {
-        ((FastCRules) fastRule).setMaxRepeatLength(maxRepeatLength);
+        ((FastCRule) fastRule).setMaxRepeatLength(maxRepeatLength);
     }
 
 

@@ -38,11 +38,11 @@ public class FastRuleWOG extends FastRule {
     }
 
     public FastRuleWOG(String ruleStr) {
-        initiate(ruleStr, "\t", false);
+        initiate(ruleStr, false);
     }
 
     public FastRuleWOG(String ruleStr, boolean caseSensitive) {
-        initiate(ruleStr, "\t", caseSensitive);
+        initiate(ruleStr, caseSensitive);
     }
 
     public FastRuleWOG(HashMap<Integer, Rule> ruleStore) {

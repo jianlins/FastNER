@@ -106,6 +106,7 @@ public class FastCNER_AE_GeneralTest {
 		while (annoIter.hasNext()) {
 			Object anno = annoIter.next();
 			logger.finest(anno.getClass().getCanonicalName());
+			logger.finest(((Annotation) anno).getCoveredText());
 			concepts.add((Annotation) anno);
 			logger.finest(concepts.get(concepts.size() - 1).getCoveredText());
 		}

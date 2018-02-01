@@ -17,6 +17,7 @@
 package edu.utah.bmi.nlp.fastcner;
 
 import edu.utah.bmi.nlp.core.Rule;
+import edu.utah.bmi.nlp.fastner.FastRuleFactory;
 import edu.utah.bmi.nlp.fastner.IOUtil;
 
 import java.util.ArrayList;
@@ -26,26 +27,26 @@ import java.util.Map;
 import java.util.logging.Level;
 
 /**
- * This class extend FastCRules to support square brackets (not support nested square brackets)
+ * This class extend FastCRule to support square brackets (not support nested square brackets)
  * Note: in order to make the implementation simpler, parenthesis is only used to capture the target group.
  * Square brackets are used to provide logic OR expression, always use together with "|"
  *
  * @author Jianlin Shi
  * Created on 5/27/16.
  */
-public class FastCRulesSB extends FastCRules {
+public class FastCRuleSB extends FastCRule {
 
-    public FastCRulesSB() {
+    public FastCRuleSB() {
     }
 
 
-    public FastCRulesSB(String ruleStr) {
+    public FastCRuleSB(String ruleStr) {
         initiate(ruleStr, "\t");
     }
 
     public void initiate(String ruleStr, String splitter) {
         method = "scorewidth";
-        ruleStore = IOUtil.parseRuleStr(ruleStr, splitter, true);
+        ruleStore = (HashMap<Integer, Rule>) FastRuleFactory.buildRuleStore(ruleStr, null, true, true)[0];
         initiate(ruleStore);
     }
 
@@ -56,7 +57,7 @@ public class FastCRulesSB extends FastCRules {
         }
     }
 
-    public FastCRulesSB(HashMap<Integer, Rule> ruleStore) {
+    public FastCRuleSB(HashMap<Integer, Rule> ruleStore) {
         method = "scorewidth";
 //        initiate(ruleStore);
         this.ruleStore = ruleStore;

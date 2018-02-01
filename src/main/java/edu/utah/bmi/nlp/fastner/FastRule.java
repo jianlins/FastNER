@@ -61,8 +61,8 @@ public abstract class FastRule {
         initiate(ruleStore);
     }
 
-    public void initiate(String ruleStr, String splitter, boolean caseSensitive) {
-        ruleStore = IOUtil.parseRuleStr(ruleStr, splitter, caseSensitive);
+    public void initiate(String ruleStr, boolean caseSensitive) {
+        ruleStore = (HashMap<Integer, Rule>) FastRuleFactory.buildRuleStore(ruleStr, null,caseSensitive,true)[0];
         initiate(ruleStore);
     }
 

@@ -46,9 +46,11 @@ import static edu.utah.bmi.nlp.fastcner.UnicodeChecker.isChinese;
 /**
  * @author Jianlin Shi on 4/20/16.
  */
+@Deprecated
 public class IOUtil {
     public static Logger logger = edu.utah.bmi.nlp.core.IOUtil.getLogger(IOUtil.class);
 
+    @Deprecated
     public static HashMap<Integer, Rule> parseRuleStr(String ruleStr, String splitter, boolean caseSensitive) {
         HashMap<Integer, Rule> rules = new HashMap<>();
         int strLength = ruleStr.trim().length();

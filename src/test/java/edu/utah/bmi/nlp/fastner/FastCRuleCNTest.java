@@ -33,7 +33,7 @@ import java.util.logging.Level;
  * @author Jianlin Shi
  * Created on 6/2/16.
  */
-public class FastCRulesCNTest {
+public class FastCRuleCNTest {
 
 
     @Test
@@ -43,8 +43,9 @@ public class FastCRulesCNTest {
         HashMap<String, ArrayList<Span>> res = fastCNER.processString(input);
         assert (res.size() == 1 && res.containsKey("VISUAL"));
         assert (res.get("VISUAL").size() == 2);
-        assert (res.get("VISUAL").get(0).toString().equals("(Rule2: 1-3):咯血"));
-        assert (res.get("VISUAL").get(1).toString().equals("(Rule2: 3-5):咯痰"));
+        System.out.println(res.get("VISUAL").get(0).serialize());
+        assert (res.get("VISUAL").get(0).serialize().equals("(Rule3: 1-3:0.5):咯血"));
+        assert (res.get("VISUAL").get(1).serialize().equals("(Rule3: 3-5:0.5):咯痰"));
     }
 
 
@@ -74,9 +75,10 @@ public class FastCRulesCNTest {
         assert (res.size() == 2);
         assert (res.containsKey("R1") && res.containsKey("R2"));
         assert (res.get("R1").size() == 1);
-        assert (res.get("R1").get(0).toString().equals("(Rule2: 6-8):胸痛"));
+        System.out.println(res.get("R1").get(0).serialize());
+        assert (res.get("R1").get(0).serialize().equals("(Rule2: 6-8:1.0):胸痛"));
         assert (res.get("R2").size() == 1);
-        assert (res.get("R2").get(0).toString().equals("(Rule3: 3-5):胸闷"));
+        assert (res.get("R2").get(0).serialize().equals("(Rule3: 3-5:1.0):胸闷"));
     }
 
 

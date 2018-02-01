@@ -101,7 +101,7 @@ public class FastCNERTest extends TestCase {
         input = "abziad ok";
         result = fcrp.processString(input);
         printMatches(result, input);
-//        TODO maximum replicants doesn't work in FastCRules and FastCRules2
+//        TODO maximum replicants doesn't work in FastCRule and FastCRules2
         input = "abccccd ok";
         result = fcrp.processString(input);
         printMatches(result, input);
@@ -437,6 +437,22 @@ public class FastCNERTest extends TestCase {
 
     }
 
+    public void test15() {
+        String rule = "T\\s+1\\d\\d.\\d\t0.1\tFever_present";
+        FastCNER fcrp;
+        String input = "T 100.6 .\n";
+        HashMap<String, ArrayList<Span>> result;
+
+
+        fcrp = new FastCNER(rule);
+        fcrp.setMaxRepeatLength(30);
+
+
+        result = fcrp.processString(input);
+        printMatches(result, input, fcrp);
+        assertEquals(1, result.size());
+        assertEquals(1, result.get("Fever_present").size());
+    }
 
     private void printMatches(HashMap<String, ArrayList<Span>> result, String input) {
         logger.finest("Results for: " + input);
