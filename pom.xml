@@ -24,6 +24,9 @@
     <version>1.0.2</version>
     <name>FastNER (Fast Name Entity Recognition)</name>
     <url>https://github.com/jianlins/FastNER</url>
+    <description>FastNER is a fast implementation of rule-based named entity recognition using hashed rule processing
+        engine. There are two versions: FastNER supports token-based rules, FastCNER supports character-based rules.
+    </description>
     <scm>
         <connection>https://github.com/jianlins/FastNER.git</connection>
         <url>scm:git:git@github.com:jianlins/FastNER.git</url>
