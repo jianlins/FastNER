@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.utah.bmi.nlp</groupId>
     <artifactId>fastner</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <name>FastNER (Fast Name Entity Recognition)</name>
     <url>https://github.com/jianlins/FastNER</url>
     <scm>
