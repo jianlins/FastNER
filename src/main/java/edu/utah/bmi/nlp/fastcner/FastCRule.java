@@ -257,6 +257,38 @@ public class FastCRule extends FastRuleWG {
         }
     }
 
+    protected boolean iss(char thisChar) {
+        return (thisChar == ' ' || thisChar == '\t' || (int) thisChar == 160);
+    }
+
+    protected boolean isd(char thisChar) {
+        return isDigit(thisChar);
+    }
+
+    protected boolean isC(char thisChar) {
+        return isUpperCase(thisChar);
+    }
+
+    protected boolean isc(char thisChar) {
+        return isLowerCase(thisChar);
+    }
+
+    protected boolean isp(char thisChar) {
+        return WildCardChecker.isPunctuation(thisChar);
+    }
+
+    protected boolean isu(char thisChar) {
+        return WildCardChecker.isSpecialChar(thisChar);
+    }
+
+    protected boolean isw(char thisChar) {
+        return isWhitespace(thisChar) || (int) thisChar == 160 || WildCardChecker.isSpecialChar(thisChar);
+    }
+
+    protected boolean isa(char thisChar) {
+        return !isWhitespace(thisChar) && !((int) thisChar == 160);
+    }
+
 
     protected void processWildCards(String text, char[] textChars, HashMap rule, int matchBegin, int matchEnd, int currentPosition, HashMap<String, ArrayList<Span>> matches, char previousChar, boolean wildcard, char previousKey) {
         char thisChar = textChars[currentPosition];
@@ -265,7 +297,7 @@ public class FastCRule extends FastRuleWG {
             switch (thisRuleChar) {
                 case 's':
 //                    if (thisChar == ' ' || thisChar == '\t' || (scSupport && !(isLetterOrDigit(thisChar) || isWhitespace(thisChar) || WildCardChecker.isPunctuation(thisChar)))) {
-                    if (thisChar == ' ' || thisChar == '\t' || (int) thisChar == 160) {
+                    if (iss(thisChar)) {
                         processRules(text, textChars, (HashMap) rule.get('s'), matchBegin, matchEnd, currentPosition + 1, matches,
                                 thisChar, true, 's');
                     }
@@ -287,25 +319,25 @@ public class FastCRule extends FastRuleWG {
                                 thisChar, true, ')');
                     break;
                 case 'd':
-                    if (isDigit(thisChar)) {
+                    if (isd(thisChar)) {
                         processRules(text, textChars, (HashMap) rule.get('d'), matchBegin, matchEnd, currentPosition + 1, matches,
                                 thisChar, true, 'd');
                     }
                     break;
                 case 'C':
-                    if (isUpperCase(thisChar)) {
+                    if (isC(thisChar)) {
                         processRules(text, textChars, (HashMap) rule.get('C'), matchBegin, matchEnd, currentPosition + 1, matches,
                                 thisChar, true, 'C');
                     }
                     break;
                 case 'c':
-                    if (isLowerCase(thisChar)) {
+                    if (isc(thisChar)) {
                         processRules(text, textChars, (HashMap) rule.get('c'), matchBegin, matchEnd, currentPosition + 1, matches,
                                 thisChar, true, 'c');
                     }
                     break;
                 case 'p':
-                    if (WildCardChecker.isPunctuation(thisChar)) {
+                    if (isp(thisChar)) {
                         processRules(text, textChars, (HashMap) rule.get('p'), matchBegin, matchEnd, currentPosition + 1, matches,
                                 thisChar, true, 'p');
                     }
@@ -328,19 +360,19 @@ public class FastCRule extends FastRuleWG {
                                 previousChar, false, 'b');
                     break;
                 case 'a':
-                    if (!Character.isWhitespace(thisChar) && (int) thisChar != 160)
+                    if (isa(thisChar))
 //                    if(thisChar!=' ' && thisChar!='\t' && thisChar!='\r' && thisChar!='\n')
                         processRules(text, textChars, (HashMap) rule.get('a'), matchBegin, matchEnd, currentPosition + 1, matches,
                                 thisChar, true, 'a');
                     break;
                 case 'u':
-                    if (WildCardChecker.isSpecialChar(thisChar))
+                    if (isu(thisChar))
                         processRules(text, textChars, (HashMap) rule.get('u'), matchBegin, matchEnd, currentPosition + 1, matches,
                                 thisChar, true, 'u');
                     break;
 
                 case 'w':
-                    if (isWhitespace(thisChar) || (int) thisChar == 160 || WildCardChecker.isSpecialChar(thisChar)) {
+                    if (isw(thisChar)) {
                         processRules(text, textChars, (HashMap) rule.get('w'), matchBegin, matchEnd, currentPosition + 1, matches,
                                 thisChar, true, 'w');
                     }
@@ -361,8 +393,8 @@ public class FastCRule extends FastRuleWG {
             switch (previousKey) {
                 case 's':
                     //                        if (thisChar == ' ' || thisChar == '\t' || (int)thisChar==160 || (scSupport && !(isLetterOrDigit(thisChar) || isWhitespace(thisChar) || WildCardChecker.isPunctuation(thisChar)))) {
-                    if ((thisChar == ' ' || thisChar == '\t' || (int) thisChar == 160)) {
-                        while ((thisChar == ' ' || thisChar == '\t' || (int) thisChar == 160) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
+                    if (iss(thisChar)) {
+                        while (iss(thisChar) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
                             currentPosition++;
                             currentRepeats++;
                             if (currentPosition == textChars.length)
@@ -383,8 +415,8 @@ public class FastCRule extends FastRuleWG {
                     }
                     break;
                 case 'd':
-                    if (isDigit(thisChar)) {
-                        while ((isDigit(thisChar)) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
+                    if (isd(thisChar)) {
+                        while (isd(thisChar) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
                             currentPosition++;
                             currentRepeats++;
                             if (currentPosition == textChars.length)
@@ -394,8 +426,8 @@ public class FastCRule extends FastRuleWG {
                     }
                     break;
                 case 'C':
-                    if (isUpperCase(thisChar)) {
-                        while ((isUpperCase(thisChar)) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
+                    if (isC(thisChar)) {
+                        while (isC(thisChar) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
                             currentPosition++;
                             currentRepeats++;
                             if (currentPosition == textChars.length)
@@ -405,8 +437,8 @@ public class FastCRule extends FastRuleWG {
                     }
                     break;
                 case 'c':
-                    if (isLowerCase(thisChar)) {
-                        while ((isLowerCase(thisChar)) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
+                    if (isc(thisChar)) {
+                        while (isc(thisChar) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
                             currentPosition++;
                             currentRepeats++;
                             if (currentPosition == textChars.length)
@@ -416,8 +448,8 @@ public class FastCRule extends FastRuleWG {
                     }
                     break;
                 case 'p':
-                    if (WildCardChecker.isPunctuation(thisChar)) {
-                        while ((WildCardChecker.isPunctuation(thisChar)) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
+                    if (isp(thisChar)) {
+                        while (isp(thisChar) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
                             currentPosition++;
                             currentRepeats++;
                             if (currentPosition == textChars.length)
@@ -427,8 +459,8 @@ public class FastCRule extends FastRuleWG {
                     }
                     break;
                 case 'a':
-                    if (!Character.isWhitespace(thisChar)) {
-                        while ((!Character.isWhitespace(thisChar)) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
+                    if (isa(thisChar)) {
+                        while (isa(thisChar) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
                             currentPosition++;
                             currentRepeats++;
                             if (currentPosition == textChars.length)
@@ -438,8 +470,8 @@ public class FastCRule extends FastRuleWG {
                     }
                     break;
                 case 'u':
-                    if (WildCardChecker.isSpecialChar(thisChar)) {
-                        while ((WildCardChecker.isSpecialChar(thisChar)) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
+                    if (isu(thisChar)) {
+                        while (isu(thisChar) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
                             currentPosition++;
                             currentRepeats++;
                             if (currentPosition == textChars.length)
@@ -449,8 +481,8 @@ public class FastCRule extends FastRuleWG {
                     }
                     break;
                 case 'w':
-                    if (isWhitespace(thisChar) || (int) thisChar == 160 || WildCardChecker.isSpecialChar(thisChar)) {
-                        while ((isWhitespace(thisChar) || (int) thisChar == 160 || WildCardChecker.isSpecialChar(thisChar)) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
+                    if (isw(thisChar)) {
+                        while (isw(thisChar) && currentRepeats < maxRepeatLength && currentPosition < textChars.length) {
                             currentPosition++;
                             currentRepeats++;
                             if (currentPosition == textChars.length)
@@ -507,9 +539,9 @@ public class FastCRule extends FastRuleWG {
             int rulePos = deterRule.get(key);
             double score = getScore(rulePos);
             currentSpan.ruleId = rulePos;
-            currentSpan.score=score;
+            currentSpan.score = score;
             if (logger.isLoggable(Level.FINEST))
-                logger.finest("\t\tRule Id: " + rulePos + "\t" + getRule(rulePos).type + "\t" + getRuleString(rulePos));
+                logger.finest("\t\tRule Id: " + rulePos + "\t" + key + "\t" + getRule(rulePos).type + "\t" + getRuleString(rulePos));
 //          If needed, implement your own selection ruleStore and score updating logic below
             if (matches.containsKey(key)) {
 //              because the ruleStore are all processed at the same time from the input left to the input right,

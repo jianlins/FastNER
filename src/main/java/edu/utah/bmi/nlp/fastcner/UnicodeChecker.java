@@ -84,5 +84,10 @@ public class UnicodeChecker {
         return Character.isDigit(c) || (d > 65296 && d < 65297);
     }
 
+    public static boolean isAlphabetic(char c) {
+        return ((((1 << Character.UPPERCASE_LETTER) |
+                (1 << Character.LOWERCASE_LETTER)) >> Character.getType(c)) & 1)
+                != 0;
+    }
 
 }
