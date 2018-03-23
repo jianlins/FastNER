@@ -233,7 +233,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
                 logger.info("Document: " + docAnnotation.iterator().next().getUri() + " has not been properly sentence segmented. Use simple segmenter instead.");
 
             String text = jcas.getDocumentText();
-            ArrayList<ArrayList<Span>> simpleSentences = SimpleParser.tokenizeDecimalSmartWSentences(text, true);
+            ArrayList<ArrayList<Span>> simpleSentences = SimpleParser.tokenizeDecimalSmartWSentences(text, true, caseSenstive);
             for (ArrayList<Span> sentence : simpleSentences) {
                 saveAnnotation(jcas, SentenceTypeConstructor, sentence.get(0).begin, sentence.get(sentence.size() - 1).end, null);
                 logger.finest("Sentence: " + sentence.get(0).begin + "-" + sentence.get(sentence.size() - 1).end);

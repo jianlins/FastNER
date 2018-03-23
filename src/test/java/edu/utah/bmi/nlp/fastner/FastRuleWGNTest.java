@@ -46,7 +46,7 @@ public class FastRuleWGNTest {
         for (Map.Entry<String, ArrayList<Span>> entry : res.entrySet()) {
             System.out.println(entry.getKey() + "\t");
             entry.getValue().forEach((span) -> {
-                System.out.println(tokens.subList(span.getBegin(),span.getEnd()));
+                System.out.println(tokens.subList(span.getBegin(),span.getEnd()+1));
             });
         }
     }
@@ -89,5 +89,25 @@ public class FastRuleWGNTest {
             });
         }
         assert (res.containsKey("Concept") && res.get("Concept").size() == 0);
+    }
+
+
+    @Test
+    public void processSpans3() throws Exception {
+
+        String text = "Exam was done yesterday. Positive when HbA1C 105 but not HbA1C 50. No further treatment needed.";
+        String rule = "@fastner\n" +
+                "emboli	0	Concept	ACTUAL\n" +
+                "HbA 1 C \\> 100 	0	Concept	ACTUAL\n";
+        ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
+
+        fastNER = new FastNER(rule);
+        HashMap<String, ArrayList<Span>> res = fastNER.processSpanList(tokens);
+        for (Map.Entry<String, ArrayList<Span>> entry : res.entrySet()) {
+            System.out.println(entry.getKey() + ":\t");
+            entry.getValue().forEach((span) -> {
+                System.out.println("\t" + text.substring(span.getBegin(), span.getEnd()));
+            });
+        }
     }
 }

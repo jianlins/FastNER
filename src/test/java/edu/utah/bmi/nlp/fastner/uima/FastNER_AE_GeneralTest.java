@@ -39,6 +39,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngine;
 import static org.junit.Assert.assertTrue;
@@ -183,7 +184,7 @@ public class FastNER_AE_GeneralTest {
         String text = "HISTORY: a  of 103.8 , tachycardia in the 130s-150s , and initial hypertensive in the 140s .\nIMPRESSION: no fever currently.";
         jCas.reset();
         jCas.setDocumentText(text);
-        SectionBody sectionBody = new SectionBody(jCas,9, text.indexOf("IMPRESSION") - 1);
+        SectionBody sectionBody = new SectionBody(jCas, 9, text.indexOf("IMPRESSION") - 1);
         sectionBody.addToIndexes();
         try {
             Class cls = Class.forName(DeterminantValueSet.checkNameSpace("Impression")).asSubclass(SectionBody.class);
@@ -213,7 +214,7 @@ public class FastNER_AE_GeneralTest {
         fastNER_AE.process(jCas);
         FSIndex annoIndex = jCas.getAnnotationIndex(Concept.type);
         Iterator annoIter = annoIndex.iterator();
-        assert(!annoIter.hasNext());
+        assert (!annoIter.hasNext());
 
     }
 
@@ -262,10 +263,10 @@ public class FastNER_AE_GeneralTest {
         while (annoIter.hasNext()) {
             concepts.add((Concept) annoIter.next());
         }
-        assert(concepts.size()==1);
+        assert (concepts.size() == 1);
         for (Concept concept : concepts) {
             System.out.println(concept.getType().getShortName() + concept.getBegin() + "-" + concept.getEnd() + "\t" + concept.getSection() + ": >" + concept.getCoveredText() + "<");
-            assert (concept.getBegin()==114);
+            assert (concept.getBegin() == 114);
         }
     }
 
@@ -317,6 +318,15 @@ public class FastNER_AE_GeneralTest {
         annotationPrinter.process(jCas);
         annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "PseudoConcept"});
         annotationPrinter.process(jCas);
+    }
+
+    @Test
+    public void testTypeGen() {
+        String rule = "@fastner\nfever\t0\tEntity\tACTUAL";
+        LinkedHashMap<String, TypeDefinition> typeDefinition = FastNER_AE_General.getTypeDefinitions(rule, false);
+        for (String type : typeDefinition.keySet()) {
+            System.out.println(type + "\t" + typeDefinition.get(type));
+        }
     }
 
 }
