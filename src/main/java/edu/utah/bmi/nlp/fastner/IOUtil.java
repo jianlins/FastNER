@@ -228,7 +228,7 @@ public class IOUtil {
                 cells.add(cell);
             }
 //          to be back compatible
-            if (!cells.get(0).startsWith("@") && cells.size() > 1 && !NumberUtils.isNumber(cells.get(1)))
+            if ((!cells.get(0).startsWith("@") && !cells.get(0).startsWith("&")) && cells.size() > 1 && !NumberUtils.isNumber(cells.get(1)))
                 cells.add(1, "1");
             ruleSupports = parseCells(cells, id, rules, typeDefinition, caseSensitive, ruleSupports);
             id++;
@@ -241,7 +241,7 @@ public class IOUtil {
                                         boolean[] ruleSupports) {
         if (cells.get(0).startsWith("#") || cells.get(0).trim().length() == 0)
             return ruleSupports;
-        if (cells.get(0).startsWith("@")) {
+        if (cells.get(0).startsWith("@") || cells.get(0).startsWith("&")) {
 //          Rule type should be defined in the 1st line that starting with '@':  '@fastner' or '@fastcner'
             if (cells.size() == 1) {
                 ruleSupports = checkFastCRule(cells.get(0));
@@ -336,13 +336,15 @@ public class IOUtil {
      */
     private static boolean[] checkFastCRule(String ruleString) {
         int begin = ruleString.indexOf("@");
+        if (begin == -1)
+            begin = ruleString.indexOf("&");
         int end = ruleString.indexOf("\n", begin);
         boolean[] ruleSupports = new boolean[]{false, false, false, false, false, false};
         String definition = ruleString.substring(begin, end == -1 ? ruleString.length() : end).toLowerCase();
         if (definition.indexOf("fastcnercn") != -1) {
             ruleSupports[5] = true;
         } else if (definition.indexOf("fastcner") != -1) {
-            ruleSupports[0]=true;
+            ruleSupports[0] = true;
         }
         return ruleSupports;
     }
