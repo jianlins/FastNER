@@ -73,7 +73,9 @@ public class FastCNER_AE_General extends FastNER_AE_General {
 
     public void process(JCas jcas) throws AnalysisEngineProcessException {
         IntervalST<String> sectionTree = new IntervalST<>();
-        int totalSections = indexSections(jcas, sectionTree);
+        int totalSections = 0;
+        if (assignSection || forceAssignSections)
+            totalSections = indexSections(jcas, sectionTree);
 
         LinkedHashMap<String, ArrayList<Annotation>> sentences = new LinkedHashMap<>();
         FSIndex annoIndex = jcas.getAnnotationIndex(SentenceType);
@@ -97,11 +99,21 @@ public class FastCNER_AE_General extends FastNER_AE_General {
         }
         if (totalSentences > 0) {
             for (String sectionName : sentences.keySet()) {
+                boolean outsiders = true;
+                if ((includeSections.size() == 0 && excludeSections.size() > 0 && !excludeSections.contains(sectionName))
+                        || (includeSections.size() > 0 && includeSections.contains(sectionName))
+                        || (includeSections.size() == 0 && excludeSections.size() == 0)) {
+                    outsiders = false;
+                }
+
                 for (Annotation sentence : sentences.get(sectionName)) {
                     HashMap<String, ArrayList<Span>> concepts = ((FastCNER) fastNER).processAnnotation(sentence);
 //              store found concepts in annotation
                     if (concepts.size() > 0) {
-                        saveConcepts(jcas, concepts, sectionName);
+                        if (outsiders)
+                            saveOutsideScopeConcepts(jcas, concepts, sectionName);
+                        else
+                            saveConcepts(jcas, concepts, sectionName);
                     }
                 }
             }
@@ -115,9 +127,9 @@ public class FastCNER_AE_General extends FastNER_AE_General {
             for (ArrayList<Span> sentence : simpleSentences) {
                 Span sentenceSpan = new Span(sentence.get(0).begin, sentence.get(sentence.size() - 1).end);
                 sentenceSpan.text = text.substring(sentenceSpan.begin, sentenceSpan.end);
-                saveAnnotation(jcas, SentenceTypeConstructor, sentenceSpan.begin, sentenceSpan.end, null);
+                saveConcept(jcas, SentenceTypeConstructor, sentenceSpan.begin, sentenceSpan.end, null);
                 for (Span token : sentence) {
-                    saveAnnotation(jcas, TokenTypeConstructor, token.begin, token.end, null);
+                    saveConcept(jcas, TokenTypeConstructor, token.begin, token.end, null);
                 }
                 HashMap<String, ArrayList<Span>> concepts = ((FastCNER) fastNER).processSpan(sentenceSpan);
 //              store found concepts in annotation

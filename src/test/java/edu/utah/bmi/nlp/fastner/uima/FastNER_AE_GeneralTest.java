@@ -18,10 +18,10 @@ package edu.utah.bmi.nlp.fastner.uima;
 
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.TypeDefinition;
-import edu.utah.bmi.nlp.type.system.Concept;
-import edu.utah.bmi.nlp.type.system.SectionBody;
-import edu.utah.bmi.nlp.type.system.Token;
+import edu.utah.bmi.nlp.type.system.*;
 import edu.utah.bmi.nlp.uima.AdaptableUIMACPERunner;
+import edu.utah.bmi.nlp.uima.ae.AnnotationCountEvaluator;
+import edu.utah.bmi.nlp.uima.ae.AnnotationEvaluator;
 import edu.utah.bmi.nlp.uima.ae.AnnotationPrinter;
 import edu.utah.bmi.nlp.uima.ae.SimpleParser_AE;
 import org.apache.uima.analysis_engine.AnalysisEngine;
@@ -29,6 +29,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FSIndex;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.InvalidXMLException;
 import org.junit.Before;
@@ -62,6 +63,7 @@ public class FastNER_AE_GeneralTest {
         runner.addConceptTypes(FastNER_AE_General.getTypeDefinitions("conf/rules.xlsx", true).values());
         runner.addConceptTypes(FastNER_AE_General.getTypeDefinitions("conf/rules_g.tsv", true).values());
         runner.addConceptType(new TypeDefinition("Impression", "SectionBody"));
+        runner.addConceptType(new TypeDefinition("Plan", "SectionBody"));
         runner.reInitTypeSystem("target/generated-test-sources/customized");
         jCas = runner.initJCas();
 //      Set up the parameters
@@ -73,7 +75,8 @@ public class FastNER_AE_GeneralTest {
             fastNER_AE = createEngine(FastNER_AE_General.class,
                     configurationData);
             simpleParser_AE = createEngine(SimpleParser_AE.class, new Object[]{});
-            annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "Concept"});
+            annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "ConceptBASE"});
+
         } catch (ResourceInitializationException e) {
             e.printStackTrace();
         }
@@ -266,6 +269,7 @@ public class FastNER_AE_GeneralTest {
         assert (concepts.size() == 1);
         for (Concept concept : concepts) {
             System.out.println(concept.getType().getShortName() + concept.getBegin() + "-" + concept.getEnd() + "\t" + concept.getSection() + ": >" + concept.getCoveredText() + "<");
+            System.out.println(concept);
             assert (concept.getBegin() == 114);
         }
     }
@@ -289,10 +293,81 @@ public class FastNER_AE_GeneralTest {
                 configurationData);
         simpleParser_AE.process(jCas);
         fastNER_AE.process(jCas);
-
-        annotationPrinter.process(jCas);
+        AnalysisEngine annotationEval1 = createEngine(AnnotationCountEvaluator.class, new Object[]{
+                AnnotationCountEvaluator.PARAM_TYPE_NAME, "Concept",
+                AnnotationCountEvaluator.PARAM_TYPE_COUNT, 0});
+        annotationEval1.process(jCas);
+        assert (AnnotationCountEvaluator.pass);
+//        annotationPrinter.process(jCas);
         annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "PseudoConcept"});
-        annotationPrinter.process(jCas);
+//        annotationPrinter.process(jCas);
+        annotationEval1 = createEngine(AnnotationCountEvaluator.class, new Object[]{
+                AnnotationCountEvaluator.PARAM_TYPE_NAME, "PseudoConcept",
+                AnnotationCountEvaluator.PARAM_TYPE_COUNT, 1});
+        annotationEval1.process(jCas);
+        assert (AnnotationCountEvaluator.pass);
+    }
+
+    @Test
+    public void testExclusion() throws ResourceInitializationException, AnalysisEngineProcessException {
+        String text = "Exam was done yesterday. Positive for pulmonary emboli protocol.\n\n\n Plan: No further emboli treatment needed.";
+        jCas.reset();
+        jCas.setDocumentText(text);
+        SectionBody sectionBody = new SectionBody(jCas, text.indexOf("Positive"), text.indexOf(" Plan") - 4);
+        createAnnotation("Plan", SectionBody.class, text.indexOf("Plan"), text.length());
+        sectionBody.addToIndexes();
+        String rule = "@fastner\n" +
+                "emboli	0	Concept	ACTUAL\n";
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, rule,
+                FastNER_AE_General.PARAM_EXCLUDE_SECTIONS, "Plan",
+                FastNER_AE_General.PARAM_MARK_PSEUDO, true,
+                FastNER_AE_General.PARAM_LOG_RULE_INFO, true,
+                FastNER_AE_General.PARAM_ASSIGN_SECTIONS, false};
+        fastNER_AE = createEngine(FastNER_AE_General.class,
+                configurationData);
+        simpleParser_AE.process(jCas);
+        fastNER_AE.process(jCas);
+        AnalysisEngine annotationEval1 = createEngine(AnnotationCountEvaluator.class, new Object[]{
+                AnnotationCountEvaluator.PARAM_TYPE_NAME, "Concept",
+                AnnotationCountEvaluator.PARAM_TYPE_COUNT, 1});
+        annotationEval1.process(jCas);
+//        assert(AnnotationCountEvaluator.pass);
+//        annotationPrinter.process(jCas);
+        annotationEval1 = createEngine(AnnotationCountEvaluator.class, new Object[]{
+                AnnotationCountEvaluator.PARAM_TYPE_NAME, "ConceptBASE",
+                AnnotationCountEvaluator.PARAM_TYPE_COUNT, 1});
+        annotationEval1.process(jCas);
+        assert (AnnotationCountEvaluator.pass);
+
+    }
+
+
+    @Test
+    public void testForceAssign() throws ResourceInitializationException, AnalysisEngineProcessException {
+        String text = "pulmonary emboli protocol. \n\n Plan: No further emboli treatment needed.";
+        jCas.reset();
+        jCas.setDocumentText(text);
+        SectionBody sectionBody = new SectionBody(jCas, text.indexOf("Positive"), text.indexOf(" Plan") - 1);
+        createAnnotation("Plan", SectionBody.class, text.indexOf("Plan"), text.length());
+        sectionBody.addToIndexes();
+        String rule = "@fastner\n" +
+                "emboli	0	Concept	ACTUAL\n";
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, rule,
+                FastNER_AE_General.PARAM_EXCLUDE_SECTIONS, "Plan",
+                FastNER_AE_General.PARAM_MARK_PSEUDO, true,
+                FastNER_AE_General.PARAM_LOG_RULE_INFO, true,
+                FastNER_AE_General.PARAM_ASSIGN_SECTIONS, true};
+        fastNER_AE = createEngine(FastNER_AE_General.class,
+                configurationData);
+        simpleParser_AE.process(jCas);
+        fastNER_AE.process(jCas);
+        AnalysisEngine annotationEval1 = createEngine(AnnotationCountEvaluator.class, new Object[]{AnnotationCountEvaluator.PARAM_TYPE_NAME, "Concept",
+                AnnotationCountEvaluator.PARAM_TYPE_COUNT, 1});
+        annotationEval1.process(jCas);
+//        annotationPrinter.process(jCas);
+        AnalysisEngine annotationEval2 = createEngine(AnnotationCountEvaluator.class, new Object[]{AnnotationCountEvaluator.PARAM_TYPE_NAME, "OutsideScopeConcept",
+                AnnotationCountEvaluator.PARAM_TYPE_COUNT, 1});
+        annotationEval2.process(jCas);
     }
 
 
@@ -308,16 +383,18 @@ public class FastNER_AE_GeneralTest {
         configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, rule,
                 FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "SectionBody",
                 FastNER_AE_General.PARAM_MARK_PSEUDO, true,
-                FastNER_AE_General.PARAM_LOG_RULE_INFO, true,
-                FastNER_AE_General.PARAM_ENABLE_DEBUG, true};
+                FastNER_AE_General.PARAM_LOG_RULE_INFO, true};
         fastNER_AE = createEngine(FastNER_AE_General.class,
                 configurationData);
         simpleParser_AE.process(jCas);
         fastNER_AE.process(jCas);
 
+        annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "ConceptBASE"});
         annotationPrinter.process(jCas);
-        annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "PseudoConcept"});
-        annotationPrinter.process(jCas);
+        AnalysisEngine annotationEval1 = createEngine(AnnotationCountEvaluator.class, new Object[]{AnnotationCountEvaluator.PARAM_TYPE_NAME, "ConceptBASE",
+                AnnotationCountEvaluator.PARAM_TYPE_COUNT, 1, AnnotationCountEvaluator.PARAM_FEATURE_VALUES, "Text,protocol"});
+        annotationEval1.process(jCas);
+        assert (AnnotationCountEvaluator.pass);
     }
 
     @Test
@@ -329,4 +406,25 @@ public class FastNER_AE_GeneralTest {
         }
     }
 
+
+    public void createAnnotation(String typeName, Class superClass, int begin, int end) {
+        try {
+            Class cls = Class.forName(DeterminantValueSet.checkNameSpace(typeName)).asSubclass(superClass);
+            Constructor<SectionBody> clsConstruct = cls.getConstructor(JCas.class);
+            Annotation annotation = clsConstruct.newInstance(jCas);
+            annotation.setBegin(begin);
+            annotation.setEnd(end);
+            annotation.addToIndexes();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
 }

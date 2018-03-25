@@ -18,7 +18,6 @@ package edu.utah.bmi.nlp.fastcner;
 
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.fastner.FastRuleFactory;
-import edu.utah.bmi.nlp.fastner.IOUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
