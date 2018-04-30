@@ -115,7 +115,7 @@ public class FastRuleWGN extends FastRuleWOG {
                                    BiFunction<ArrayList, Integer, Integer> getEnd,
                                    HashMap rule, int matchBegin, int matchEnd, int currentPosition,
                                    HashMap<String, ArrayList<Span>> matches, String numericToken, boolean greaterThan) {
-        Double num = NumberUtils.createDouble(numericToken);
+        Double num = NumberUtils.createDouble(numericToken.trim());
         for (Object ruleValue : rule.keySet()) {
             Double ruleNumValue = NumberUtils.createDouble((String) ruleValue);
             if (greaterThan && num > ruleNumValue) {
