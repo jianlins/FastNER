@@ -15,9 +15,9 @@
  */
 package edu.utah.bmi.nlp.fastner;
 
+import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
@@ -225,6 +225,7 @@ public class FastRuleWOG extends FastRule {
             // System.out.println(key.getClass());
             currentSpan = new Span(matchBegin, matchEnd);
             currentSpan.ruleId = deterRule.get(key);
+            System.out.println(getRule(currentSpan.ruleId).rule);
             if (matches.containsKey((String) key)) {
 //              because the ruleStore are all processed at the same time from the input left to the input right,
 //                it becomes more efficient to compare the overlaps
@@ -232,13 +233,15 @@ public class FastRuleWOG extends FastRule {
                 Span lastSpan = currentSpanList.get(currentSpanList.size() - 1);
 
 //                  Since there is no directional preference, assume the span is not exclusive within each determinant.
-                if (currentSpan.end <= lastSpan.end) {
+                if (currentSpan.end < lastSpan.end) {
 //                      if currentSpan is within lastSpan
                     continue;
-                } else if (lastSpan.end >= currentSpan.begin) {
+                } else if (lastSpan.end > currentSpan.begin) {
 //                      if overlap and current span is wider than last span
 
                     if (lastSpan.width < currentSpan.width) {
+                        currentSpanList.remove(currentSpanList.size() - 1);
+                    }else if(lastSpan.width == currentSpan.width&& getRule(lastSpan.ruleId).type==DeterminantValueSet.Determinants.ACTUAL && getRule(currentSpan.ruleId).type==DeterminantValueSet.Determinants.PSEUDO){
                         currentSpanList.remove(currentSpanList.size() - 1);
                     } else {
                         continue;
