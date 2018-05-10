@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.utah.bmi.nlp</groupId>
     <artifactId>fastner</artifactId>
-    <version>1.3.1.2</version>
+    <version>1.3.1.5</version>
     <name>FastNER (Fast Name Entity Recognition)</name>
     <url>https://github.com/jianlins/FastNER</url>
     <description>FastNER is a fast implementation of rule-based named entity recognition using hashed rule processing
@@ -152,7 +152,7 @@
         <dependency>
             <groupId>edu.utah.bmi.nlp</groupId>
             <artifactId>nlp-core</artifactId>
-            <version>1.3.1.2</version>
+            <version>1.3.1.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
