@@ -19,9 +19,9 @@ import edu.utah.bmi.nlp.core.*;
 import edu.utah.bmi.nlp.core.DeterminantValueSet.Determinants;
 import edu.utah.bmi.nlp.fastner.FastNER;
 import edu.utah.bmi.nlp.type.system.*;
+import edu.utah.bmi.nlp.uima.ae.RuleBasedAEInf;
 import edu.utah.bmi.nlp.uima.common.AnnotationComparator;
 import edu.utah.bmi.nlp.uima.common.AnnotationOper;
-import org.apache.poi.hssf.record.BOFRecord;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_component.JCasAnnotator_ImplBase;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  *
  * @author Jianlin Shi
  */
-public class FastNER_AE_General extends JCasAnnotator_ImplBase {
+public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBasedAEInf {
     public static Logger logger = IOUtil.getLogger(FastNER_AE_General.class);
 
 
@@ -56,8 +56,8 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
 
     public static final String PARAM_ASSIGN_SECTIONS = "AssignSections";
 
-    public static final String PARAM_RULE_FILE_OR_STR = "RuleFileOrString";
-    //    @ConfigurationParameter(name = PARAM_RULE_FILE_OR_STR)
+    public static final String PARAM_RULE_STR = DeterminantValueSet.PARAM_RULE_STR;
+    //    @ConfigurationParameter(name = PARAM_RULE_STR)
 //    protected String ruleFileName;
     public static final String PARAM_SENTENCE_TYPE_NAME = "SentenceTypeName";
     //    @ConfigurationParameter(name = PARAM_SENTENCE_TYPE_NAME)
@@ -101,7 +101,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase {
     public void initialize(UimaContext cont) {
         String ruleStr, sentenceTypeName, tokenTypeName;
         ruleStr = (String) (cont
-                .getConfigParameterValue(PARAM_RULE_FILE_OR_STR));
+                .getConfigParameterValue(PARAM_RULE_STR));
         Object obj;
         obj = cont.getConfigParameterValue(PARAM_SENTENCE_TYPE_NAME);
         if (obj == null)

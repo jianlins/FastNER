@@ -18,7 +18,6 @@ package edu.utah.bmi.nlp.fastcner;
 
 
 import edu.utah.bmi.nlp.fastcner.uima.FastCNER_AE_General;
-import edu.utah.bmi.nlp.fastner.FastRule;
 import edu.utah.bmi.nlp.type.system.Concept;
 import edu.utah.bmi.nlp.type.system.ConceptBASE;
 import edu.utah.bmi.nlp.type.system.Sentence;
@@ -77,7 +76,7 @@ public class FastCNER_AE_GeneralTest {
 		runner.reInitTypeSystem("target/generated-test-sources/customized");
 		jCas = runner.initJCas();
 //      Set up the parameters
-		configurationData = new Object[]{FastCNER_AE_General.PARAM_RULE_FILE_OR_STR, "conf/crule_test.xlsx",
+		configurationData = new Object[]{FastCNER_AE_General.PARAM_RULE_STR, "conf/crule_test.xlsx",
 				FastCNER_AE_General.PARAM_SENTENCE_TYPE_NAME, "edu.utah.bmi.nlp.type.system.Sentence",
 				FastCNER_AE_General.PARAM_MARK_PSEUDO, true,
 				FastCNER_AE_General.PARAM_LOG_RULE_INFO, true};

@@ -18,6 +18,7 @@ package edu.utah.bmi.nlp.fastcner.uima;
 import edu.utah.bmi.nlp.core.*;
 import edu.utah.bmi.nlp.fastcner.FastCNER;
 import edu.utah.bmi.nlp.fastner.uima.FastNER_AE_General;
+import edu.utah.bmi.nlp.uima.ae.RuleBasedAEInf;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.FSIndex;

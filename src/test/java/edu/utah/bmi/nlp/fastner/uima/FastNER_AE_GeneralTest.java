@@ -21,7 +21,6 @@ import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.type.system.*;
 import edu.utah.bmi.nlp.uima.AdaptableUIMACPERunner;
 import edu.utah.bmi.nlp.uima.ae.AnnotationCountEvaluator;
-import edu.utah.bmi.nlp.uima.ae.AnnotationEvaluator;
 import edu.utah.bmi.nlp.uima.ae.AnnotationPrinter;
 import edu.utah.bmi.nlp.uima.ae.SimpleParser_AE;
 import org.apache.uima.analysis_engine.AnalysisEngine;
@@ -67,7 +66,7 @@ public class FastNER_AE_GeneralTest {
         runner.reInitTypeSystem("target/generated-test-sources/customized");
         jCas = runner.initJCas();
 //      Set up the parameters
-        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, "conf/rules.xlsx",
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, "conf/rules.xlsx",
                 FastNER_AE_General.PARAM_SENTENCE_TYPE_NAME, "edu.utah.bmi.nlp.type.system.Sentence",
                 FastNER_AE_General.PARAM_MARK_PSEUDO, true,
                 FastNER_AE_General.PARAM_LOG_RULE_INFO, true};
@@ -162,7 +161,7 @@ public class FastNER_AE_GeneralTest {
         jCas.setDocumentText(text);
         SectionBody sectionBody = new SectionBody(jCas, text.indexOf("a fever of 103.8"), text.indexOf("IMPRESSION") - 1);
         sectionBody.addToIndexes();
-        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, "@fastner\nfever\t0\tEntity\tACTUAL",
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, "@fastner\nfever\t0\tEntity\tACTUAL",
                 FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "SectionBody",
                 FastNER_AE_General.PARAM_MARK_PSEUDO, true,
                 FastNER_AE_General.PARAM_LOG_RULE_INFO, true};
@@ -207,7 +206,7 @@ public class FastNER_AE_GeneralTest {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, "@fastner\nfever\t0\tEntity\tACTUAL",
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, "@fastner\nfever\t0\tEntity\tACTUAL",
                 FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "SectionBody",
                 FastNER_AE_General.PARAM_MARK_PSEUDO, true,
                 FastNER_AE_General.PARAM_LOG_RULE_INFO, true};
@@ -252,7 +251,7 @@ public class FastNER_AE_GeneralTest {
         annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "SectionBody"});
         annotationPrinter.process(jCas);
 
-        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, "@fastner\nfever\t0\tEntity\tACTUAL",
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, "@fastner\nfever\t0\tEntity\tACTUAL",
                 FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "Impression",
                 FastNER_AE_General.PARAM_MARK_PSEUDO, true,
                 FastNER_AE_General.PARAM_LOG_RULE_INFO, true};
@@ -284,7 +283,7 @@ public class FastNER_AE_GeneralTest {
         String rule = "@fastner\n" +
                 "emboli	0	Concept	ACTUAL\n" +
                 "emboli protocol	0	Concept	PSEUDO";
-        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, rule,
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, rule,
                 FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "SectionBody",
                 FastNER_AE_General.PARAM_MARK_PSEUDO, true,
                 FastNER_AE_General.PARAM_LOG_RULE_INFO, true,
@@ -318,7 +317,7 @@ public class FastNER_AE_GeneralTest {
         sectionBody.addToIndexes();
         String rule = "@fastner\n" +
                 "emboli	0	Concept	ACTUAL\n";
-        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, rule,
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, rule,
                 FastNER_AE_General.PARAM_EXCLUDE_SECTIONS, "Plan",
                 FastNER_AE_General.PARAM_MARK_PSEUDO, true,
                 FastNER_AE_General.PARAM_LOG_RULE_INFO, true,
@@ -352,7 +351,7 @@ public class FastNER_AE_GeneralTest {
         sectionBody.addToIndexes();
         String rule = "@fastner\n" +
                 "emboli	0	Concept	ACTUAL\n";
-        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, rule,
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, rule,
                 FastNER_AE_General.PARAM_EXCLUDE_SECTIONS, "Plan",
                 FastNER_AE_General.PARAM_MARK_PSEUDO, true,
                 FastNER_AE_General.PARAM_LOG_RULE_INFO, true,
@@ -380,7 +379,7 @@ public class FastNER_AE_GeneralTest {
         sectionBody.addToIndexes();
         String rule = "@fastner\n" +
                 "emboli \\( protocol \\)	0	Concept	ACTUAL";
-        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_FILE_OR_STR, rule,
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, rule,
                 FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "SectionBody",
                 FastNER_AE_General.PARAM_MARK_PSEUDO, true,
                 FastNER_AE_General.PARAM_LOG_RULE_INFO, true};
