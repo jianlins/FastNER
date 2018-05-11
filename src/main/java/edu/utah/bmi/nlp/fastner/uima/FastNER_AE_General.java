@@ -413,4 +413,9 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
     public static LinkedHashMap<String, TypeDefinition> getTypeDefinitions(String ruleFile, boolean caseSenstive) {
         return new FastNER(ruleFile, caseSenstive, false).getTypeDefinitions();
     }
+
+    @Override
+    public LinkedHashMap<String, TypeDefinition> getTypeDefs(String ruleStr) {
+        return new FastNER(ruleStr, false, false).getTypeDefinitions();
+    }
 }
