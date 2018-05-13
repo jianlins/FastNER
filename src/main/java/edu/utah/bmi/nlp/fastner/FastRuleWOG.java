@@ -70,6 +70,7 @@ public class FastRuleWOG extends FastRule {
         HashMap rule2 = new HashMap();
         HashMap rule_t;
         String[] ruleContent = rule.rule.split("\\s+");
+        ruleLengths.put(rule.id, ruleContent.length);
         int length = ruleContent.length;
         int i = 0;
         rules_tmp.add(rulesMap);
@@ -102,7 +103,6 @@ public class FastRuleWOG extends FastRule {
             }
         }
         rule1.put(ruleContent[i], rule2.clone());
-        ruleLengths.put(rule.id, ruleContent.length);
         return true;
     }
 
@@ -191,7 +191,10 @@ public class FastRuleWOG extends FastRule {
         ArrayList<Span> currentSpanList;
         for (Object key : deterRule.keySet()) {
 //          claim as Span instance, to be compatible with old methods
-            currentSpan = new NERSpan(matchBegin, matchEnd, deterRule.get(key), ruleLengths.get(deterRule.get(key)), ruleStore.get(deterRule.get(key)).score, "");
+            int ruleId = deterRule.get(key);
+            boolean contain = ruleLengths.containsKey(ruleId);
+            contain = ruleStore.containsKey(ruleId);
+            currentSpan = new NERSpan(matchBegin, matchEnd, ruleId, ruleLengths.get(ruleId), ruleStore.get(ruleId).score, "");
             ((NERSpan) currentSpan).setCompareMethod(spanCompareMethod);
             ((NERSpan) currentSpan).setWidthCompareMethod(widthCompareMethod);
             logger.finest(getRule(currentSpan.ruleId).toString());

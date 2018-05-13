@@ -149,4 +149,35 @@ public class FastRuleWGNTest {
         assert (text.substring(span.begin, span.end).equals("8164"));
 
     }
+
+    @Test
+    public void processSpans6() throws Exception {
+
+        String text = "The trial was intended to enroll 8500 patients, but in conjunction with the US Food and Drug Administration enrollment was modified to 5745 patients presenting from 296 hospitals in 17 countries from July 13, 2004, to May 11, 2006.";
+        String rule = "@fastner\n" +
+                "\\d+\tCLUE\n" +
+                "\\d+ , \\d+\tCLUE\n" +
+                "\\d+ , \\d+ , \\d+\tCLUE\n" +
+
+                "#Between Dec 19, 2006, and April 2, 2010, patients were enrolled\n" +
+                "May \\d+ , \\d+\tCLUE\tPSEUDO\n" +
+                "June \\d+ , \\d+\tCLUE\tPSEUDO\n" +
+                "July \\d+ , \\d+\tCLUE\tPSEUDO\n" +
+                "\n" +
+                "May \\d+ , \\d+\tCLUE\tPSEUDO\n" +
+                "Jun \\d+ , \\d+\tCLUE\tPSEUDO\n" +
+                "Jul \\d+ , \\d+\tCLUE\tPSEUDO\n" +
+                "\n" +
+                "May . \\d+ , \\d+\tCLUE\tPSEUDO\n" +
+                "Jun . \\d+ , \\d+\tCLUE\tPSEUDO\n" +
+                "Jul . \\d+ , \\d+\tCLUE\tPSEUDO\n" ;
+        ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
+
+        fastNER = new FastNER(rule);
+        HashMap<String, ArrayList<Span>> res = fastNER.processSpanList(tokens);
+
+
+    }
+
+
 }

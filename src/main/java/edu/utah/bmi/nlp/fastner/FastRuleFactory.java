@@ -62,17 +62,17 @@ public class FastRuleFactory {
         } else {
             edu.utah.bmi.nlp.core.IOUtil ioUtil = new edu.utah.bmi.nlp.core.IOUtil(ruleStr);
             for (ArrayList<String> cells : ioUtil.getInitiations()) {
-                if (cells.get(1).startsWith("@CONCEPT_FEATURES")) {
+                if (cells.get(1).startsWith(DeterminantValueSet.CONCEPT_FEATURES1) || cells.get(1).startsWith(DeterminantValueSet.CONCEPT_FEATURES2)) {
                     String conceptName = cells.get(1).trim();
                     String conceptShortName = getShortName(conceptName);
-                    if (typeDefinition!=null && !typeDefinition.containsKey(conceptShortName)) {
+                    if (typeDefinition != null && !typeDefinition.containsKey(conceptShortName)) {
                         typeDefinition.put(conceptShortName, new TypeDefinition(cells.subList(1, cells.size())));
                     }
                 } else if (Character.isUpperCase(cells.get(1).charAt(1))) {
 //                  back compatibility
                     String conceptName = cells.get(1).substring(1);
                     String conceptShortName = getShortName(conceptName);
-                    if (typeDefinition!=null && !typeDefinition.containsKey(conceptShortName)) {
+                    if (typeDefinition != null && !typeDefinition.containsKey(conceptShortName)) {
                         if (cells.size() > 3)
                             typeDefinition.put(conceptShortName, new TypeDefinition(conceptName, cells.get(2), cells.subList(3, cells.size())));
                         else
@@ -93,9 +93,11 @@ public class FastRuleFactory {
             String conceptName;
             double score = 0;
             DeterminantValueSet.Determinants determinant = DeterminantValueSet.Determinants.ACTUAL;
+            boolean scoreSet = false;
             if (UnicodeChecker.isNumber(cells.get(2))) {
                 conceptName = cells.get(3).trim();
                 score = Double.parseDouble(cells.get(2));
+                scoreSet = true;
                 if (cells.size() > 4)
                     determinant = DeterminantValueSet.Determinants.valueOf(cells.get(4));
             } else {
@@ -104,9 +106,11 @@ public class FastRuleFactory {
                     determinant = DeterminantValueSet.Determinants.valueOf(cells.get(3));
             }
             String conceptShortName = getShortName(conceptName);
-            if (typeDefinition!=null && !typeDefinition.containsKey(conceptName)) {
+            if (typeDefinition != null && !typeDefinition.containsKey(conceptName)) {
                 typeDefinition.put(conceptShortName, new TypeDefinition(conceptName, DeterminantValueSet.defaultSuperTypeName, new ArrayList<>()));
             }
+            if (!scoreSet && determinant == DeterminantValueSet.Determinants.PSEUDO)
+                score = 1d;
             if (constructRuleMap)
                 rules.put(id, new Rule(id, caseSensitive ? rule : rule.toLowerCase(), conceptName, score, determinant));
         }
