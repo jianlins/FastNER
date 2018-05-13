@@ -1,98 +1,15 @@
-package edu.utah.bmi.nlp.fastcner;
+package edu.utah.bmi.nlp.fastner;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
-public class UnicodeChecker {
+public class TestDigit {
 
-    public static boolean isSpecialChar(char c) {
-        int d = (int) c;
-        return d > 126 && d != 160 && d < 11904;
+    public static void main(String[] args) {
+        System.out.println(isNumber("091"));
+        System.out.println(NumberUtils.createDouble("091"));
     }
 
-    public static boolean isChinese(char c) {
-        int d = (int) c;
-        return d > 19967 && d < 40908;
-    }
-
-    public static boolean isPunctuation(char c) {
-        return c == '！' ||
-                c == '、' ||
-                c == '。' ||
-                c == '＃' ||
-                c == '％' ||
-                c == '＆' ||
-                c == '（' ||
-                c == '）' ||
-                c == '《' ||
-                c == '＋' ||
-                c == '》' ||
-                c == '，' ||
-                c == '「' ||
-                c == '－' ||
-                c == '」' ||
-                c == '／' ||
-                c == '—' ||
-                c == '‘' ||
-                c == '’' ||
-                c == '：' ||
-                c == '；' ||
-                c == '“' ||
-                c == '”' ||
-                c == '＝' ||
-                c == '？' ||
-                c == '＠' ||
-                c == '!' ||
-                c == '"' ||
-                c == '#' ||
-                c == '$' ||
-                c == '%' ||
-                c == '&' ||
-                c == '…' ||
-                c == '\'' ||
-                c == '(' ||
-                c == ')' ||
-                c == '*' ||
-                c == '+' ||
-                c == ',' ||
-                c == '-' ||
-                c == '.' ||
-                c == '/' ||
-                c == '·' ||
-                c == ':' ||
-                c == ';' ||
-                c == '<' ||
-                c == '=' ||
-                c == '>' ||
-                c == '?' ||
-                c == '@' ||
-                c == '｀' ||
-                c == '×' ||
-                c == '[' ||
-                c == '｛' ||
-                c == '\\' ||
-                c == '｜' ||
-                c == ']' ||
-                c == '｝' ||
-                c == '^' ||
-                c == '～' ||
-                c == '_' ||
-                c == '`' ||
-                c == '￥' ||
-                c == '{';
-    }
-
-    public static boolean isDigit(char c) {
-        int d = (int) c;
-        return Character.isDigit(c) || (d > 65296 && d < 65297);
-    }
-
-    public static boolean isAlphabetic(char c) {
-        return ((((1 << Character.UPPERCASE_LETTER) |
-                (1 << Character.LOWERCASE_LETTER)) >> Character.getType(c)) & 1)
-                != 0;
-    }
-
-//  revised from org.apache.commons.lang3.math.NumberUtils to allow "093" type of numbers
     public static boolean isNumber(final String str) {
         if (StringUtils.isEmpty(str)) {
             return false;
@@ -127,7 +44,7 @@ public class UnicodeChecker {
                 // leading 0, but not hex, must be octal
                 int i = start + 1;
                 for (; i < chars.length; i++) {
-                    if (chars[i] < '0' || chars[i] > '9') {
+                    if (chars[i] < '0' || chars[i] > '7') {
                         return false;
                     }
                 }
@@ -208,5 +125,4 @@ public class UnicodeChecker {
         // found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
         return !allowSigns && foundDigit;
     }
-
 }
