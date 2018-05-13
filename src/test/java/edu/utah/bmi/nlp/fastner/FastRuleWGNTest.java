@@ -46,7 +46,7 @@ public class FastRuleWGNTest {
         for (Map.Entry<String, ArrayList<Span>> entry : res.entrySet()) {
             System.out.println(entry.getKey() + "\t");
             entry.getValue().forEach((span) -> {
-                System.out.println(tokens.subList(span.getBegin(),span.getEnd()+1));
+                System.out.println(tokens.subList(span.getBegin(), span.getEnd() + 1));
             });
         }
     }
@@ -128,5 +128,25 @@ public class FastRuleWGNTest {
                 System.out.println("\t" + text.substring(span.getBegin(), span.getEnd()));
             });
         }
+    }
+
+    @Test
+    public void processSpans5() throws Exception {
+
+        String text = "and Dec 31, 2008, 8164 patients";
+        String rule = "@fastner\n" +
+                "\\d+\tCLUE\n" +
+                "\\d+ , \\d+\tCLUE\n" +
+                "\\d+ , \\d+ , \\d+\tCLUE\n" +
+                "Dec \\d+ , \\d+\t2\tCLUE\tPSEUDO";
+        ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
+
+        fastNER = new FastNER(rule);
+        HashMap<String, ArrayList<Span>> res = fastNER.processSpanList(tokens);
+        assert (res.size() == 1);
+        assert (res.get("CLUE").size() == 1);
+        Span span = res.get("CLUE").get(0);
+        assert (text.substring(span.begin, span.end).equals("8164"));
+
     }
 }

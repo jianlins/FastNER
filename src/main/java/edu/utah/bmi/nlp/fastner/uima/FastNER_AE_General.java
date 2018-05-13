@@ -18,6 +18,7 @@ package edu.utah.bmi.nlp.fastner.uima;
 import edu.utah.bmi.nlp.core.*;
 import edu.utah.bmi.nlp.core.DeterminantValueSet.Determinants;
 import edu.utah.bmi.nlp.fastner.FastNER;
+import edu.utah.bmi.nlp.fastner.FastRuleWOG;
 import edu.utah.bmi.nlp.type.system.*;
 import edu.utah.bmi.nlp.uima.ae.RuleBasedAEInf;
 import edu.utah.bmi.nlp.uima.common.AnnotationComparator;
@@ -35,6 +36,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Logger;
+
+import static edu.utah.bmi.nlp.core.NERSpan.byRuleLength;
+import static edu.utah.bmi.nlp.core.NERSpan.scorewidth;
 
 
 /**
@@ -73,6 +77,9 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
 
     public static final String PARAM_CASE_SENSITIVE = "CaseSensitive";
 
+    public static final String ADV_PARAM_SPAN_COMPARE_METHOD = "SpanCompareMethod";
+    public static final String ADV_PARAM_WIDTH_COMPARE_METHOD = "WidthCompareMethod";
+
     //    @ConfigurationParameter(name = TOKEN_TYPE_NAME)
 //    protected String tokenTypeName;
 //    public static final String PARAM_CONCEPT_TYPE_NAME = "conceptTypeName";
@@ -94,6 +101,8 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
     protected HashMap<String, Constructor<? extends Concept>> ConceptTypeConstructors = new HashMap<>();
     protected boolean markPseudo = false, logRuleInfo = false;
     protected boolean caseSenstive = true, forceAssignSections = true, assignSection = true;
+    private String spanCompareMethod = scorewidth;
+    private String widthCompareMethod = byRuleLength;
     @Deprecated
     protected boolean debug = false;
 
@@ -151,6 +160,14 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
         if (obj != null && obj instanceof Boolean && (Boolean) obj != true)
             forceAssignSections = false;
 
+        obj = cont.getConfigParameterValue(ADV_PARAM_SPAN_COMPARE_METHOD);
+        if (obj != null && obj instanceof String)
+            spanCompareMethod = (String) obj;
+
+        obj = cont.getConfigParameterValue(ADV_PARAM_WIDTH_COMPARE_METHOD);
+        if (obj != null && obj instanceof String)
+            widthCompareMethod = (String) obj;
+
         if (includeSections.size() == 0 && excludeSections.size() == 0)
             assignSection = false;
 
@@ -188,6 +205,8 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
         fastNER = new FastNER(ruleStr, caseSenstive);
         if (markPseudo)
             fastNER.setRemovePseudo(false);
+        fastNER.setCompareMethod(this.spanCompareMethod);
+        fastNER.setWidthCompareMethod(this.widthCompareMethod);
         return fastNER.getTypeDefinitions();
     }
 

@@ -21,12 +21,9 @@ import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.SimpleParser;
 import edu.utah.bmi.nlp.core.Span;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
@@ -53,6 +50,7 @@ public abstract class FastRule {
     protected BiFunction<ArrayList, Integer, Integer> getSpanBegin, getSpanEnd, getBeginId, getEndId;
     protected BiFunction<ArrayList, Integer, String> getSpanText, getStringText;
 
+
     public FastRule() {
 
     }
@@ -62,7 +60,7 @@ public abstract class FastRule {
     }
 
     public void initiate(String ruleStr, boolean caseSensitive) {
-        ruleStore = (HashMap<Integer, Rule>) FastRuleFactory.buildRuleStore(ruleStr, null,caseSensitive,true)[0];
+        ruleStore = (HashMap<Integer, Rule>) FastRuleFactory.buildRuleStore(ruleStr, null, caseSensitive, true)[0];
         initiate(ruleStore);
     }
 
@@ -163,6 +161,7 @@ public abstract class FastRule {
         return ruleStore.get(ruleId).rule;
     }
 
+
     public Rule getRule(int pos) {
         return ruleStore.get(pos);
     }
@@ -177,7 +176,7 @@ public abstract class FastRule {
                 logger.finer(offset + "key: " + ent.getKey());
             if (ent.getValue().getClass() == HashMap.class) {
                 printEmbededMap((HashMap<Object, Object>) ent.getValue(), offset + "\t");
-            } else if (logger.isLoggable(Level.FINER)){
+            } else if (logger.isLoggable(Level.FINER)) {
                 logger.finer(offset + "pair: " + ent.getKey() + "->" + ent.getValue());
             }
 
@@ -187,4 +186,6 @@ public abstract class FastRule {
     public HashMap<Integer, Rule> getRuleStore() {
         return ruleStore;
     }
+
+
 }

@@ -15,15 +15,17 @@
  */
 package edu.utah.bmi.nlp.fastner;
 
-import edu.utah.bmi.nlp.core.DeterminantValueSet;
+import edu.utah.bmi.nlp.core.NERSpan;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
 import edu.utah.bmi.nlp.fastcner.UnicodeChecker;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.BiFunction;
+
+import static edu.utah.bmi.nlp.core.NERSpan.byRuleLength;
+import static edu.utah.bmi.nlp.core.NERSpan.scorewidth;
 
 /**
  * This is a class extended from FastRule, which apply the full rule as a match (does not consider group capturing)
@@ -33,7 +35,9 @@ import java.util.function.BiFunction;
 @SuppressWarnings("rawtypes")
 public class FastRuleWOG extends FastRule {
     //    fields are defined in abstract class
-
+    protected HashMap<Integer, Integer> ruleLengths = new HashMap<Integer, Integer>();
+    private String spanCompareMethod = scorewidth;
+    private String widthCompareMethod = byRuleLength;
 
     public FastRuleWOG() {
     }
@@ -50,91 +54,57 @@ public class FastRuleWOG extends FastRule {
         initiate(ruleStore);
     }
 
+    public void setCompareMethod(String method) {
+        this.spanCompareMethod = method;
+    }
 
-//    public HashMap<String, ArrayList<Span>> processTokens(ArrayList<String> contextTokens) {
-//        // use the first "startposition" to remember the original start matching
-//        // position.
-//        // use the 2nd one to remember the start position in which recursion.
-//        HashMap<String, ArrayList<Span>> matches = new HashMap<String, ArrayList<Span>>();
-//        for (int i = 0; i < contextTokens.size(); i++) {
-//            // System.out.println(contextTokens.get(i));
-//            processRules(contextTokens, rulesMap, i, i, matches);
-//        }
-//        if (removePseudo)
-//            removePseudoMatches(matches);
-//        return matches;
-//    }
-//
-//
-//    protected void processRules(ArrayList<String> contextTokens, HashMap rule, int matchBegin, int startPosition,
-//                                HashMap<String, ArrayList<Span>> matches) {
-//        // when reach the end of the tunedcontext, end the iteration
-//        if (startPosition < contextTokens.size()) {
-//            // start processing the tunedcontext tokens
-//            String thisToken = contextTokens.get(startPosition);
-////			System.out.println("thisToken-"+thisToken);
-//            if (rule.containsKey("\\w+")) {
-//                processRules(contextTokens, (HashMap) rule.get("\\w+"), matchBegin, startPosition + 1, matches);
-//            }
-//            // if the end of a rule is met
-//            if (rule.containsKey(END)) {
-//                addDeterminants(rule, matches, matchBegin, startPosition);
-//            }
-//            // if the current token match the element of a rule
-//            if (rule.containsKey(thisToken)) {
-//                processRules(contextTokens, (HashMap) rule.get(thisToken), matchBegin, startPosition + 1, matches);
-//            }
-//            if (rule.containsKey("\\d+") && StringUtils.isNumeric(thisToken)) {
-//                processRules(contextTokens, (HashMap) rule.get("\\d+"), matchBegin, startPosition + 1, matches);
-//            }
-//        } else if (startPosition == contextTokens.size() && rule.containsKey(END)) {
-//            addDeterminants(rule, matches, matchBegin, startPosition);
-//        }
-//    }
-//
-//
-//    public HashMap<String, ArrayList<Span>> processSpans(ArrayList<Span> contextTokens) {
-//        // use the first "startposition" to remember the original start matching
-//        // position.
-//        // use the 2nd one to remember the start position in which recursion.
-//        HashMap<String, ArrayList<Span>> matches = new HashMap<String, ArrayList<Span>>();
-//        for (int i = 0; i < contextTokens.size(); i++) {
-//            // System.out.println(contextTokens.get(i));
-//            processSpans(contextTokens, rulesMap, i, i, matches);
-//        }
-//        if (removePseudo)
-//            removePseudoMatches(matches);
-//        return matches;
-//    }
-//
-//
-//    protected void processSpans(ArrayList<Span> contextTokens, HashMap rule, int matchBegin, int currentPosition,
-//                                HashMap<String, ArrayList<Span>> matches) {
-//        // when reach the end of the tunedcontext, end the iteration
-//        if (currentPosition < contextTokens.size()) {
-//            // start processing the tunedcontext tokens
-//            String thisToken = contextTokens.get(currentPosition).text;
-////			System.out.println("thisToken-"+thisToken);
-//            if (rule.containsKey("\\w+")) {
-//                processSpans(contextTokens, (HashMap) rule.get("\\w+"), matchBegin, currentPosition + 1, matches);
-//            }
-//            // if the end of a rule is met
-//            if (rule.containsKey(END)) {
-////                convert to absolute offset
-//                addDeterminants(rule, matches, contextTokens.get(matchBegin).begin, contextTokens.get(currentPosition - 1).end);
-//            }
-//            // if the current token match the element of a rule
-//            if (rule.containsKey(thisToken)) {
-//                processSpans(contextTokens, (HashMap) rule.get(thisToken), matchBegin, currentPosition + 1, matches);
-//            }
-//            if (rule.containsKey("\\d+") && UnicodeChecker.isNumber(thisToken)) {
-//                processSpans(contextTokens, (HashMap) rule.get("\\d+"), matchBegin, currentPosition + 1, matches);
-//            }
-//        } else if (currentPosition == contextTokens.size() && rule.containsKey(END)) {
-//            //                convert to absolute offset
-//            addDeterminants(rule, matches, contextTokens.get(matchBegin).begin, contextTokens.get(currentPosition - 1).end);
-//        }
-//    }
+    public void setWidthCompareMethod(String widthCompareMethod) {
+        this.widthCompareMethod = widthCompareMethod;
+    }
+
+    protected boolean addRule(Rule rule) {
+        // use to store the HashMap sub-chain that have the key chain that meet
+        // the rule[]
+        ArrayList<HashMap> rules_tmp = new ArrayList<HashMap>();
+        HashMap rule1 = rulesMap;
+        HashMap rule2 = new HashMap();
+        HashMap rule_t;
+        String[] ruleContent = rule.rule.split("\\s+");
+        int length = ruleContent.length;
+        int i = 0;
+        rules_tmp.add(rulesMap);
+        while (i < length && rule1 != null && rule1.containsKey(ruleContent[i])) {
+            rule1 = (HashMap) rule1.get(ruleContent[i]);
+            i++;
+        }
+        // if the rule has been included
+        if (i > length)
+            return false;
+        // start with the determinant, construct the last descendant HashMap
+        // <Determinant, null>
+        if (i == length) {
+            if (rule1.containsKey(END)) {
+                ((HashMap) rule1.get(END)).put(rule.ruleName, rule.id);
+            } else {
+                rule2.put(rule.ruleName, rule.id);
+                rule1.put(END, rule2.clone());
+            }
+            return true;
+        } else {
+            rule2.put(rule.ruleName, rule.id);
+            rule2.put(END, rule2.clone());
+            rule2.remove(rule.ruleName);
+            // filling the HashMap chain which ruleStore doesn't have the key chain
+            for (int j = length - 1; j > i; j--) {
+                rule_t = (HashMap) rule2.clone();
+                rule2.clear();
+                rule2.put(ruleContent[j], rule_t);
+            }
+        }
+        rule1.put(ruleContent[i], rule2.clone());
+        ruleLengths.put(rule.id, ruleContent.length);
+        return true;
+    }
 
     public HashMap<String, ArrayList<Span>> processTokens(ArrayList<String> contextTokens) {
         // use the first "startposition" to remember the original start matching
@@ -220,13 +190,11 @@ public class FastRuleWOG extends FastRule {
         Span currentSpan;
         ArrayList<Span> currentSpanList;
         for (Object key : deterRule.keySet()) {
-            // matches.put(Determinants.valueOf(key.toString()), new
-            // Span(startposition, i - 1));
-            // choose the largest span, may be improved later(e.g. defined order)
-            // System.out.println(key.getClass());
-            currentSpan = new Span(matchBegin, matchEnd);
-            currentSpan.ruleId = deterRule.get(key);
-            System.out.println(getRule(currentSpan.ruleId).rule);
+//          claim as Span instance, to be compatible with old methods
+            currentSpan = new NERSpan(matchBegin, matchEnd, deterRule.get(key), ruleLengths.get(deterRule.get(key)), ruleStore.get(deterRule.get(key)).score, "");
+            ((NERSpan) currentSpan).setCompareMethod(spanCompareMethod);
+            ((NERSpan) currentSpan).setWidthCompareMethod(widthCompareMethod);
+            logger.finest(getRule(currentSpan.ruleId).toString());
             if (matches.containsKey((String) key)) {
 //              because the ruleStore are all processed at the same time from the input left to the input right,
 //                it becomes more efficient to compare the overlaps
@@ -238,11 +206,8 @@ public class FastRuleWOG extends FastRule {
 //                      if currentSpan is within lastSpan
                     continue;
                 } else if (lastSpan.end > currentSpan.begin) {
-//                      if overlap and current span is wider than last span
-
-                    if (lastSpan.width < currentSpan.width) {
-                        currentSpanList.remove(currentSpanList.size() - 1);
-                    }else if(lastSpan.width == currentSpan.width&& getRule(lastSpan.ruleId).type==DeterminantValueSet.Determinants.ACTUAL && getRule(currentSpan.ruleId).type==DeterminantValueSet.Determinants.PSEUDO){
+//                      if overlap and current span has priority than last span
+                    if (((NERSpan) currentSpan).compareTo((NERSpan) lastSpan) > 0) {
                         currentSpanList.remove(currentSpanList.size() - 1);
                     } else {
                         continue;
