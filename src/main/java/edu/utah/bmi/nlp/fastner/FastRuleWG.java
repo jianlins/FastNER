@@ -17,6 +17,7 @@ package edu.utah.bmi.nlp.fastner;
 
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
+import edu.utah.bmi.nlp.fastcner.UnicodeChecker;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -88,7 +89,7 @@ public class FastRuleWG extends FastRuleWOG {
             if (rule.containsKey(thisToken)) {
                 process(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get(thisToken), matchBegin, matchEnd, currentPosition + 1, matches);
             }
-            if (rule.containsKey("\\d+") && NumberUtils.isNumber(thisToken)) {
+            if (rule.containsKey("\\d+") && UnicodeChecker.isNumber(thisToken)) {
                 process(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get("\\d+"), matchBegin, matchEnd, currentPosition + 1, matches);
             }
             if (rule.containsKey("\\(")) {

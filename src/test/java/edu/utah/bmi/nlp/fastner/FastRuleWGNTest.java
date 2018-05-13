@@ -110,4 +110,23 @@ public class FastRuleWGNTest {
             });
         }
     }
+
+    @Test
+    public void processSpans4() throws Exception {
+
+        String text = "There are 13,092 patients enrolled.";
+        String rule = "@fastner\n" +
+                "emboli	0	Concept	ACTUAL\n" +
+                "\\d+ , \\d+ 	0	Concept	ACTUAL\n";
+        ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
+
+        fastNER = new FastNER(rule);
+        HashMap<String, ArrayList<Span>> res = fastNER.processSpanList(tokens);
+        for (Map.Entry<String, ArrayList<Span>> entry : res.entrySet()) {
+            System.out.println(entry.getKey() + ":\t");
+            entry.getValue().forEach((span) -> {
+                System.out.println("\t" + text.substring(span.getBegin(), span.getEnd()));
+            });
+        }
+    }
 }

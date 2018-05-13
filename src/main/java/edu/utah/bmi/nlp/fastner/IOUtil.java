@@ -23,6 +23,7 @@ import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.DeterminantValueSet.Determinants;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.TypeDefinition;
+import edu.utah.bmi.nlp.fastcner.UnicodeChecker;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -228,7 +229,7 @@ public class IOUtil {
                 cells.add(cell);
             }
 //          to be back compatible
-            if ((!cells.get(0).startsWith("@") && !cells.get(0).startsWith("&")) && cells.size() > 1 && !NumberUtils.isNumber(cells.get(1)))
+            if ((!cells.get(0).startsWith("@") && !cells.get(0).startsWith("&")) && cells.size() > 1 && !UnicodeChecker.isNumber(cells.get(1)))
                 cells.add(1, "1");
             ruleSupports = parseCells(cells, id, rules, typeDefinition, caseSensitive, ruleSupports);
             id++;
@@ -257,7 +258,7 @@ public class IOUtil {
 //            if (cells.get(2).indexOf(".") == -1)
 //                cells.set(2, checkNameSpace(cells.get(2)));
             String rule = cells.get(0);
-            if (NumberUtils.isNumber(cells.get(1))) {
+            if (UnicodeChecker.isNumber(cells.get(1))) {
                 String conceptShortName = getShortName(cells.get(2).trim());
                 if (!typeDefinition.containsKey(conceptShortName)) {
                     typeDefinition.put(conceptShortName, new TypeDefinition(cells.get(2).trim(), DeterminantValueSet.defaultSuperTypeName, new ArrayList<>()));

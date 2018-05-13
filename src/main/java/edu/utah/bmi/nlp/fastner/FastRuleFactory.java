@@ -19,10 +19,7 @@ package edu.utah.bmi.nlp.fastner;
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.TypeDefinition;
-import edu.utah.bmi.nlp.fastcner.FastCNER;
-import edu.utah.bmi.nlp.fastcner.FastCRule;
-import edu.utah.bmi.nlp.fastcner.FastCRuleCN;
-import edu.utah.bmi.nlp.fastcner.FastCRuleSB;
+import edu.utah.bmi.nlp.fastcner.*;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.File;
@@ -96,7 +93,7 @@ public class FastRuleFactory {
             String conceptName;
             double score = 0;
             DeterminantValueSet.Determinants determinant = DeterminantValueSet.Determinants.ACTUAL;
-            if (NumberUtils.isNumber(cells.get(2))) {
+            if (UnicodeChecker.isNumber(cells.get(2))) {
                 conceptName = cells.get(3).trim();
                 score = Double.parseDouble(cells.get(2));
                 if (cells.size() > 4)

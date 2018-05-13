@@ -18,6 +18,7 @@ package edu.utah.bmi.nlp.fastner;
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
+import edu.utah.bmi.nlp.fastcner.UnicodeChecker;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
@@ -126,7 +127,7 @@ public class FastRuleWOG extends FastRule {
 //            if (rule.containsKey(thisToken)) {
 //                processSpans(contextTokens, (HashMap) rule.get(thisToken), matchBegin, currentPosition + 1, matches);
 //            }
-//            if (rule.containsKey("\\d+") && NumberUtils.isNumber(thisToken)) {
+//            if (rule.containsKey("\\d+") && UnicodeChecker.isNumber(thisToken)) {
 //                processSpans(contextTokens, (HashMap) rule.get("\\d+"), matchBegin, currentPosition + 1, matches);
 //            }
 //        } else if (currentPosition == contextTokens.size() && rule.containsKey(END)) {
@@ -202,7 +203,7 @@ public class FastRuleWOG extends FastRule {
             if (rule.containsKey(thisToken)) {
                 process(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get(thisToken), matchBegin, matchEnd, currentPosition + 1, matches);
             }
-            if (rule.containsKey("\\d+") && NumberUtils.isNumber(thisToken)) {
+            if (rule.containsKey("\\d+") && UnicodeChecker.isNumber(thisToken)) {
                 process(contextTokens, getText, getBegin, getEnd, (HashMap) rule.get("\\d+"), matchBegin, matchEnd, currentPosition + 1, matches);
             }
         } else if (currentPosition == contextTokens.size() && rule.containsKey(END)) {
