@@ -6,8 +6,8 @@ import org.apache.commons.lang3.math.NumberUtils;
 public class TestDigit {
 
     public static void main(String[] args) {
-        System.out.println(isNumber("091"));
-        System.out.println(NumberUtils.createDouble("091"));
+        System.out.println(isNumber("00021"));
+        System.out.println(NumberUtils.createDouble("00021"));
     }
 
     public static boolean isNumber(final String str) {
@@ -44,7 +44,7 @@ public class TestDigit {
                 // leading 0, but not hex, must be octal
                 int i = start + 1;
                 for (; i < chars.length; i++) {
-                    if (chars[i] < '0' || chars[i] > '7') {
+                    if (chars[i] < '0' || chars[i] > '9') {
                         return false;
                     }
                 }
