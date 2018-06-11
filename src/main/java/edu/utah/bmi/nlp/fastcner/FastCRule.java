@@ -528,6 +528,7 @@ public class FastCRule extends FastRuleWG {
             snippetEnd = snippetEnd > text.length() ? text.length() : snippetEnd;
             logger.warning("try to match span: " + text.substring(snippetBegin, end) + "<*>"
                     + text.substring(end, matchBegin) + "<*>" + text.substring(matchBegin, snippetEnd));
+            return;
 
         }
         Span currentSpan = new Span(matchBegin + offset, end + offset, text.substring(matchBegin, end));
