@@ -19,7 +19,7 @@ package edu.utah.bmi.nlp.fastner.uima;
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.type.system.*;
-import edu.utah.bmi.nlp.uima.AdaptableUIMACPERunner;
+import edu.utah.bmi.nlp.uima.AdaptableUIMACPETaskRunner;
 import edu.utah.bmi.nlp.uima.ae.AnnotationCountEvaluator;
 import edu.utah.bmi.nlp.uima.ae.AnnotationPrinter;
 import edu.utah.bmi.nlp.uima.ae.SimpleParser_AE;
@@ -51,14 +51,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class FastNER_AE_GeneralTest {
     private AnalysisEngine fastNER_AE, simpleParser_AE, annotationPrinter;
-    private AdaptableUIMACPERunner runner;
+    private AdaptableUIMACPETaskRunner runner;
     private JCas jCas;
     private Object[] configurationData;
 
     @Before
     public void setUp() {
         String typeDescriptor = "desc/type/All_Types";
-        runner = new AdaptableUIMACPERunner(typeDescriptor, "target/generated-test-sources/");
+        runner = new AdaptableUIMACPETaskRunner(typeDescriptor, "target/generated-test-sources/");
         runner.addConceptTypes(FastNER_AE_General.getTypeDefinitions("conf/rules.xlsx", true).values());
         runner.addConceptTypes(FastNER_AE_General.getTypeDefinitions("conf/rules_g.tsv", true).values());
         runner.addConceptType(new TypeDefinition("Impression", "SectionBody"));

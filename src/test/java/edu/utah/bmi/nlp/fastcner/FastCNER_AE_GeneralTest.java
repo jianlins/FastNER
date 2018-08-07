@@ -22,7 +22,7 @@ import edu.utah.bmi.nlp.type.system.Concept;
 import edu.utah.bmi.nlp.type.system.ConceptBASE;
 import edu.utah.bmi.nlp.type.system.Sentence;
 import edu.utah.bmi.nlp.type.system.Token;
-import edu.utah.bmi.nlp.uima.AdaptableUIMACPERunner;
+import edu.utah.bmi.nlp.uima.AdaptableUIMACPETaskRunner;
 import edu.utah.bmi.nlp.uima.ae.AnnotationPrinter;
 import edu.utah.bmi.nlp.uima.ae.SimpleParser_AE;
 import org.apache.uima.analysis_engine.AnalysisEngine;
@@ -55,7 +55,7 @@ import static org.junit.Assert.assertTrue;
 public class FastCNER_AE_GeneralTest {
 	public static Logger logger = Logger.getLogger(FastCNER_AE_GeneralTest.class.getCanonicalName());
 	private AnalysisEngine fastCNER_AE, simpleParser_AE, annoprinter;
-	private AdaptableUIMACPERunner runner;
+	private AdaptableUIMACPETaskRunner runner;
 	private JCas jCas;
 	private Object[] configurationData;
 
@@ -71,8 +71,8 @@ public class FastCNER_AE_GeneralTest {
             e.printStackTrace();
         }
 		String typeDescriptor = "desc/type/All_Types";
-		runner = new AdaptableUIMACPERunner(typeDescriptor, "target/generated-test-sources/");
-		runner.addConceptTypes(new FastCNER("conf/crule_test.xlsx", true).getTypeDefinitions().values());
+		runner = new AdaptableUIMACPETaskRunner(typeDescriptor, "target/generated-test-sources/");
+		runner.addConceptTypes(FastCNER_AE_General.getTypeDefinitions("conf/crule_test.xlsx", true).values());
 		runner.reInitTypeSystem("target/generated-test-sources/customized");
 		jCas = runner.initJCas();
 //      Set up the parameters
