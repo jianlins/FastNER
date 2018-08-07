@@ -23,7 +23,7 @@
     <artifactId>fastner</artifactId>
     <version>1.3.1.8</version>
     <properties>
-        <nlp.core.veresion>1.3.1.7</nlp.core.veresion>
+        <nlp.core.veresion>1.3.1.8</nlp.core.veresion>
     </properties>
     <name>FastNER (Fast Name Entity Recognition)</name>
     <url>https://github.com/jianlins/FastNER</url>
