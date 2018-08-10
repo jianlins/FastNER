@@ -1,6 +1,6 @@
 # FastNER
 
-FastNER is an speed-optimized rule-base name entity recognition solution. It uses n-trie engine<sup>[1]</sup> internally to builds a hash-trie structure from rules and processing the input text without iterating through each of the rules.
+FastNER is an speed-optimized rule-base name entity recognition solution. It uses n-trie engine<sup>[1]</sup> internally to builds a hash-trie structure from rules and processing the input text without iterating through every rule.
 
 
 ## Maven setup
