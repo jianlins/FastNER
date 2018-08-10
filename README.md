@@ -8,7 +8,7 @@ FastNER is an speed-optimized rule-base name entity recognition solution. It use
 <dependency>
     <groupId>edu.utah.bmi.nlp</groupId>
     <artifactId>fastner</artifactId>
-    <version>1.3.1.7</version>
+    <version>1.3.1.8</version>
 </dependency>
 ```
 
@@ -22,4 +22,6 @@ Use of FastNER is simple. Some example codes are here:
 
 ## References
 
-1. Jianlin Shi, John F. Hurdle. Trie-based Rule Processing for Clinical NLP: a use-case study of n-trie, making the ConText algorithm more efficient and scalable. Journal of Biomedical Informatics. Under review.
+If you are using FastContext within your research work, please cite the following publication:
+
+1. Shi, Jianlin, and John F. Hurdle. “Trie-Based Rule Processing for Clinical NLP: A Use-Case Study of n-Trie, Making the ConText Algorithm More Efficient and Scalable.” Journal of Biomedical Informatics, August 6, 2018. https://doi.org/10.1016/j.jbi.2018.08.002.
