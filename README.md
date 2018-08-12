@@ -22,6 +22,6 @@ Use of FastNER is simple. Some example codes are here:
 
 ## References
 
-If you are using FastContext within your research work, please cite the following publication:
+If you are using FastNER within your research work, please cite the following publication:
 
 1. Shi, Jianlin, and John F. Hurdle. “Trie-Based Rule Processing for Clinical NLP: A Use-Case Study of n-Trie, Making the ConText Algorithm More Efficient and Scalable.” Journal of Biomedical Informatics, August 6, 2018. https://doi.org/10.1016/j.jbi.2018.08.002.
