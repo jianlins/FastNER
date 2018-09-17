@@ -63,10 +63,10 @@ public class FastRuleFactory {
             edu.utah.bmi.nlp.core.IOUtil ioUtil = new edu.utah.bmi.nlp.core.IOUtil(ruleStr);
             for (ArrayList<String> cells : ioUtil.getInitiations()) {
                 if (cells.get(1).startsWith(DeterminantValueSet.CONCEPT_FEATURES1) || cells.get(1).startsWith(DeterminantValueSet.CONCEPT_FEATURES2)) {
-                    String conceptName = cells.get(1).trim();
+                    String conceptName = cells.get(2).trim();
                     String conceptShortName = getShortName(conceptName);
                     if (typeDefinition != null && !typeDefinition.containsKey(conceptShortName)) {
-                        typeDefinition.put(conceptShortName, new TypeDefinition(cells.subList(1, cells.size())));
+                        typeDefinition.put(conceptShortName, new TypeDefinition(cells.subList(2, cells.size())));
                     }
                 } else if (Character.isUpperCase(cells.get(1).charAt(1))) {
 //                  back compatibility
