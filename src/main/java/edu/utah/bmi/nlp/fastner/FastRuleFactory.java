@@ -94,7 +94,14 @@ public class FastRuleFactory {
             double score = 0;
             DeterminantValueSet.Determinants determinant = DeterminantValueSet.Determinants.ACTUAL;
             boolean scoreSet = false;
-            if (UnicodeChecker.isNumber(cells.get(2))) {
+            if (cells.size() < 3) {
+                System.out.println("Rule format error: " + cells);
+                continue;
+            } else if (cells.size() < 4) {
+                conceptName = cells.get(2).trim();
+                score = 0d;
+                determinant = DeterminantValueSet.Determinants.ACTUAL;
+            } else if (UnicodeChecker.isNumber(cells.get(2))) {
                 conceptName = cells.get(3).trim();
                 score = Double.parseDouble(cells.get(2));
                 scoreSet = true;
