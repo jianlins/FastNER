@@ -26,6 +26,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.logging.Logger;
 
 import static edu.utah.bmi.nlp.core.DeterminantValueSet.getShortName;
 
@@ -34,6 +35,7 @@ import static edu.utah.bmi.nlp.core.DeterminantValueSet.getShortName;
  * Created on 3/5/17.
  */
 public class FastRuleFactory {
+    public static Logger logger = edu.utah.bmi.nlp.core.IOUtil.getLogger(FastRuleFactory.class);
 
     public FastRuleFactory() {
 
@@ -88,6 +90,7 @@ public class FastRuleFactory {
             concatenated = ioUtil.getConcatenatedRuleStr();
         }
         for (ArrayList<String> cells : allCells) {
+            logger.finest("Add rule: " + cells);
             int id = Integer.parseInt(cells.get(0));
             String rule = cells.get(1);
             String conceptName;
@@ -95,7 +98,7 @@ public class FastRuleFactory {
             DeterminantValueSet.Determinants determinant = DeterminantValueSet.Determinants.ACTUAL;
             boolean scoreSet = false;
             if (cells.size() < 3) {
-                System.out.println("Rule format error: " + cells);
+                logger.info("Rule format error: " + cells+". Will skip it.");
                 continue;
             } else if (cells.size() < 4) {
                 conceptName = cells.get(2).trim();
