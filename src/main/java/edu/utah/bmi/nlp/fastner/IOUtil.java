@@ -21,7 +21,7 @@ import edu.utah.blulab.domainontology.LogicExpression;
 import edu.utah.blulab.domainontology.Variable;
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.DeterminantValueSet.Determinants;
-import edu.utah.bmi.nlp.core.Rule;
+import edu.utah.bmi.nlp.core.NERRule;
 import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.fastcner.UnicodeChecker;
 import org.apache.commons.csv.CSVFormat;
@@ -52,8 +52,8 @@ public class IOUtil {
     public static Logger logger = edu.utah.bmi.nlp.core.IOUtil.getLogger(IOUtil.class);
 
     @Deprecated
-    public static HashMap<Integer, Rule> parseRuleStr(String ruleStr, String splitter, boolean caseSensitive) {
-        HashMap<Integer, Rule> rules = new HashMap<>();
+    public static HashMap<Integer, NERRule> parseRuleStr(String ruleStr, String splitter, boolean caseSensitive) {
+        HashMap<Integer, NERRule> rules = new HashMap<>();
         int strLength = ruleStr.trim().length();
         String testFileStr = ruleStr.trim().substring(strLength - 4).toLowerCase();
         boolean[] thisRuleType = new boolean[]{false, false, false};
@@ -66,7 +66,7 @@ public class IOUtil {
         return rules;
     }
 
-    public static boolean[] readOwlFile(String owlFileName, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive, boolean[] ruleSupports) {
+    public static boolean[] readOwlFile(String owlFileName, HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive, boolean[] ruleSupports) {
         int ruleType = 0;
         int id = 0;
         try {
@@ -85,24 +85,24 @@ public class IOUtil {
 //                            TODO enable annotating at variable name level and/or semantic type level
                             String nameEntityClass = term.getSemanticType().get(0);
                             nameEntityClass = nameEntityClass.replaceAll(" +", "_").toUpperCase();
-                            ruleSupports = addRule(rules, typeDefinition, new Rule(++id, caseSensitive ? preferredTerm : preferredTerm.toLowerCase(), nameEntityClass, 0, Determinants.ACTUAL), ruleSupports);
+                            ruleSupports = addRule(rules, typeDefinition, new NERRule(++id, caseSensitive ? preferredTerm : preferredTerm.toLowerCase(), nameEntityClass, 0, Determinants.ACTUAL), ruleSupports);
 
                             if (term.getSynonym().size() > 0) {
                                 for (String s : term.getSynonym()) {
-                                    ruleSupports = addRule(rules, typeDefinition, new Rule(++id, caseSensitive ? s : s.toLowerCase(), nameEntityClass, 0, Determinants.ACTUAL), ruleSupports);
+                                    ruleSupports = addRule(rules, typeDefinition, new NERRule(++id, caseSensitive ? s : s.toLowerCase(), nameEntityClass, 0, Determinants.ACTUAL), ruleSupports);
                                 }
                             }
                             if (term.getAbbreviation().size() > 0) {
                                 for (String s : term.getAbbreviation())
-                                    ruleSupports = addRule(rules, typeDefinition, new Rule(++id, caseSensitive ? s : s.toLowerCase(), nameEntityClass, 0, Determinants.ACTUAL), ruleSupports);
+                                    ruleSupports = addRule(rules, typeDefinition, new NERRule(++id, caseSensitive ? s : s.toLowerCase(), nameEntityClass, 0, Determinants.ACTUAL), ruleSupports);
                             }
                             if (term.getMisspelling().size() > 0) {
                                 for (String s : term.getMisspelling())
-                                    ruleSupports = addRule(rules, typeDefinition, new Rule(++id, caseSensitive ? s : s.toLowerCase(), nameEntityClass, 0, Determinants.ACTUAL), ruleSupports);
+                                    ruleSupports = addRule(rules, typeDefinition, new NERRule(++id, caseSensitive ? s : s.toLowerCase(), nameEntityClass, 0, Determinants.ACTUAL), ruleSupports);
                             }
                             if (term.getPseudos().size() > 0) {
                                 for (String s : term.getMisspelling())
-                                    ruleSupports = addRule(rules, typeDefinition, new Rule(++id, caseSensitive ? s : s.toLowerCase(), nameEntityClass, 0, Determinants.PSEUDO), ruleSupports);
+                                    ruleSupports = addRule(rules, typeDefinition, new NERRule(++id, caseSensitive ? s : s.toLowerCase(), nameEntityClass, 0, Determinants.PSEUDO), ruleSupports);
                             }
                         }
                     } else {
@@ -117,7 +117,7 @@ public class IOUtil {
     }
 
 
-    public static boolean[] readOwlDirectory(String owlFileDirectory, HashMap<Integer, Rule> rules, boolean caseSensitive) {
+    public static boolean[] readOwlDirectory(String owlFileDirectory, HashMap<Integer, NERRule> rules, boolean caseSensitive) {
         Collection<File> files = FileUtils.listFiles(new File(owlFileDirectory), new String[]{"owl"}, true);
         LinkedHashMap<String, TypeDefinition> typeDefinition = new LinkedHashMap<>();
         boolean[] thisRuleType = new boolean[]{false, false, false};
@@ -127,13 +127,13 @@ public class IOUtil {
         return thisRuleType;
     }
 
-    public static boolean[] readAgnosticFile(String agnosticFileName, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive) {
+    public static boolean[] readAgnosticFile(String agnosticFileName, HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive) {
         boolean[] thisRuleType = new boolean[]{false, false, false, false, false, false};
         readAgnosticFile(agnosticFileName, rules, typeDefinition, caseSensitive, thisRuleType);
         return thisRuleType;
     }
 
-    public static boolean[] readAgnosticFile(String agnosticFileName, HashMap<Integer, Rule> rules,
+    public static boolean[] readAgnosticFile(String agnosticFileName, HashMap<Integer, NERRule> rules,
                                              LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive,
                                              boolean[] thisRuleType) {
         File agnosticFile = new File(agnosticFileName);
@@ -154,14 +154,14 @@ public class IOUtil {
         return thisRuleType;
     }
 
-//    public static HashMap<Integer, Rule> readXLSXRuleFile(String xlsxFileName) {
-//        HashMap<Integer, Rule> rules = new HashMap<Integer, Rule>();
+//    public static HashMap<Integer, NERRule> readXLSXRuleFile(String xlsxFileName) {
+//        HashMap<Integer, NERRule> rules = new HashMap<Integer, NERRule>();
 //        readXLSXRuleFile(xlsxFileName, rules, FASTRULEFILE, true);
 //        return rules;
 //    }
 
 
-    public static boolean[] readXLSXRuleFile(String xlsxFileName, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive, boolean[] ruleSupports) {
+    public static boolean[] readXLSXRuleFile(String xlsxFileName, HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive, boolean[] ruleSupports) {
         try {
             FileInputStream inputStream = new FileInputStream(new File(xlsxFileName));
             Workbook workbook = new XSSFWorkbook(inputStream);
@@ -187,7 +187,7 @@ public class IOUtil {
         return ruleSupports;
     }
 
-    public static boolean[] readCSVFile(String csvFileName, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, CSVFormat csvFormat, boolean caseSensitive, boolean[] ruleSupports) {
+    public static boolean[] readCSVFile(String csvFileName, HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, CSVFormat csvFormat, boolean caseSensitive, boolean[] ruleSupports) {
         try {
             Iterable<CSVRecord> recordsIterator = CSVParser.parse(new File(csvFileName), StandardCharsets.UTF_8, csvFormat);
             ruleSupports = readCSV(recordsIterator, rules, typeDefinition, caseSensitive, ruleSupports);
@@ -199,7 +199,7 @@ public class IOUtil {
         return ruleSupports;
     }
 
-    public static boolean[] readCSVString(String csvString, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, String splitter, boolean caseSensitive, boolean[] ruleSupports) {
+    public static boolean[] readCSVString(String csvString, HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, String splitter, boolean caseSensitive, boolean[] ruleSupports) {
         CSVFormat csvFormat = CSVFormat.DEFAULT;
         if (splitter.equals("\t")) {
             csvFormat = CSVFormat.TDF;
@@ -208,7 +208,7 @@ public class IOUtil {
         return ruleSupports;
     }
 
-    public static boolean[] readCSVString(String csvString, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, CSVFormat csvFormat, boolean caseSensitive, boolean[] ruleSupports) {
+    public static boolean[] readCSVString(String csvString, HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, CSVFormat csvFormat, boolean caseSensitive, boolean[] ruleSupports) {
         try {
             Iterable<CSVRecord> recordsIterator = CSVParser.parse(csvString, csvFormat);
             ruleSupports = readCSV(recordsIterator, rules, typeDefinition, caseSensitive, ruleSupports);
@@ -220,7 +220,7 @@ public class IOUtil {
         return ruleSupports;
     }
 
-    private static boolean[] readCSV(Iterable<CSVRecord> recordsIterator, HashMap<Integer, Rule> rules,
+    private static boolean[] readCSV(Iterable<CSVRecord> recordsIterator, HashMap<Integer, NERRule> rules,
                                      LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive, boolean[] ruleSupports) {
         int id = 0;
         for (CSVRecord record : recordsIterator) {
@@ -238,7 +238,7 @@ public class IOUtil {
     }
 
     private static boolean[] parseCells(ArrayList<String> cells, int id, HashMap<
-            Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive,
+            Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive,
                                         boolean[] ruleSupports) {
         if (cells.get(0).startsWith("#") || cells.get(0).trim().length() == 0)
             return ruleSupports;
@@ -263,13 +263,13 @@ public class IOUtil {
                 if (!typeDefinition.containsKey(conceptShortName)) {
                     typeDefinition.put(conceptShortName, new TypeDefinition(cells.get(2).trim(), DeterminantValueSet.defaultSuperTypeName, new ArrayList<>()));
                 }
-                ruleSupports = addRule(rules, typeDefinition, new Rule(id, caseSensitive ? rule : rule.toLowerCase(), cells.get(2).trim(), Double.parseDouble(cells.get(1)), cells.size() > 3 ? Determinants.valueOf(cells.get(3)) : Determinants.ACTUAL), ruleSupports);
+                ruleSupports = addRule(rules, typeDefinition, new NERRule(id, caseSensitive ? rule : rule.toLowerCase(), cells.get(2).trim(), Double.parseDouble(cells.get(1)), cells.size() > 3 ? Determinants.valueOf(cells.get(3)) : Determinants.ACTUAL), ruleSupports);
             } else {
                 String conceptShortName = getShortName(cells.get(1).trim());
                 if (!typeDefinition.containsKey(conceptShortName)) {
                     typeDefinition.put(conceptShortName, new TypeDefinition(cells.get(1).trim(), DeterminantValueSet.defaultSuperTypeName, new ArrayList<>()));
                 }
-                ruleSupports = addRule(rules, typeDefinition, new Rule(id, caseSensitive ? rule : rule.toLowerCase(), cells.get(1).trim(), 0d, cells.size() > 2 ? Determinants.valueOf(cells.get(2)) : Determinants.ACTUAL), ruleSupports);
+                ruleSupports = addRule(rules, typeDefinition, new NERRule(id, caseSensitive ? rule : rule.toLowerCase(), cells.get(1).trim(), 0d, cells.size() > 2 ? Determinants.valueOf(cells.get(2)) : Determinants.ACTUAL), ruleSupports);
             }
         } else
             logger.info("Definition format error: line " + id + "\t\t" + cells);
@@ -277,9 +277,9 @@ public class IOUtil {
     }
 
 
-    public static HashMap<Integer, Rule> readCRuleString(String ruleString, String splitter) {
+    public static HashMap<Integer, NERRule> readCRuleString(String ruleString, String splitter) {
         int id = 0;
-        HashMap<Integer, Rule> rules = new HashMap<>();
+        HashMap<Integer, NERRule> rules = new HashMap<>();
         for (String rule : ruleString.split("\n")) {
             rule = rule.trim();
             id++;
@@ -296,13 +296,13 @@ public class IOUtil {
                 logger.info("Definition format error: line " + id + "\t\t" + rule);
                 continue;
             }
-            rules.put(id, new Rule(id, definition[0], definition[2].trim(), Double.parseDouble(definition[1]), determinant));
+            rules.put(id, new NERRule(id, definition[0], definition[2].trim(), Double.parseDouble(definition[1]), determinant));
         }
         return rules;
     }
 
 
-    private static boolean[] addRule(HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, Rule rule, boolean[] ruleSupports) {
+    private static boolean[] addRule(HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, NERRule rule, boolean[] ruleSupports) {
 //        support grouping
         if (ruleSupports[1] == false && rule.rule.indexOf("(") != -1) {
             ruleSupports[1] = true;

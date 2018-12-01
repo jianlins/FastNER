@@ -18,6 +18,7 @@ package edu.utah.bmi.nlp.fastner;
 
 
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
+import edu.utah.bmi.nlp.core.NERRule;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
 import edu.utah.bmi.nlp.fastcner.FastCNER;
@@ -51,8 +52,8 @@ public class FastCRuleCNTest {
 
     @Test
     public void testSquareBracket() {
-        HashMap<Integer, Rule> rules = new HashMap<>();
-        rules.put(1, new Rule(1, "胸[痛|闷]", "R1", 1.5, DeterminantValueSet.Determinants.ACTUAL));
+        HashMap<Integer, NERRule> rules = new HashMap<>();
+        rules.put(1, new NERRule(1, "胸[痛|闷]", "R1", 1.5, DeterminantValueSet.Determinants.ACTUAL));
         FastCNER fastCNER = new FastCNER(rules);
         FastRule.logger.setLevel(Level.FINER);
         fastCNER.fastRule.printRulesMap();
@@ -64,11 +65,11 @@ public class FastCRuleCNTest {
 
     @Test
     public void testPseudo() {
-        HashMap<Integer, Rule> rules = new HashMap<>();
-        rules.put(1, new Rule(1, "无心前区不适", "R1", 1.5, DeterminantValueSet.Determinants.PSEUDO));
-        rules.put(2, new Rule(2, "心前区不适", "R1", 1, DeterminantValueSet.Determinants.ACTUAL));
-        rules.put(2, new Rule(2, "胸痛", "R1", 1, DeterminantValueSet.Determinants.ACTUAL));
-        rules.put(3, new Rule(3, "胸闷", "R2", 1, DeterminantValueSet.Determinants.ACTUAL));
+        HashMap<Integer, NERRule> rules = new HashMap<>();
+        rules.put(1, new NERRule(1, "无心前区不适", "R1", 1.5, DeterminantValueSet.Determinants.PSEUDO));
+        rules.put(2, new NERRule(2, "心前区不适", "R1", 1, DeterminantValueSet.Determinants.ACTUAL));
+        rules.put(2, new NERRule(2, "胸痛", "R1", 1, DeterminantValueSet.Determinants.ACTUAL));
+        rules.put(3, new NERRule(3, "胸闷", "R2", 1, DeterminantValueSet.Determinants.ACTUAL));
         FastCNER fcruleSB = new FastCNER(rules);
         fcruleSB.printRulesMap();
         HashMap<String, ArrayList<Span>> res = fcruleSB.processString("患者诉胸闷、胸痛、无心前区不适");

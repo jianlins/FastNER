@@ -84,7 +84,7 @@ public class FastCRule extends FastRuleWG {
         super(ruleStr);
     }
 
-    public FastCRule(HashMap<Integer, Rule> ruleStore) {
+    public FastCRule(HashMap<Integer, NERRule> ruleStore) {
         initiate(ruleStore);
     }
 

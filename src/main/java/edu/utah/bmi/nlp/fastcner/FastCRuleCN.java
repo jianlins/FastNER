@@ -1,5 +1,6 @@
 package edu.utah.bmi.nlp.fastcner;
 
+import edu.utah.bmi.nlp.core.NERRule;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
 
@@ -30,7 +31,7 @@ public class FastCRuleCN extends FastCRuleSB {
     }
 
 
-    public FastCRuleCN(HashMap<Integer, Rule> ruleStore) {
+    public FastCRuleCN(HashMap<Integer, NERRule> ruleStore) {
         super(ruleStore);
     }
 

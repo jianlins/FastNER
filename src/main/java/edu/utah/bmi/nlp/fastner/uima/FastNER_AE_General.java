@@ -180,7 +180,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
             LinkedHashMap<String, TypeDefinition> conceptNames = initFastNER(cont, ruleStr);
             for (Map.Entry<String, TypeDefinition> conceptTypeSuperTypePair : conceptNames.entrySet()) {
                 String fullTypeName = conceptTypeSuperTypePair.getValue().fullTypeName;
-                Class conceptTypeClass = Class.forName(fullTypeName).asSubclass(Class.forName(conceptTypeSuperTypePair.getValue().getFullSuperTypeName()));
+                Class conceptTypeClass = Class.forName(fullTypeName).asSubclass(Class.forName(DeterminantValueSet.getRealClassTypeName(conceptTypeSuperTypePair.getValue().getFullSuperTypeName())));
                 ConceptTypes.put(conceptTypeSuperTypePair.getKey(), conceptTypeClass);
                 ConceptTypeConstructors.put(conceptTypeSuperTypePair.getKey(), ConceptTypes.get(conceptTypeSuperTypePair.getKey()).getConstructor(new Class[]{JCas.class, int.class, int.class}));
             }

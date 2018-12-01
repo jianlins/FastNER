@@ -15,6 +15,7 @@
  */
 package edu.utah.bmi.nlp.fastner;
 
+import edu.utah.bmi.nlp.core.NERRule;
 import edu.utah.bmi.nlp.core.NERSpan;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
@@ -50,7 +51,7 @@ public class FastRuleWOG extends FastRule {
         initiate(ruleStr, caseSensitive);
     }
 
-    public FastRuleWOG(HashMap<Integer, Rule> ruleStore) {
+    public FastRuleWOG(HashMap<Integer, NERRule> ruleStore) {
         initiate(ruleStore);
     }
 

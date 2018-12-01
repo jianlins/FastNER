@@ -15,6 +15,7 @@
  */
 package edu.utah.bmi.nlp.fastcner;
 
+import edu.utah.bmi.nlp.core.NERRule;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
 import edu.utah.bmi.nlp.fastner.FastNER;
@@ -42,12 +43,12 @@ public class FastCNER extends FastNER {
         initiate(ruleFile, true, constructRuleMap);
     }
 
-    public FastCNER(HashMap<Integer, Rule> ruleStore) {
+    public FastCNER(HashMap<Integer, NERRule> ruleStore) {
         initiate(ruleStore);
 
     }
 
-    protected void initiate(HashMap<Integer, Rule> ruleStore) {
+    protected void initiate(HashMap<Integer, NERRule> ruleStore) {
         fastRule = new FastCRuleSB(ruleStore);
     }
 

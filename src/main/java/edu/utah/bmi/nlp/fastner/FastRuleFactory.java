@@ -17,6 +17,7 @@
 package edu.utah.bmi.nlp.fastner;
 
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
+import edu.utah.bmi.nlp.core.NERRule;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.fastcner.*;
@@ -48,7 +49,7 @@ public class FastRuleFactory {
     public static Object[] buildRuleStore(String ruleStr, LinkedHashMap<String, TypeDefinition> typeDefinition,
                                           boolean caseSensitive, boolean constructRuleMap) {
         Object[] output = new Object[3];
-        HashMap<Integer, Rule> rules = new HashMap<>();
+        HashMap<Integer, NERRule> rules = new HashMap<>();
         int strLength = ruleStr.trim().length();
         String testFileStr = ruleStr.trim().substring(strLength - 4).toLowerCase();
         File agnosticFile = new File(ruleStr);
@@ -122,7 +123,7 @@ public class FastRuleFactory {
             if (!scoreSet && determinant == DeterminantValueSet.Determinants.PSEUDO)
                 score = 1d;
             if (constructRuleMap)
-                rules.put(id, new Rule(id, caseSensitive ? rule : rule.toLowerCase(), conceptName, score, determinant));
+                rules.put(id, new NERRule(id, caseSensitive ? rule : rule.toLowerCase(), conceptName, score, determinant));
         }
         output[0] = rules;
         output[1] = ruleType;
@@ -138,7 +139,7 @@ public class FastRuleFactory {
         String concatenated = (String) output[2];
         boolean supportReplication = concatenated.indexOf("+") != -1 ? true : false;
         if (constructRuleMap) {
-            HashMap<Integer, Rule> rules = (HashMap<Integer, Rule>) output[0];
+            HashMap<Integer, NERRule> rules = (HashMap<Integer, NERRule>) output[0];
             switch (ruleType) {
                 case "FastCRuleCN":
                     fastRule = new FastCRuleCN(rules);
@@ -171,7 +172,7 @@ public class FastRuleFactory {
         FastRule fastRule = null;
         int strLength = ruleStr.trim().length();
         String testFileStr = ruleStr.trim().substring(strLength - 4).toLowerCase();
-        HashMap<Integer, Rule> rules = new HashMap<>();
+        HashMap<Integer, NERRule> rules = new HashMap<>();
         boolean[] thisRuleType = new boolean[]{false, false, false, false, false, false};
         if (testFileStr.equals(".tsv") || testFileStr.equals(".csv") || testFileStr.equals("xlsx") || testFileStr.equals(".owl")) {
             thisRuleType = IOUtil.readAgnosticFile(ruleStr, rules, typeDefinition, caseSensitive, thisRuleType);

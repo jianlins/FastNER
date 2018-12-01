@@ -16,6 +16,7 @@
 package edu.utah.bmi.nlp.fastner;
 
 import edu.utah.bmi.nlp.core.DeterminantValueSet.Determinants;
+import edu.utah.bmi.nlp.core.NERRule;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
 import edu.utah.bmi.nlp.core.TypeDefinition;
@@ -154,7 +155,7 @@ public class FastNER {
         return fastRule.getRule(ruleId).score;
     }
 
-    public HashMap<Integer, Rule> getRuleStore() {
+    public HashMap<Integer, NERRule> getRuleStore() {
         return fastRule.getRuleStore();
     }
 

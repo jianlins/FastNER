@@ -16,6 +16,7 @@
 
 package edu.utah.bmi.nlp.fastcner;
 
+import edu.utah.bmi.nlp.core.NERRule;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.fastner.FastRuleFactory;
 
@@ -45,32 +46,32 @@ public class FastCRuleSB extends FastCRule {
 
     public void initiate(String ruleStr, String splitter) {
         method = "scorewidth";
-        ruleStore = (HashMap<Integer, Rule>) FastRuleFactory.buildRuleStore(ruleStr, null, true, true)[0];
+        ruleStore = (HashMap<Integer, NERRule>) FastRuleFactory.buildRuleStore(ruleStr, null, true, true)[0];
         initiate(ruleStore);
     }
 
-    public void initiate(HashMap<Integer, Rule> ruleStore) {
+    public void initiate(HashMap<Integer, NERRule> ruleStore) {
         this.ruleStore = ruleStore;
-        for (Map.Entry<Integer, Rule> ent : ruleStore.entrySet()) {
+        for (Map.Entry<Integer, NERRule> ent : ruleStore.entrySet()) {
             addSBRule(ent.getValue());
         }
     }
 
-    public FastCRuleSB(HashMap<Integer, Rule> ruleStore) {
+    public FastCRuleSB(HashMap<Integer, NERRule> ruleStore) {
         method = "scorewidth";
 //        initiate(ruleStore);
         this.ruleStore = ruleStore;
-        for (Map.Entry<Integer, Rule> ent : ruleStore.entrySet()) {
+        for (Map.Entry<Integer, NERRule> ent : ruleStore.entrySet()) {
             addSBRule(ent.getValue());
         }
     }
 
-    public boolean addSBRule(Rule rule) {
+    public boolean addSBRule(NERRule rule) {
         char[] crule = rule.rule.toCharArray();
 
         if (rule.rule.indexOf("[") != -1) {
-            ArrayList<Rule> rules = expandSB(rule);
-            for (Rule subrule : rules) {
+            ArrayList<NERRule> rules = expandSB(rule);
+            for (NERRule subrule : rules) {
                 addRule(subrule);
             }
         } else {
@@ -79,8 +80,8 @@ public class FastCRuleSB extends FastCRule {
         return true;
     }
 
-    public ArrayList<Rule> expandSB(Rule rule) {
-        ArrayList<Rule> expandedRules = new ArrayList<>();
+    public ArrayList<NERRule> expandSB(NERRule rule) {
+        ArrayList<NERRule> expandedRules = new ArrayList<>();
         ArrayList<StringBuilder> ruleStringBuilders = new ArrayList<>();
         String ruleString = rule.rule;
         ruleStringBuilders.add(new StringBuilder());
@@ -145,7 +146,7 @@ public class FastCRuleSB extends FastCRule {
         }
         for (StringBuilder subRule : ruleStringBuilders) {
             logger.logp(Level.FINEST, getClass().getCanonicalName(), "expandSB", subRule.toString() + "\t" + rule.ruleName);
-            Rule newRule = new Rule(rule.id, subRule.toString(), rule.ruleName, rule.score, rule.type);
+            NERRule newRule = new NERRule(rule.id, subRule.toString(), rule.ruleName, rule.score, rule.type);
             expandedRules.add(newRule);
         }
 
@@ -155,7 +156,7 @@ public class FastCRuleSB extends FastCRule {
 
     // TODO it's buggish now. check the FastCNERTest.test8--It will build the map, but some innest End Map doesn't contain Determinant
 
-    protected HashMap buildOneStepRule(int i, Rule rule, char[] crule, HashMap parentMap) {
+    protected HashMap buildOneStepRule(int i, NERRule rule, char[] crule, HashMap parentMap) {
         HashMap ruleMap2 = new HashMap();
         if (i == crule.length) {
             if (parentMap.containsKey(END)) {

@@ -15,6 +15,7 @@
  */
 package edu.utah.bmi.nlp.fastner;
 
+import edu.utah.bmi.nlp.core.NERRule;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
 import edu.utah.bmi.nlp.fastcner.UnicodeChecker;
@@ -51,7 +52,7 @@ public class FastRuleWGN extends FastRuleWOG {
         super(ruleStr, caseSensitive);
     }
 
-    public FastRuleWGN(HashMap<Integer, Rule> ruleStore) {
+    public FastRuleWGN(HashMap<Integer, NERRule> ruleStore) {
         super(ruleStore);
     }
 
