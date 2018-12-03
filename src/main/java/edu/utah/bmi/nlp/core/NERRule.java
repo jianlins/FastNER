@@ -1,5 +1,6 @@
 package edu.utah.bmi.nlp.core;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
@@ -10,15 +11,15 @@ import java.util.LinkedHashMap;
  */
 public class NERRule extends Rule {
 
-    public LinkedHashMap<String, String> attributes = new LinkedHashMap<>();
+    public ArrayList<Object> attributes = new ArrayList<>();
 
 
-    public NERRule(int id, String rule, String ruleName, DeterminantValueSet.Determinants type, LinkedHashMap<String, String> attributes) {
+    public NERRule(int id, String rule, String ruleName, DeterminantValueSet.Determinants type, ArrayList<Object> attributes) {
         super(id, rule, ruleName, type);
         this.attributes = attributes;
     }
 
-    public NERRule(int id, String rule, String ruleName, double score, DeterminantValueSet.Determinants type, LinkedHashMap<String, String> attributes) {
+    public NERRule(int id, String rule, String ruleName, double score, DeterminantValueSet.Determinants type, ArrayList<Object> attributes) {
         super(id, rule, ruleName, score, type);
         this.attributes = attributes;
     }
@@ -28,11 +29,12 @@ public class NERRule extends Rule {
         if (attributes.length % 2 != 0) {
             throw new IllegalArgumentException("Attributes to create NERRule need to be pairs. " + Arrays.asList(attributes));
         } else {
-            for (int i = 0; i < attributes.length - 1; i++) {
-                this.attributes.put(attributes[i], attributes[i + 1]);
+            for (int i = 0; i < attributes.length; i++) {
+                this.attributes.add(attributes[i]);
             }
         }
     }
+
 
     public String toString() {
         StringBuilder serialized = new StringBuilder();
@@ -47,14 +49,14 @@ public class NERRule extends Rule {
         serialized.append(score);
         serialized.append("\trule type:\t");
         serialized.append(type);
-        for (String attributeName : attributes.keySet()) {
-            serialized.append("\t" + attributeName + ":" + attributes.get(attributeName));
+        for (Object value : attributes) {
+            serialized.append("\t" + value);
         }
         return serialized.toString();
     }
 
 
     public NERRule clone() {
-        return new NERRule(id, rule, ruleName, score, type, (LinkedHashMap<String, String>) attributes.clone());
+        return new NERRule(id, rule, ruleName, score, type, (ArrayList<Object>) attributes.clone());
     }
 }

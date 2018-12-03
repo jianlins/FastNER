@@ -75,11 +75,12 @@ public class FastRuleFactory {
 //                  back compatibility
                     String conceptName = cells.get(1).substring(1);
                     String conceptShortName = getShortName(conceptName);
+                    String superTypeName=cells.get(2);
                     if (typeDefinition != null && !typeDefinition.containsKey(conceptShortName)) {
                         if (cells.size() > 3)
                             typeDefinition.put(conceptShortName, new TypeDefinition(conceptName, cells.get(2), cells.subList(3, cells.size())));
                         else
-                            typeDefinition.put(conceptShortName, new TypeDefinition(conceptName, cells.get(2), new ArrayList<String>()));
+                            typeDefinition.put(conceptShortName, new TypeDefinition(conceptName, cells.get(2), new ArrayList<>()));
                     }
 
                 } else if (cells.size() > 3) {
@@ -90,7 +91,10 @@ public class FastRuleFactory {
             ruleType = getRuleType(ioUtil);
             concatenated = ioUtil.getConcatenatedRuleStr();
         }
+
         for (ArrayList<String> cells : allCells) {
+            ArrayList<String> featureValues = new ArrayList<>();
+            String[]featureValuesArray;
             logger.finest("Add rule: " + cells);
             int id = Integer.parseInt(cells.get(0));
             String rule = cells.get(1);
@@ -99,22 +103,34 @@ public class FastRuleFactory {
             DeterminantValueSet.Determinants determinant = DeterminantValueSet.Determinants.ACTUAL;
             boolean scoreSet = false;
             if (cells.size() < 3) {
-                logger.info("Rule format error: " + cells+". Will skip it.");
+                logger.info("Rule format error: " + cells + ". Will skip it.");
                 continue;
             } else if (cells.size() < 4) {
+//                1 rule_string ConceptType
                 conceptName = cells.get(2).trim();
-                score = 0d;
                 determinant = DeterminantValueSet.Determinants.ACTUAL;
-            } else if (UnicodeChecker.isNumber(cells.get(2))) {
-                conceptName = cells.get(3).trim();
-                score = Double.parseDouble(cells.get(2));
-                scoreSet = true;
-                if (cells.size() > 4)
-                    determinant = DeterminantValueSet.Determinants.valueOf(cells.get(4));
             } else {
-                conceptName = cells.get(2).trim();
-                if (cells.size() > 3)
-                    determinant = DeterminantValueSet.Determinants.valueOf(cells.get(3));
+                int featureCellBegin = 5;
+                if (UnicodeChecker.isNumber(cells.get(2))) {
+                    conceptName = cells.get(3).trim();
+                    score = Double.parseDouble(cells.get(2));
+                    scoreSet = true;
+                    if (cells.size() > 4 && cells.get(4).trim().length() > 0)
+                        determinant = DeterminantValueSet.Determinants.valueOf(cells.get(4));
+                } else {
+                    conceptName = cells.get(2).trim();
+                    if (cells.size() > 3 && cells.get(3).trim().length() > 0)
+                        determinant = DeterminantValueSet.Determinants.valueOf(cells.get(3));
+                    featureCellBegin = 4;
+                }
+                if (cells.size() > featureCellBegin) {
+                    for (String featureName : typeDefinition.get(conceptName).getFeatureValuePairs().keySet()) {
+                        featureValues.add(cells.get(featureCellBegin));
+                        featureCellBegin++;
+                        if (featureCellBegin >= cells.size())
+                            break;
+                    }
+                }
             }
             String conceptShortName = getShortName(conceptName);
             if (typeDefinition != null && !typeDefinition.containsKey(conceptName)) {
@@ -122,8 +138,14 @@ public class FastRuleFactory {
             }
             if (!scoreSet && determinant == DeterminantValueSet.Determinants.PSEUDO)
                 score = 1d;
-            if (constructRuleMap)
-                rules.put(id, new NERRule(id, caseSensitive ? rule : rule.toLowerCase(), conceptName, score, determinant));
+            if (constructRuleMap) {
+                if (featureValues.size() > 0) {
+                    featureValuesArray=new String[featureValues.size()];
+                    featureValuesArray= featureValues.toArray(featureValuesArray);
+                    rules.put(id, new NERRule(id, caseSensitive ? rule : rule.toLowerCase(), conceptName, score, determinant, featureValuesArray));
+                }else
+                    rules.put(id, new NERRule(id, caseSensitive ? rule : rule.toLowerCase(), conceptName, score, determinant));
+            }
         }
         output[0] = rules;
         output[1] = ruleType;

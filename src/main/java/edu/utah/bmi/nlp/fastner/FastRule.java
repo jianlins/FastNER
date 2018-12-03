@@ -163,7 +163,7 @@ public abstract class FastRule {
     }
 
 
-    public Rule getRule(int pos) {
+    public NERRule getRule(int pos) {
         return ruleStore.get(pos);
     }
 

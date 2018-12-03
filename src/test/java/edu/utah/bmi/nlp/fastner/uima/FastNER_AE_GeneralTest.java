@@ -19,6 +19,7 @@ package edu.utah.bmi.nlp.fastner.uima;
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.type.system.*;
+import edu.utah.bmi.nlp.uima.AdaptableCPEDescriptorRunner;
 import edu.utah.bmi.nlp.uima.AdaptableUIMACPETaskRunner;
 import edu.utah.bmi.nlp.uima.ae.AnnotationCountEvaluator;
 import edu.utah.bmi.nlp.uima.ae.AnnotationPrinter;
@@ -425,5 +426,40 @@ public class FastNER_AE_GeneralTest {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testAdditionalFeatures() throws ResourceInitializationException, AnalysisEngineProcessException {
+        String text = "HISTORY: a  fever of 103.8 , tachycardia in the 130s-150s , and initial hypertensive in the 140s .\nIMPRESSION: no fever currently.";
+        String ruleStr = "@fastner\n" +
+                "@CONCEPT_FEATURES\tNewUmlsConcept\t\tCui\tPreferredText\n" +
+                "fever\t0\tNewUmlsConcept\t\tC302837\thyperthermia";
+        String typeDescriptor = "desc/type/All_Types";
+        runner = new AdaptableUIMACPETaskRunner(typeDescriptor, "target/generated-test-sources/");
+        runner.addConceptTypes(new FastNER_AE_General().getTypeDefs(ruleStr).values());
+        runner.reInitTypeSystem("target/generated-test-sources/test_type.xml");
+        jCas = runner.initJCas();
+        jCas.setDocumentText(text);
+
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, ruleStr,
+                FastNER_AE_General.PARAM_MARK_PSEUDO, true,
+                FastNER_AE_General.PARAM_LOG_RULE_INFO, true};
+        fastNER_AE = createEngine(FastNER_AE_General.class,
+                configurationData);
+        simpleParser_AE.process(jCas);
+        fastNER_AE.process(jCas);
+        FSIndex annoIndex = jCas.getAnnotationIndex(Concept.type);
+        Iterator annoIter = annoIndex.iterator();
+        ArrayList<Concept> concepts = new ArrayList<Concept>();
+        while (annoIter.hasNext()) {
+            concepts.add((Concept) annoIter.next());
+        }
+        for (Concept concept : concepts) {
+            System.out.println(concept);
+        }
+        assertTrue(concepts.size()==2);
+        assertTrue(concepts.get(0).getClass().getSimpleName().equals("NewUmlsConcept"));
+        assertTrue(concepts.get(0).toString().contains("C302837"));
+        assertTrue(concepts.get(0).toString().contains("hyperthermia"));
     }
 }

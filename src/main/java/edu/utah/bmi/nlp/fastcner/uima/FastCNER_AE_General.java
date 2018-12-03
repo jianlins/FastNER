@@ -128,9 +128,9 @@ public class FastCNER_AE_General extends FastNER_AE_General {
             for (ArrayList<Span> sentence : simpleSentences) {
                 Span sentenceSpan = new Span(sentence.get(0).begin, sentence.get(sentence.size() - 1).end);
                 sentenceSpan.text = text.substring(sentenceSpan.begin, sentenceSpan.end);
-                saveConcept(jcas, SentenceTypeConstructor, sentenceSpan.begin, sentenceSpan.end, null);
+                saveConcept(jcas, "Sentence", SentenceTypeConstructor, sentenceSpan.begin, sentenceSpan.end, null);
                 for (Span token : sentence) {
-                    saveConcept(jcas, TokenTypeConstructor, token.begin, token.end, null);
+                    saveConcept(jcas, "Token", TokenTypeConstructor, token.begin, token.end, null);
                 }
                 HashMap<String, ArrayList<Span>> concepts = ((FastCNER) fastNER).processSpan(sentenceSpan);
 //              store found concepts in annotation
