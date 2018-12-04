@@ -26,12 +26,8 @@ public class NERRule extends Rule {
 
     public NERRule(int id, String rule, String ruleName, double score, DeterminantValueSet.Determinants type, String... attributes) {
         super(id, rule, ruleName, score, type);
-        if (attributes.length % 2 != 0) {
-            throw new IllegalArgumentException("Attributes to create NERRule need to be pairs. " + Arrays.asList(attributes));
-        } else {
-            for (int i = 0; i < attributes.length; i++) {
-                this.attributes.add(attributes[i]);
-            }
+        for (int i = 0; i < attributes.length; i++) {
+            this.attributes.add(attributes[i]);
         }
     }
 
