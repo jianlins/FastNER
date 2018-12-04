@@ -169,10 +169,7 @@ public class FastCNER_AE_GeneralTest {
         fastCNER_AE = createEngine(FastCNER_AE_General.class,
                 configurationData);
         jCas.setDocumentText(text);
-        simpleParser_AE.process(jCas);
-        annoprinter.process(jCas);
         fastCNER_AE.process(jCas);
-
         FSIndex annoIndex = jCas.getAnnotationIndex(Concept.type);
         Iterator annoIter = annoIndex.iterator();
         ArrayList<Annotation> concepts = new ArrayList<>();
@@ -183,6 +180,7 @@ public class FastCNER_AE_GeneralTest {
         assertTrue(concepts.size()==1);
         assertTrue(concepts.get(0).toString().contains("C009273"));
         assertTrue(concepts.get(0).toString().contains("preferred any"));
+        assertTrue(concepts.get(0).getCoveredText().equals("problem"));
 
     }
 
