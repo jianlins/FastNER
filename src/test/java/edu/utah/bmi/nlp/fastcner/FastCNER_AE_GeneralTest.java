@@ -181,7 +181,6 @@ public class FastCNER_AE_GeneralTest {
         assertTrue(concepts.get(0).toString().contains("C009273"));
         assertTrue(concepts.get(0).toString().contains("preferred any"));
         assertTrue(concepts.get(0).getCoveredText().equals("problem"));
-
     }
 
 }
