@@ -187,8 +187,6 @@ public class FastNER_AE_GeneralTest {
         String text = "HISTORY: a  of 103.8 , tachycardia in the 130s-150s , and initial hypertensive in the 140s .\nIMPRESSION: no fever currently.";
         jCas.reset();
         jCas.setDocumentText(text);
-        SectionBody sectionBody = new SectionBody(jCas, 9, text.indexOf("IMPRESSION") - 1);
-        sectionBody.addToIndexes();
         try {
             Class cls = Class.forName(DeterminantValueSet.checkNameSpace("Impression")).asSubclass(SectionBody.class);
             Constructor<SectionBody> clsConstruct = cls.getConstructor(JCas.class);
@@ -207,7 +205,7 @@ public class FastNER_AE_GeneralTest {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
-        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, "@fastner\nfever\t0\tEntity\tACTUAL",
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, "@fastner\ntachycardia\t0\tEntity\tACTUAL",
                 FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "SectionBody",
                 FastNER_AE_General.PARAM_MARK_PSEUDO, true,
                 FastNER_AE_General.PARAM_LOG_RULE_INFO, true};
@@ -217,7 +215,44 @@ public class FastNER_AE_GeneralTest {
         fastNER_AE.process(jCas);
         FSIndex annoIndex = jCas.getAnnotationIndex(Concept.type);
         Iterator annoIter = annoIndex.iterator();
-        assert (!annoIter.hasNext());
+        Concept concept = null;
+        if (annoIter.hasNext()) {
+            concept = (Concept) annoIter.next();
+        }
+//        System.out.println(concept);
+        assert (concept == null);
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, "@fastner\ntachycardia\t0\tEntity\tACTUAL",
+                FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "Impression",
+                FastNER_AE_General.PARAM_MARK_PSEUDO, true,
+                FastNER_AE_General.PARAM_LOG_RULE_INFO, true};
+        fastNER_AE = createEngine(FastNER_AE_General.class,
+                configurationData);
+        simpleParser_AE.process(jCas);
+        fastNER_AE.process(jCas);
+        annoIndex = jCas.getAnnotationIndex(Concept.type);
+        annoIter = annoIndex.iterator();
+        concept = null;
+        if (annoIter.hasNext()) {
+            concept = (Concept) annoIter.next();
+        }
+//        System.out.println(concept);
+        assert (concept == null);
+        configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, "@fastner\nfever\t0\tEntity\tACTUAL",
+                FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "SectionBody",
+                FastNER_AE_General.PARAM_MARK_PSEUDO, true,
+                FastNER_AE_General.PARAM_LOG_RULE_INFO, true};
+        fastNER_AE = createEngine(FastNER_AE_General.class,
+                configurationData);
+        simpleParser_AE.process(jCas);
+        fastNER_AE.process(jCas);
+        annoIndex = jCas.getAnnotationIndex(Concept.type);
+        annoIter = annoIndex.iterator();
+        concept = null;
+        if (annoIter.hasNext()) {
+            concept = (Concept) annoIter.next();
+        }
+//        System.out.println(concept);
+        assert (concept != null);
 
     }
 
@@ -457,7 +492,7 @@ public class FastNER_AE_GeneralTest {
         for (Concept concept : concepts) {
             System.out.println(concept);
         }
-        assertTrue(concepts.size()==2);
+        assertTrue(concepts.size() == 2);
         assertTrue(concepts.get(0).getClass().getSimpleName().equals("NewUmlsConcept"));
         assertTrue(concepts.get(0).toString().contains("C302837"));
         assertTrue(concepts.get(0).toString().contains("hyperthermia"));

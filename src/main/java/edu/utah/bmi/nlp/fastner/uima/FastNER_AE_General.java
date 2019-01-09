@@ -136,7 +136,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
         if (obj != null && ((String) obj).trim().length() > 0) {
             for (String sectionName : ((String) obj).split("[\\|,;]")) {
                 sectionName = sectionName.trim();
-                includeSections.add(sectionName);
+                includeSections.add(DeterminantValueSet.checkNameSpace(sectionName));
                 includeSectionClasses.add(AnnotationOper.getTypeClass(DeterminantValueSet.checkNameSpace(sectionName)));
             }
         }
@@ -145,7 +145,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
         if (obj != null && ((String) obj).trim().length() > 0) {
             for (String sectionName : ((String) obj).split("[\\|,;]")) {
                 sectionName = sectionName.trim();
-                excludeSections.add(sectionName);
+                excludeSections.add(DeterminantValueSet.checkNameSpace(sectionName));
             }
         }
 
@@ -274,12 +274,12 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
 //     Construct annotation_id-annotation_id map, easier and faster to find related annotations.
                 TreeMap<Integer, TreeSet<Integer>> sentence2TokenMap = new TreeMap<Integer, TreeSet<Integer>>();
                 AnnotationOper.buildAnnoMap(sections.get(sectionName), tokens, sentence2TokenMap);
-                boolean outsiders = true;
-                if ((includeSections.size() == 0 && excludeSections.size() > 0 && !excludeSections.contains(sectionName))
-                        || (includeSections.size() > 0 && includeSections.contains(sectionName))
-                        || (includeSections.size() == 0 && excludeSections.size() == 0)) {
-                    outsiders = false;
-                }
+//                boolean outsiders = true;
+//                if ((includeSections.size() == 0 && excludeSections.size() > 0 && !excludeSections.contains(sectionName))
+//                        || (includeSections.size() > 0 && includeSections.contains(sectionName))
+//                        || (includeSections.size() == 0 && excludeSections.size() == 0)) {
+//                    outsiders = false;
+//                }
 
 //        process each sentence that has at least one concept inside
                 for (Map.Entry<Integer, TreeSet<Integer>> sentence : sentence2TokenMap.entrySet()) {
@@ -292,9 +292,9 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
                     HashMap<String, ArrayList<Span>> concepts = fastNER.processAnnotationList(tokensInThisSentence);
 //              store found concepts in annotation
                     if (concepts.size() > 0) {
-                        if (outsiders)
-                            saveOutsideScopeConcepts(jcas, concepts, sectionName);
-                        else
+//                        if (outsiders)
+//                            saveOutsideScopeConcepts(jcas, concepts, sectionName);
+//                        else
                             saveConcepts(jcas, concepts, sectionName);
                     }
                 }
@@ -344,7 +344,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
                 Iterator annoIter = annoIndex.iterator();
                 while (annoIter.hasNext()) {
                     Annotation section = (Annotation) annoIter.next();
-                    String sectionName = section.getType().getShortName();
+                    String sectionName = section.getType().getName();
                     if (excludeSections.size() ==0 || !excludeSections.contains(sectionName)) {
                         sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
                         totalSections++;
@@ -357,7 +357,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
             Iterator annoIter = annoIndex.iterator();
             while (annoIter.hasNext()) {
                 Annotation section = (Annotation) annoIter.next();
-                String sectionName = section.getType().getShortName();
+                String sectionName = section.getType().getName();
                 if (forceAssignSections) {
                     sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
                 } else if (excludeSections.size() > 0 && !excludeSections.contains(sectionName)) {
