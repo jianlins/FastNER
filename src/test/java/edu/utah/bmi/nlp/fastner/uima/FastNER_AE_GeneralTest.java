@@ -300,7 +300,7 @@ public class FastNER_AE_GeneralTest {
         assert (AnnotationCountEvaluator.pass);
 //        annotationPrinter.process(jCas);
         annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "PseudoConcept"});
-//        annotationPrinter.process(jCas);
+        annotationPrinter.process(jCas);
         annotationEval1 = createEngine(AnnotationCountEvaluator.class, new Object[]{
                 AnnotationCountEvaluator.PARAM_TYPE_NAME, "PseudoConcept",
                 AnnotationCountEvaluator.PARAM_TYPE_COUNT, 1});

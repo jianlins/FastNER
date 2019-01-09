@@ -53,10 +53,15 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
     //	a list of section names (can use short name if name space is "edu.utah.bmi.nlp.type.system."),
 // separated by "|", ",", or ";".
     public static final String PARAM_INCLUDE_SECTIONS = "IncludeSections";
+
+//  If IncludeSections is set, the ExcludeSections will only exclude what has been included (e.g. a subclass (subsection type)).
+//  If  IncludeSections is not set, the ExcludeSections will include all SectionBody and SectionHeader except the ExcludeSections.
     public static final String PARAM_EXCLUDE_SECTIONS = "ExcludeSections";
+
+
 //WARNING! include sections and/or exclude sections may miss any positive NEs when sections are not detected properly.
-//Unless you are very satified with sections detection, try not to set these two. But just assign sections,
-// and use feature inference instead. So that all the NEs will be output for review.
+//Unless you are very satified with sections detection, try not to set these two. But use feature inference instead.
+// So that all the NEs will be output for review.
 
     public static final String PARAM_ASSIGN_SECTIONS = "AssignSections";
 
@@ -93,6 +98,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
 //    need to make sure the corresponding types (descriptor and Java classes) are available.
     protected HashMap<String, Constructor<? extends Annotation>> ConceptTypeClasses = new HashMap<String, Constructor<? extends Annotation>>();
     protected HashSet<String> includeSections = new HashSet<>();
+    protected HashSet<Class> includeSectionClasses = new LinkedHashSet<>();
     protected HashSet<String> excludeSections = new HashSet<>();
     protected Class<? extends Annotation> SentenceType, TokenType;
     protected Constructor<? extends Annotation> SentenceTypeConstructor;
@@ -131,6 +137,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
             for (String sectionName : ((String) obj).split("[\\|,;]")) {
                 sectionName = sectionName.trim();
                 includeSections.add(sectionName);
+                includeSectionClasses.add(AnnotationOper.getTypeClass(DeterminantValueSet.checkNameSpace(sectionName)));
             }
         }
 
@@ -331,34 +338,45 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
 
     protected int indexSections(JCas jCas, IntervalST<String> sectionTree) {
         int totalSections = 0;
-        FSIndex annoIndex = jCas.getAnnotationIndex(SectionBody.class);
-        Iterator annoIter = annoIndex.iterator();
-        while (annoIter.hasNext()) {
-            Annotation section = (Annotation) annoIter.next();
-            String sectionName = section.getType().getShortName();
-            if (forceAssignSections)
-                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
-            else if (includeSections.size() > 0 && includeSections.contains(sectionName)) {
-                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
-            } else if (excludeSections.size() > 0 && !excludeSections.contains(sectionName)) {
-                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
+        if (includeSections.size() > 0) {
+            for (Class sectionCls: includeSectionClasses) {
+                FSIndex annoIndex = jCas.getAnnotationIndex(sectionCls);
+                Iterator annoIter = annoIndex.iterator();
+                while (annoIter.hasNext()) {
+                    Annotation section = (Annotation) annoIter.next();
+                    String sectionName = section.getType().getShortName();
+                    if (excludeSections.size() ==0 || !excludeSections.contains(sectionName)) {
+                        sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
+                    }
+                }
             }
-            totalSections++;
-        }
-        //add section header as well.
-        annoIndex = jCas.getAnnotationIndex(SectionHeader.class);
-        annoIter = annoIndex.iterator();
-        while (annoIter.hasNext()) {
-            Annotation section = (Annotation) annoIter.next();
-            String sectionName = section.getType().getShortName();
-            if (forceAssignSections)
-                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
-            else if (includeSections.size() > 0 && includeSections.contains(sectionName)) {
-                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
-            } else if (excludeSections.size() > 0 && !excludeSections.contains(sectionName)) {
-                sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
+        } else {
+//          if sections are defined as subclass of SectionBody or SectionHeader
+            FSIndex annoIndex = jCas.getAnnotationIndex(SectionBody.class);
+            Iterator annoIter = annoIndex.iterator();
+            while (annoIter.hasNext()) {
+                Annotation section = (Annotation) annoIter.next();
+                String sectionName = section.getType().getShortName();
+                if (forceAssignSections) {
+                    sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
+                } else if (excludeSections.size() > 0 && !excludeSections.contains(sectionName)) {
+                    sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
+                }
+                totalSections++;
             }
-            totalSections++;
+            //add section header as well.
+            annoIndex = jCas.getAnnotationIndex(SectionHeader.class);
+            annoIter = annoIndex.iterator();
+            while (annoIter.hasNext()) {
+                Annotation section = (Annotation) annoIter.next();
+                String sectionName = section.getType().getShortName();
+                if (forceAssignSections)
+                    sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
+                else if (excludeSections.size() > 0 && !excludeSections.contains(sectionName)) {
+                    sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
+                }
+                totalSections++;
+            }
         }
         return totalSections;
     }

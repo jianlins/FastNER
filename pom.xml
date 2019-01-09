@@ -159,11 +159,6 @@
             <version>${nlp.core.veresion}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>3.16</version>
-        </dependency>
-        <dependency>
             <groupId>edu.utah.bmi.blulab</groupId>
             <artifactId>domainontology</artifactId>
             <version>2016.12.2-SNAPSHOT</version>
