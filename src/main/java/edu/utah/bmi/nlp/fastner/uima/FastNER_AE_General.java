@@ -347,6 +347,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
                     String sectionName = section.getType().getShortName();
                     if (excludeSections.size() ==0 || !excludeSections.contains(sectionName)) {
                         sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
+                        totalSections++;
                     }
                 }
             }
