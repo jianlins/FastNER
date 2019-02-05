@@ -84,7 +84,7 @@ public class FastRuleWG extends FastRuleWOG {
             // if the end of a rule is met
             if (rule.containsKey(END)) {
                 // if no () is used in this definition, use the whole rule string
-                addDeterminants(rule, matches, getBegin.apply(contextTokens, matchBegin), getEnd.apply(contextTokens, (matchEnd == 0 ? currentPosition - 1 : matchEnd)));
+                addDeterminants(rule, matches, getBegin.apply(contextTokens, matchBegin), getEnd.apply(contextTokens, (matchEnd == -1 ? currentPosition - 1 : matchEnd)));
             }
             // if the current token match the element of a rule
             if (rule.containsKey(thisToken)) {
@@ -101,7 +101,7 @@ public class FastRuleWG extends FastRuleWOG {
             }
         } else if (currentPosition == contextTokens.size() && rule.containsKey(END)) {
             // if no () is used in this definition, use the whole rule string
-            matchEnd = matchEnd == 0 ? currentPosition - 1 : matchEnd;
+            matchEnd = matchEnd == -1 ? currentPosition - 1 : matchEnd;
             addDeterminants(rule, matches, getBegin.apply(contextTokens, matchBegin), getEnd.apply(contextTokens, matchEnd));
         }
     }

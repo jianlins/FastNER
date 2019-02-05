@@ -182,7 +182,7 @@ public class FastCRule extends FastRuleWG {
         char[] textChars = text.toCharArray();
         for (int i = 0; i < textChars.length; i++) {
             char previousChar = i > 0 ? textChars[i - 1] : ' ';
-            processRules(text, textChars, rulesMap, i, 0, i, matches, previousChar, false, ' ');
+            processRules(text, textChars, rulesMap, i, -1, i, matches, previousChar, false, ' ');
         }
         if (removePseudo)
             removePseudoMatches(matches);
@@ -235,13 +235,13 @@ public class FastCRule extends FastRuleWG {
 
 
         } else if (currentPosition == textChars.length && rule.containsKey(END)) {
-            if (matchEnd == 0)
+            if (matchEnd == -1)
                 addDeterminants(text, rule, matches, matchBegin, currentPosition, currentPosition);
             else
                 addDeterminants(text, rule, matches, matchBegin, matchEnd, currentPosition);
         } else if (currentPosition == textChars.length && rule.containsKey('\\') && ((HashMap) rule.get('\\')).containsKey('e')) {
             HashMap deterRule = ((HashMap) ((HashMap) rule.get('\\')).get('e'));
-            if (matchEnd == 0)
+            if (matchEnd == -1)
                 addDeterminants(text, deterRule, matches, matchBegin, currentPosition, currentPosition);
             else
                 addDeterminants(text, deterRule, matches, matchBegin, matchEnd, currentPosition);
@@ -512,7 +512,7 @@ public class FastCRule extends FastRuleWG {
     protected void addDeterminants(String text, HashMap rule, HashMap<String, ArrayList<Span>> matches,
                                    int matchBegin, int matchEnd, int currentPosition) {
         HashMap<Determinants, Integer> deterRule = (HashMap<Determinants, Integer>) rule.get(END);
-        int end = matchEnd == 0 ? currentPosition : matchEnd;
+        int end = matchEnd == -1 ? currentPosition : matchEnd;
         if (matchBegin > end) {
             StringBuilder sb = new StringBuilder();
             for (Object key : deterRule.keySet()) {

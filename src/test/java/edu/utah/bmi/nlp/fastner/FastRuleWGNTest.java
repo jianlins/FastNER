@@ -179,5 +179,21 @@ public class FastRuleWGNTest {
 
     }
 
+    @Test
+    public void processSpans7() throws Exception {
+
+        String text = "89 years old";
+        String rule = "@fastner\n" +
+                "\\d+ \\) years old\tCLUE\n";
+        ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
+
+        fastNER = new FastNER(rule);
+        HashMap<String, ArrayList<Span>> res = fastNER.processSpanList(tokens);
+        assert (res.size() == 1);
+        assert (res.get("CLUE").size() == 1);
+        Span span = res.get("CLUE").get(0);
+        System.out.println(span);
+
+    }
 
 }

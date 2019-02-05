@@ -48,6 +48,7 @@ public class FastRuleWGTest {
         for (Map.Entry<String, ArrayList<Span>> entry : res.entrySet()) {
             System.out.println(entry.getKey() + "\t");
             entry.getValue().forEach((span) -> {
+                System.out.println(span.getBegin()+" "+span.getEnd());
                 System.out.println(tokens.subList(span.getBegin(),span.getEnd()));
             });
         }
