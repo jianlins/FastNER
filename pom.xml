@@ -174,12 +174,12 @@
             <version>${ctakes.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>edu.utah.bmi.nlp</groupId>
-            <artifactId>easycie-gui</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>edu.utah.bmi.nlp</groupId>-->
+            <!--<artifactId>easycie-gui</artifactId>-->
+            <!--<version>3.0.0-SNAPSHOT</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
     </dependencies>
 
 </project>

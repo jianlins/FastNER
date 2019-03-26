@@ -19,7 +19,6 @@ package edu.utah.bmi.nlp.fastner.uima;
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.type.system.*;
-import edu.utah.bmi.nlp.uima.AdaptableCPEDescriptorRunner;
 import edu.utah.bmi.nlp.uima.AdaptableUIMACPETaskRunner;
 import edu.utah.bmi.nlp.uima.ae.AnnotationCountEvaluator;
 import edu.utah.bmi.nlp.uima.ae.AnnotationPrinter;
