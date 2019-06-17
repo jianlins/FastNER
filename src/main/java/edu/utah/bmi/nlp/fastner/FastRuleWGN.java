@@ -33,7 +33,7 @@ import java.util.function.BiFunction;
  *
  * @author Jianlin Shi
  */
-public class FastRuleWGN extends FastRuleWOG {
+public class FastRuleWGN extends FastRuleWG {
 //    fields are defined in abstract class
 
 

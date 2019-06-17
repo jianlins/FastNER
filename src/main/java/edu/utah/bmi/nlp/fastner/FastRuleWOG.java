@@ -37,8 +37,8 @@ import static edu.utah.bmi.nlp.core.NERSpan.scorewidth;
 public class FastRuleWOG extends FastRule {
     //    fields are defined in abstract class
     protected HashMap<Integer, Integer> ruleLengths = new HashMap<Integer, Integer>();
-    private String spanCompareMethod = scorewidth;
-    private String widthCompareMethod = byRuleLength;
+    protected String spanCompareMethod = scorewidth;
+    protected String widthCompareMethod = byRuleLength;
 
     public FastRuleWOG() {
     }
@@ -206,10 +206,10 @@ public class FastRuleWOG extends FastRule {
                 Span lastSpan = currentSpanList.get(currentSpanList.size() - 1);
 
 //                  Since there is no directional preference, assume the span is not exclusive within each determinant.
-                if (currentSpan.end < lastSpan.end  && currentSpan.begin>=lastSpan.end) {
+                if (currentSpan.end < lastSpan.end) {
 //                      if currentSpan is within lastSpan
                     continue;
-                } else if (((NERSpan) currentSpan).overlappedWith((NERSpan) lastSpan)) {
+                } else if (lastSpan.end > currentSpan.begin) {
 //                      if overlap and current span has priority than last span
                     if (((NERSpan) currentSpan).compareTo((NERSpan) lastSpan) > 0) {
                         currentSpanList.remove(currentSpanList.size() - 1);
