@@ -206,10 +206,10 @@ public class FastRuleWOG extends FastRule {
                 Span lastSpan = currentSpanList.get(currentSpanList.size() - 1);
 
 //                  Since there is no directional preference, assume the span is not exclusive within each determinant.
-                if (currentSpan.end < lastSpan.end) {
+                if (currentSpan.end < lastSpan.end  && currentSpan.begin>=lastSpan.end) {
 //                      if currentSpan is within lastSpan
                     continue;
-                } else if (lastSpan.end > currentSpan.begin) {
+                } else if (((NERSpan) currentSpan).overlappedWith((NERSpan) lastSpan)) {
 //                      if overlap and current span has priority than last span
                     if (((NERSpan) currentSpan).compareTo((NERSpan) lastSpan) > 0) {
                         currentSpanList.remove(currentSpanList.size() - 1);

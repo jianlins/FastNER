@@ -99,4 +99,13 @@ public class NERSpan extends Span implements Comparable<Span> {
         }
     }
 
+    public String toString() {
+        return String.format("(%s-%s):%s", begin, end, ruleId);
+    }
+
+    public boolean overlappedWith(NERSpan target) {
+        if (this.begin >= target.begin && this.end <= target.end || target.begin >= this.begin && target.end <= this.end)
+            return true;
+        return false;
+    }
 }

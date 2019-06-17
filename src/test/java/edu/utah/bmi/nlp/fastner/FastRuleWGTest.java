@@ -93,4 +93,44 @@ public class FastRuleWGTest {
         }
         assert (res.containsKey("Concept") && res.get("Concept").size() == 0);
     }
+
+    @Test
+    public void processOverlap1() throws Exception {
+
+        String text = "His parents had stomach and colon cancer.";
+        String rule = "@fastner\n" +
+                "stomach \\) \\w+ colon cancer	0	CANCER\n" +
+                "stomach \\w+  \\( colon cancer	0	CANCER\n";
+        ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
+
+        fastNER = new FastNER(rule);
+        HashMap<String, ArrayList<Span>> res = fastNER.processSpanList(tokens);
+        for (Map.Entry<String, ArrayList<Span>> entry : res.entrySet()) {
+            System.out.println(entry.getKey() + ":\t");
+            entry.getValue().forEach((span) -> {
+                System.out.println("\t" + text.substring(span.getBegin(), span.getEnd()));
+            });
+        }
+        assert (res.containsKey("CANCER") && res.get("CANCER").size() == 2);
+    }
+
+    @Test
+    public void processOverlap2() throws Exception {
+
+        String text = "He has brac 1 and 2";
+        String rule = "@fastner\n" +
+                "brac 1 \\) and 2	0	MUTATION\n" +
+                "brac 1 and \\( 2	0	MUTATION\n";
+        ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
+
+        fastNER = new FastNER(rule);
+        HashMap<String, ArrayList<Span>> res = fastNER.processSpanList(tokens);
+        for (Map.Entry<String, ArrayList<Span>> entry : res.entrySet()) {
+            System.out.println(entry.getKey() + ":\t");
+            entry.getValue().forEach((span) -> {
+                System.out.println("\t" + text.substring(span.getBegin(), span.getEnd()));
+            });
+        }
+        assert (res.containsKey("MUTATION") && res.get("MUTATION").size() == 2);
+    }
 }
