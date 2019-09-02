@@ -23,7 +23,7 @@ import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
 import edu.utah.bmi.nlp.fastcner.FastCNER;
 import edu.utah.bmi.nlp.fastner.FastRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;

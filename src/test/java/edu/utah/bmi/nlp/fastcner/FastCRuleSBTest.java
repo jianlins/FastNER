@@ -21,7 +21,7 @@ import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.NERRule;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,8 +36,8 @@ public class FastCRuleSBTest {
 
     @Test
     public void expandSB() throws Exception {
-        FastCRuleSB fcruleSB = new FastCRuleSB("src/test/resources/ruleStore/crule_test.tsv");
-        fcruleSB = new FastCRuleSB("conf/crule_test.xlsx");
+//        FastCRuleSB fcruleSB = new FastCRuleSB("src/test/resources/ruleStore/crule_test.tsv");
+        FastCRuleSB fcruleSB = new FastCRuleSB("conf/crule_test.xlsx");
         ArrayList<NERRule> rules=fcruleSB.expandSB(new NERRule(1,"ab[c|d]e[f|g|h]","R1", 1.5, DeterminantValueSet.Determinants.ACTUAL));
         for(Map.Entry<Integer, NERRule> ent:fcruleSB.ruleStore.entrySet()){
             System.out.println(ent.getValue());

@@ -1,24 +1,25 @@
 package edu.utah.bmi.nlp;
 
 import edu.utah.bmi.nlp.fastcner.UnicodeChecker;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 
-public class Test {
-    @org.junit.Test
+public class Test2 {
+    @Test
     public void test() {
         int d = '　';
         System.out.println(d);
     }
 
-    @org.junit.Test
+    @Test
 
     public void test2() {
         System.out.println((int) '\u4E00');
         System.out.println((int) '\u9FCB');
     }
 
-    @org.junit.Test
+    @Test
     public void test3() {
         String all = "!\"#$%&\\'()*+,-./:;<=>?@[\\\\]^_`{|}~！“”＃￥％＆‘'||’（）×＋，－。／：；《＝》？＠·、「」…—｀｛｜｝～'";
         HashSet<Character> set = new HashSet<>();
@@ -36,7 +37,7 @@ public class Test {
 
     }
 
-    @org.junit.Test
+    @Test
     public void testDigit() {
         String input = "１２３４５６７８９０";
         for (char ch : input.toCharArray()) {

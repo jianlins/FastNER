@@ -19,7 +19,7 @@ package edu.utah.bmi.nlp.fastner.uima;
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.type.system.*;
-import edu.utah.bmi.nlp.uima.AdaptableUIMACPETaskRunner;
+import edu.utah.bmi.nlp.uima.AdaptableUIMACPERunner;
 import edu.utah.bmi.nlp.uima.ae.AnnotationCountEvaluator;
 import edu.utah.bmi.nlp.uima.ae.AnnotationPrinter;
 import edu.utah.bmi.nlp.uima.ae.SimpleParser_AE;
@@ -31,8 +31,8 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.InvalidXMLException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -42,7 +42,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import static org.apache.uima.fit.factory.AnalysisEngineFactory.createEngine;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by
@@ -51,14 +51,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class FastNER_AE_GeneralTest {
     private AnalysisEngine fastNER_AE, simpleParser_AE, annotationPrinter;
-    private AdaptableUIMACPETaskRunner runner;
+    private AdaptableUIMACPERunner runner;
     private JCas jCas;
     private Object[] configurationData;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         String typeDescriptor = "desc/type/All_Types";
-        runner = new AdaptableUIMACPETaskRunner(typeDescriptor, "target/generated-test-sources/");
+        runner = new AdaptableUIMACPERunner(typeDescriptor, "target/generated-test-sources/");
         runner.addConceptTypes(FastNER_AE_General.getTypeDefinitions("conf/rules.xlsx", true).values());
         runner.addConceptTypes(FastNER_AE_General.getTypeDefinitions("conf/rules_g.tsv", true).values());
         runner.addConceptType(new TypeDefinition("Impression", "SectionBody"));
@@ -96,8 +96,8 @@ public class FastNER_AE_GeneralTest {
         while (annoIter.hasNext()) {
             concepts.add((Concept) annoIter.next());
         }
-        assertTrue("Didn't get the right number of concepts", concepts.size() == 1);
-        assertTrue("Didn't get the right concept: 'patient denies'", concepts.get(0).getCoveredText().equals("patient denies"));
+        assertTrue(concepts.size() == 1,"Didn't get the right number of concepts");
+        assertTrue( concepts.get(0).getCoveredText().equals("patient denies"),"Didn't get the right concept: 'patient denies'");
 
 
         annoIndex = jCas.getAnnotationIndex(Token.type);
@@ -107,7 +107,7 @@ public class FastNER_AE_GeneralTest {
             tokens.add((Token) annoIter.next());
 //            System.out.println(tokens.get(tokens.size()-1).getCoveredText());
         }
-        assertTrue("Didn't get the right number of concepts", tokens.size() == 11);
+        assertTrue(tokens.size() == 11,"Didn't get the right number of concepts");
 
 //        ##print the assertions below
 //        for (int i=0;i<tokens.size();i++){
@@ -116,17 +116,17 @@ public class FastNER_AE_GeneralTest {
 //            int end=token.getEnd();
 //            System.out.println("assertTrue(\"Didn't get the right token: \'"+token.getCoveredText()+"\'\", tokens.get("+i+").getBegin()=="+begin+" && tokens.get("+i+").getEnd()=="+end+" && text.substring("+begin+","+end+").equals(tokens.get("+i+").getCoveredText()));");
 //        }
-        assertTrue("Didn't get the right token: 'The'", tokens.get(0).getBegin() == 0 && tokens.get(0).getEnd() == 3 && text.substring(0, 3).equals(tokens.get(0).getCoveredText()));
-        assertTrue("Didn't get the right token: 'patient'", tokens.get(1).getBegin() == 4 && tokens.get(1).getEnd() == 11 && text.substring(4, 11).equals(tokens.get(1).getCoveredText()));
-        assertTrue("Didn't get the right token: 'denies'", tokens.get(2).getBegin() == 12 && tokens.get(2).getEnd() == 18 && text.substring(12, 18).equals(tokens.get(2).getCoveredText()));
-        assertTrue("Didn't get the right token: 'any'", tokens.get(3).getBegin() == 19 && tokens.get(3).getEnd() == 22 && text.substring(19, 22).equals(tokens.get(3).getCoveredText()));
-        assertTrue("Didn't get the right token: 'problem'", tokens.get(4).getBegin() == 23 && tokens.get(4).getEnd() == 30 && text.substring(23, 30).equals(tokens.get(4).getCoveredText()));
-        assertTrue("Didn't get the right token: 'with'", tokens.get(5).getBegin() == 31 && tokens.get(5).getEnd() == 35 && text.substring(31, 35).equals(tokens.get(5).getCoveredText()));
-        assertTrue("Didn't get the right token: 'visual'", tokens.get(6).getBegin() == 36 && tokens.get(6).getEnd() == 42 && text.substring(36, 42).equals(tokens.get(6).getCoveredText()));
-        assertTrue("Didn't get the right token: 'changes'", tokens.get(7).getBegin() == 43 && tokens.get(7).getEnd() == 50 && text.substring(43, 50).equals(tokens.get(7).getCoveredText()));
-        assertTrue("Didn't get the right token: 'or'", tokens.get(8).getBegin() == 51 && tokens.get(8).getEnd() == 53 && text.substring(51, 53).equals(tokens.get(8).getCoveredText()));
-        assertTrue("Didn't get the right token: 'hearing'", tokens.get(9).getBegin() == 54 && tokens.get(9).getEnd() == 61 && text.substring(54, 61).equals(tokens.get(9).getCoveredText()));
-        assertTrue("Didn't get the right token: 'changes'", tokens.get(10).getBegin() == 62 && tokens.get(10).getEnd() == 69 && text.substring(62, 69).equals(tokens.get(10).getCoveredText()));
+        assertTrue(tokens.get(0).getBegin() == 0 && tokens.get(0).getEnd() == 3 && text.substring(0, 3).equals(tokens.get(0).getCoveredText()),"Didn't get the right token: 'The'");
+        assertTrue(tokens.get(1).getBegin() == 4 && tokens.get(1).getEnd() == 11 && text.substring(4, 11).equals(tokens.get(1).getCoveredText()),"Didn't get the right token: 'patient'");
+        assertTrue(tokens.get(2).getBegin() == 12 && tokens.get(2).getEnd() == 18 && text.substring(12, 18).equals(tokens.get(2).getCoveredText()),"Didn't get the right token: 'denies'");
+        assertTrue(tokens.get(3).getBegin() == 19 && tokens.get(3).getEnd() == 22 && text.substring(19, 22).equals(tokens.get(3).getCoveredText()),"Didn't get the right token: 'any'");
+        assertTrue(tokens.get(4).getBegin() == 23 && tokens.get(4).getEnd() == 30 && text.substring(23, 30).equals(tokens.get(4).getCoveredText()),"Didn't get the right token: 'problem'");
+        assertTrue(tokens.get(5).getBegin() == 31 && tokens.get(5).getEnd() == 35 && text.substring(31, 35).equals(tokens.get(5).getCoveredText()),"Didn't get the right token: 'with'");
+        assertTrue(tokens.get(6).getBegin() == 36 && tokens.get(6).getEnd() == 42 && text.substring(36, 42).equals(tokens.get(6).getCoveredText()),"Didn't get the right token: 'visual'");
+        assertTrue(tokens.get(7).getBegin() == 43 && tokens.get(7).getEnd() == 50 && text.substring(43, 50).equals(tokens.get(7).getCoveredText()),"Didn't get the right token: 'changes'");
+        assertTrue(tokens.get(8).getBegin() == 51 && tokens.get(8).getEnd() == 53 && text.substring(51, 53).equals(tokens.get(8).getCoveredText()),"Didn't get the right token: 'or'");
+        assertTrue(tokens.get(9).getBegin() == 54 && tokens.get(9).getEnd() == 61 && text.substring(54, 61).equals(tokens.get(9).getCoveredText()),"Didn't get the right token: 'hearing'");
+        assertTrue(tokens.get(10).getBegin() == 62 && tokens.get(10).getEnd() == 69 && text.substring(62, 69).equals(tokens.get(10).getCoveredText()),"Didn't get the right token: 'changes'");
     }
 
 
@@ -136,7 +136,7 @@ public class FastNER_AE_GeneralTest {
 
         String text = "a fever of 103.8 , tachycardia in the 130s-150s , and initial hypertensive in the 140s .";
         jCas.setDocumentText(text);
-        configurationData[1] = "conf/rules_g.xlsx";
+        configurationData[1] = "conf/rules_g.tsv";
         fastNER_AE = createEngine(FastNER_AE_General.class, configurationData);
 
         simpleParser_AE.process(jCas);
@@ -469,7 +469,7 @@ public class FastNER_AE_GeneralTest {
                 "@CONCEPT_FEATURES\tNewUmlsConcept\t\tCui\tPreferredText\n" +
                 "fever\t0\tNewUmlsConcept\t\tC302837\thyperthermia";
         String typeDescriptor = "desc/type/All_Types";
-        runner = new AdaptableUIMACPETaskRunner(typeDescriptor, "target/generated-test-sources/");
+        runner = new AdaptableUIMACPERunner(typeDescriptor, "target/generated-test-sources/");
         runner.addConceptTypes(new FastNER_AE_General().getTypeDefs(ruleStr).values());
         runner.reInitTypeSystem("target/generated-test-sources/test_type.xml");
         jCas = runner.initJCas();

@@ -19,9 +19,10 @@ package edu.utah.bmi.nlp.fastcner;
 import edu.utah.bmi.nlp.core.NERRule;
 import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.Span;
-import junit.framework.TestCase;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -32,17 +33,18 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import static edu.utah.bmi.nlp.core.DeterminantValueSet.Determinants.ACTUAL;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by
  *
  * @author Jianlin Shi on 4/30/17.
  */
-public class FastCNERTest extends TestCase {
+public class FastCNERTest {
     public static Logger logger = Logger.getLogger(FastCNERTest.class.getCanonicalName());
 
-    @BeforeClass
-    public void setUp() {
+    @BeforeAll
+    public static void setUp() {
         if (System.getProperty("java.util.logging.config.file") == null &&
                 new File("logging.properties").exists()) {
             System.setProperty("java.util.logging.config.file", "logging.properties");
@@ -55,6 +57,7 @@ public class FastCNERTest extends TestCase {
 
     }
 
+    @Test
     public void testProcessString() throws Exception {
         HashMap<Integer, NERRule> rules = new HashMap<>();
 
@@ -76,6 +79,7 @@ public class FastCNERTest extends TestCase {
         evalMatch(result.get("rule3"), new Span[]{new Span(16, 17)});
     }
 
+    @Test
     public void test2() {
         FastCNER fcrp = new FastCNER("conf/crule_test.xlsx");
         fcrp.setReplicationSupport(true);
@@ -84,7 +88,7 @@ public class FastCNERTest extends TestCase {
         printMatches(result, a, fcrp);
     }
 
-
+    @Test
     public void test3() {
         HashMap<Integer, NERRule> rules = new HashMap<>();
         rules.put(0, new NERRule(0, "b\\c+)d", "TEST", 0.1, ACTUAL));
@@ -112,7 +116,7 @@ public class FastCNERTest extends TestCase {
         printMatches(result, input);
     }
 
-
+    @Test
     public void test3_5() {
         HashMap<Integer, NERRule> rules = new HashMap<>();
 //        rules.put(0,new NERRule(0, "b\\c+)d", "TEST", 0.1, ACTUAL));
@@ -453,6 +457,21 @@ public class FastCNERTest extends TestCase {
         printMatches(result, input, fcrp);
         assertEquals(1, result.size());
         assertEquals(1, result.get("Fever_present").size());
+    }
+
+    public void test16() {
+        String rule = "[\\w|\\p|\\b]([\\d|0\\d|10|11|12]/[\\d|0\\d|1\\d|2\\d|30|31]/[19|20|21]\\d\\d)[\\w|\\p|\\c|\\C]\t1\tDate";
+        FastCNER fcrp;
+        String input = "• Soft tissue infection 12/21/2014 \n";
+        HashMap<String, ArrayList<Span>> result;
+
+
+        fcrp = new FastCNER(rule);
+        fcrp.setMaxRepeatLength(30);
+
+
+        result = fcrp.processString(input);
+        printMatches(result, input, fcrp);
     }
 
     private void printMatches(HashMap<String, ArrayList<Span>> result, String input) {
