@@ -155,7 +155,7 @@ public class FastRuleWGTest {
     }
 
     @Test
-    public void processOverlap4() throws Exception {
+    public void processDate() throws Exception {
 
         String text = "on 02/31/2011";
         String rule = "@fastner\n" +
