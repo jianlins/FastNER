@@ -153,4 +153,24 @@ public class FastRuleWGTest {
         }
         assert (res.containsKey("MUTATION") && res.get("MUTATION").size() == 2);
     }
+
+    @Test
+    public void processOverlap4() throws Exception {
+
+        String text = "on 02/31/2011";
+        String rule = "@fastner\n" +
+                "\\> 1 \\< 13 / \\< 32 / \\> 1910 \\< 2030 	MUTATION\n";
+
+        ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
+
+        fastNER = new FastNER(rule);
+        HashMap<String, ArrayList<Span>> res = fastNER.processSpanList(tokens);
+        for (Map.Entry<String, ArrayList<Span>> entry : res.entrySet()) {
+            System.out.println(entry.getKey() + ":\t");
+            entry.getValue().forEach((span) -> {
+                System.out.println("\t" + text.substring(span.getBegin(), span.getEnd()));
+            });
+        }
+//        assert (res.containsKey("MUTATION") && res.get("MUTATION").size() == 2);
+    }
 }
