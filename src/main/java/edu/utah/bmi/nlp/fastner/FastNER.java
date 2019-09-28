@@ -84,7 +84,7 @@ public class FastNER {
 
     protected void initiate(String ruleStr, boolean caseSenstive, boolean constructRuleMap) {
         typeDefinition = new LinkedHashMap<>();
-        fastRule = FastRuleFactory.createFastRule(this.getClass(), ruleStr, typeDefinition, caseSenstive, constructRuleMap);
+        fastRule = FastRuleFactory.createFastRule(ruleStr, typeDefinition, caseSenstive, constructRuleMap);
     }
 
     public HashMap<String, ArrayList<Span>> processStringList(ArrayList<String> tokens) {

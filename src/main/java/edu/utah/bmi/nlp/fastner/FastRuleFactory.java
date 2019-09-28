@@ -42,6 +42,7 @@ public class FastRuleFactory {
 
     }
 
+    @Deprecated
     public static FastRule createFastRule(Class fastNER, String ruleStr, LinkedHashMap<String, TypeDefinition> typeDefinition, String splitter, boolean caseSensitive) {
         return createFastRule(fastNER, ruleStr, typeDefinition, splitter, caseSensitive);
     }
@@ -75,7 +76,7 @@ public class FastRuleFactory {
 //                  back compatibility
                     String conceptName = cells.get(1).substring(1);
                     String conceptShortName = getShortName(conceptName);
-                    String superTypeName=cells.get(2);
+                    String superTypeName = cells.get(2);
                     if (typeDefinition != null && !typeDefinition.containsKey(conceptShortName)) {
                         if (cells.size() > 3)
                             typeDefinition.put(conceptShortName, new TypeDefinition(conceptName, cells.get(2), cells.subList(3, cells.size())));
@@ -94,7 +95,7 @@ public class FastRuleFactory {
 
         for (ArrayList<String> cells : allCells) {
             ArrayList<String> featureValues = new ArrayList<>();
-            String[]featureValuesArray;
+            String[] featureValuesArray;
             logger.finest("Add rule: " + cells);
             int id = Integer.parseInt(cells.get(0));
             String rule = cells.get(1);
@@ -140,10 +141,10 @@ public class FastRuleFactory {
                 score = 1d;
             if (constructRuleMap) {
                 if (featureValues.size() > 0) {
-                    featureValuesArray=new String[featureValues.size()];
-                    featureValuesArray= featureValues.toArray(featureValuesArray);
+                    featureValuesArray = new String[featureValues.size()];
+                    featureValuesArray = featureValues.toArray(featureValuesArray);
                     rules.put(id, new NERRule(id, caseSensitive ? rule : rule.toLowerCase(), conceptName, score, determinant, featureValuesArray));
-                }else
+                } else
                     rules.put(id, new NERRule(id, caseSensitive ? rule : rule.toLowerCase(), conceptName, score, determinant));
             }
         }
@@ -153,7 +154,7 @@ public class FastRuleFactory {
         return output;
     }
 
-    public static FastRule createFastRule(Class fastNER, String ruleStr, LinkedHashMap<String, TypeDefinition> typeDefinition,
+    public static FastRule createFastRule(String ruleStr, LinkedHashMap<String, TypeDefinition> typeDefinition,
                                           boolean caseSensitive, boolean constructRuleMap) {
         FastRule fastRule = null;
         Object[] output = buildRuleStore(ruleStr, typeDefinition, caseSensitive, constructRuleMap);

@@ -16,8 +16,11 @@
 
 package edu.utah.bmi.nlp.fastner;
 
+import edu.utah.bmi.nlp.core.DeterminantValueSet;
+import edu.utah.bmi.nlp.core.NERRule;
 import edu.utah.bmi.nlp.core.SimpleParser;
 import edu.utah.bmi.nlp.core.Span;
+import edu.utah.bmi.nlp.fastcner.FastCRuleSB;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -170,7 +173,7 @@ public class FastRuleWGNTest {
                 "\n" +
                 "May . \\d+ , \\d+\tCLUE\tPSEUDO\n" +
                 "Jun . \\d+ , \\d+\tCLUE\tPSEUDO\n" +
-                "Jul . \\d+ , \\d+\tCLUE\tPSEUDO\n" ;
+                "Jul . \\d+ , \\d+\tCLUE\tPSEUDO\n";
         ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
 
         fastNER = new FastNER(rule);
@@ -196,4 +199,26 @@ public class FastRuleWGNTest {
 
     }
 
+    @Test
+    public void processSpans8() throws Exception {
+
+        String text = "he is 89 years old";
+        String rule = "@fastner\n" +
+                "\\d+ \\) [year|years] old\tCLUE\n";
+        ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
+
+        fastNER = new FastNER(rule);
+        HashMap<String, ArrayList<Span>> res = fastNER.processSpanList(tokens);
+        assert (res.size() == 1);
+        assert (res.get("CLUE").size() == 1);
+        Span span = res.get("CLUE").get(0);
+        System.out.println(span);
+    }
+
+    @Test
+    public void processSpans9() throws Exception {
+        String rule = "\\d+ \\) [year|years] old";
+        ArrayList<NERRule> rules = new FastCRuleSB(rule).expandSB(new NERRule(0, rule, "CLUE", DeterminantValueSet.Determinants.ACTUAL, new ArrayList<>()));
+        System.out.println(rules);
+    }
 }

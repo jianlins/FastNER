@@ -70,11 +70,92 @@ public abstract class FastRule {
         rulesMap.clear();
         this.ruleStore = ruleStore;
         for (Map.Entry<Integer, NERRule> ent : ruleStore.entrySet()) {
-            addRule(ent.getValue());
+            NERRule rule = ent.getValue();
+            if (rule.rule.indexOf("[") != -1) {
+                ArrayList<NERRule> rules = expandSB(rule);
+                for (NERRule subrule : rules) {
+                    addRule(subrule);
+                }
+            } else {
+                addRule(rule);
+            }
         }
         initiateFunctions();
     }
 
+
+    public ArrayList<NERRule> expandSB(NERRule rule) {
+        ArrayList<NERRule> expandedRules = new ArrayList<>();
+        ArrayList<StringBuilder> ruleStringBuilders = new ArrayList<>();
+        String ruleString = rule.rule;
+        ruleStringBuilders.add(new StringBuilder());
+        final int OUT = 0, IN = 1;
+        int status = OUT;
+        char[] ruleChars = ruleString.toCharArray();
+//      keep track of previous char, so that this expansion can avoid "\[",
+        char preCh = ' ', nextCh = ' ';
+        ArrayList<StringBuilder> branches = new ArrayList<>();
+        for (int i = 0; i < ruleChars.length; i++) {
+            char ch = ruleChars[i];
+            if (i > 0)
+                preCh = ruleChars[i - 1];
+//           save the next char to avoid put '\' before '[' in the ruleMap, only need '['
+            if (i < ruleChars.length - 1)
+                nextCh = ruleChars[i + 1];
+            else
+                nextCh = ' ';
+            if (status == OUT && (ch != '[' || preCh == '\\')) {
+                if (ch == '\\' && (nextCh == '[' || nextCh == ']')) {
+                    preCh = ch;
+                    continue;
+                }
+                for (int j = 0; j < ruleStringBuilders.size(); j++) {
+                    ruleStringBuilders.get(j).append(ch);
+                }
+            } else if (status == OUT && ch == '[' && preCh != '\\') {
+                status = IN;
+                branches = new ArrayList<>();
+                branches.add(new StringBuilder());
+                continue;
+            } else if (status == IN && (ch != ']' || preCh == '\\')) {
+                if (ch == '|') {
+                    branches.add(new StringBuilder());
+                } else if (ch == '\\' && (nextCh == '[' || nextCh == ']')) {
+                    preCh = ch;
+                    continue;
+                } else {
+                    branches.get(branches.size() - 1).append(ch);
+                }
+            } else if (status == IN && ch == ']' && preCh != '\\') {
+                status = OUT;
+                int previousSize = ruleStringBuilders.size();
+                if (ch == '\\' && (nextCh == '[' || nextCh == ']')) {
+                    preCh = ch;
+                    continue;
+                }
+                for (int j = 0; j < previousSize; j++) {
+                    StringBuilder sb = new StringBuilder(ruleStringBuilders.get(j));
+                    ruleStringBuilders.get(j).append(branches.get(0));
+                    for (int k = 1; k < branches.size(); k++) {
+                        ruleStringBuilders.add(new StringBuilder(sb));
+                        ruleStringBuilders.get(ruleStringBuilders.size() - 1).append(branches.get(k));
+                    }
+                }
+            }
+        }
+
+        HashSet<String> cleanSet = new HashSet<>();
+        for (StringBuilder subRule : ruleStringBuilders) {
+            cleanSet.add(subRule.toString());
+        }
+        for (StringBuilder subRule : ruleStringBuilders) {
+            logger.logp(Level.FINEST, getClass().getCanonicalName(), "expandSB", subRule.toString() + "\t" + rule.ruleName);
+            NERRule newRule = new NERRule(rule.id, subRule.toString(), rule.ruleName, rule.score, rule.type);
+            expandedRules.add(newRule);
+        }
+
+        return expandedRules;
+    }
 
     protected void initiateFunctions() {
         getSpanEnd = (list, id) -> ((Span) list.get(id)).getEnd();
