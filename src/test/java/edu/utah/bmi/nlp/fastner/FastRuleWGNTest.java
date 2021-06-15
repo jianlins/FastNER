@@ -221,4 +221,48 @@ public class FastRuleWGNTest {
         ArrayList<NERRule> rules = new FastCRuleSB(rule).expandSB(new NERRule(0, rule, "CLUE", DeterminantValueSet.Determinants.ACTUAL, new ArrayList<>()));
         System.out.println(rules);
     }
+
+
+    @Test
+    public void processSpans10() throws Exception {
+
+        String text =   "{{ CANCER, COLON }} 30 - 50 s diagnosed ; ";
+        String rule = "@fastner\n" +
+                "\\> 19 \\< 100 \\) s diagnosed\tONSET_RANGE\n" +
+                "\\( \\> 19 \\< 100 \\) -\tONSET_RANGE\n" +
+                "\\> 19 \\< 100 \\( - \\> 19 \\< 100 \\)\tONSET_RANGE\tPSEUDO\n";
+        ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
+
+        fastNER = new FastNER(rule);
+        HashMap<String, ArrayList<Span>> res = fastNER.processSpanList(tokens);
+        for (Map.Entry<String, ArrayList<Span>> entry : res.entrySet()) {
+            System.out.println(entry.getKey() + ":\t");
+            entry.getValue().forEach((span) -> {
+                System.out.println("\t" + text.substring(span.getBegin(), span.getEnd()));
+            });
+        }
+        assert (res.size()==1);
+        assert (res.getOrDefault("ONSET_RANGE", new ArrayList<>()).size()==1);
+    }
+    @Test
+    public void processSpans11() throws Exception {
+
+        String text =   "{{ CANCER, COLON }} 30 - 50 s diagnosed ; ";
+        String rule = "@fastner\n" +
+                "\\> 19 \\< 100 \\) s diagnosed\tONSET_RANGE\n" +
+                "\\( \\> 19 \\< 100 \\) -\tONSET_RANGE\n" +
+                "#\\> 19 \\< 100 \\( - \\> 19 \\< 100 \\)\tONSET_RANGE\tPSEUDO\n";
+        ArrayList<Span> tokens = SimpleParser.tokenizeDecimalSmartWSentences(text, true).get(0);
+
+        fastNER = new FastNER(rule);
+        HashMap<String, ArrayList<Span>> res = fastNER.processSpanList(tokens);
+        for (Map.Entry<String, ArrayList<Span>> entry : res.entrySet()) {
+            System.out.println(entry.getKey() + ":\t");
+            entry.getValue().forEach((span) -> {
+                System.out.println("\t" + text.substring(span.getBegin(), span.getEnd()));
+            });
+        }
+        assert (res.size()==1);
+        assert (res.getOrDefault("ONSET_RANGE", new ArrayList<>()).size()==2);
+    }
 }
