@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
@@ -59,8 +60,10 @@ public class FastNER_AE_GeneralTest {
     public void setUp() {
         String typeDescriptor = "desc/type/All_Types";
         runner = new AdaptableUIMACPERunner(typeDescriptor, "target/generated-test-sources/");
-        runner.addConceptTypes(FastNER_AE_General.getTypeDefinitions("conf/rules.xlsx", true).values());
-        runner.addConceptTypes(FastNER_AE_General.getTypeDefinitions("conf/rules_g.tsv", true).values());
+        Collection<TypeDefinition> cons = FastNER_AE_General.getTypeDefinitions("conf/rules.xlsx", true).values();
+        runner.addConceptTypes(cons);
+        cons = FastNER_AE_General.getTypeDefinitions("conf/rules_g.tsv", true).values();
+        runner.addConceptTypes(cons);
         runner.addConceptType(new TypeDefinition("Impression", "SectionBody"));
         runner.addConceptType(new TypeDefinition("Plan", "SectionBody"));
         runner.reInitTypeSystem("target/generated-test-sources/customized");
