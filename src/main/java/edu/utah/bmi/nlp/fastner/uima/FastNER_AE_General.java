@@ -185,7 +185,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
                 String shortTypeName = conceptTypeDefPair.getKey();
                 TypeDefinition typeDefinition = conceptTypeDefPair.getValue();
                 String fullTypeName = typeDefinition.fullTypeName;
-                Class<? extends Annotation> superClass = AnnotationOper.getTypeClass(DeterminantValueSet.getRealClassTypeName(typeDefinition.getFullSuperTypeName()));
+                Class<? extends Annotation> superClass = AnnotationOper.getTypeClass(typeDefinition.getFullSuperTypeName());
                 Class conceptTypeClass = AnnotationOper.getTypeClass(fullTypeName);
                 if (superClass == null) {
                     logger.warning("Super Class " + DeterminantValueSet.getRealClassTypeName(typeDefinition.getFullSuperTypeName()) + " for class: " + fullTypeName + " has not been loaded.");

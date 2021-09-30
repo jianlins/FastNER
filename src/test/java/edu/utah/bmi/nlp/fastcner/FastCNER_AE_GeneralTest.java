@@ -113,7 +113,7 @@ public class FastCNER_AE_GeneralTest {
         assertTrue(concepts.size() == 1,"Didn't get the right number of concepts");
         assertTrue(concepts.get(0).getCoveredText().equals("hearing"),"Didn't get the right concept: 'hearing'");
         assertTrue(
-                concepts.get(0).getClass().getCanonicalName().equals("edu.utah.bmi.nlp.type.system.HEARING"),"Didn't get the right concept type: 'hearing'");
+                concepts.get(0).getType().getName().equals("edu.utah.bmi.nlp.type.system.HEARING"),"Didn't get the right concept type: 'hearing'");
 
         annoIndex = jCas.getAnnotationIndex(ConceptBASE.type);
         annoIter = annoIndex.iterator();
@@ -129,7 +129,7 @@ public class FastCNER_AE_GeneralTest {
         assertTrue(concepts.size() == 3,"Didn't get the right number of concepts");
         assertTrue(concepts.get(0).getCoveredText().equals("pa"),"Didn't get the right concept: 'pa'");
         assertTrue(
-                concepts.get(0).getClass().getCanonicalName().equals("edu.utah.bmi.nlp.type.system.PROBLEM"),"Didn't get the right concept type: 'pa'");
+                concepts.get(0).getType().getName().equals("edu.utah.bmi.nlp.type.system.PROBLEM"),"Didn't get the right concept type: 'pa'");
 
         annoIndex = jCas.getAnnotationIndex(Token.type);
         annoIter = annoIndex.iterator();

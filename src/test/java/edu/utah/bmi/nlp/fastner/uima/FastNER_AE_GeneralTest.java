@@ -16,6 +16,7 @@
 
 package edu.utah.bmi.nlp.fastner.uima;
 
+import edu.utah.bmi.nlp.compiler.MemoryClassLoader;
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.type.system.*;
@@ -23,10 +24,13 @@ import edu.utah.bmi.nlp.uima.AdaptableUIMACPERunner;
 import edu.utah.bmi.nlp.uima.ae.AnnotationCountEvaluator;
 import edu.utah.bmi.nlp.uima.ae.AnnotationPrinter;
 import edu.utah.bmi.nlp.uima.ae.SimpleParser_AE;
+import edu.utah.bmi.nlp.uima.common.AnnotationOper;
 import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.cas.CASException;
 import org.apache.uima.cas.FSIndex;
+import org.apache.uima.fit.factory.AnnotationFactory;
+import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
@@ -189,24 +193,10 @@ public class FastNER_AE_GeneralTest {
         String text = "HISTORY: a  of 103.8 , tachycardia in the 130s-150s , and initial hypertensive in the 140s .\nIMPRESSION: no fever currently.";
         jCas.reset();
         jCas.setDocumentText(text);
-        try {
-            Class cls = Class.forName(DeterminantValueSet.checkNameSpace("Impression")).asSubclass(SectionBody.class);
-            Constructor<SectionBody> clsConstruct = cls.getConstructor(JCas.class);
-            SectionBody impression = clsConstruct.newInstance(jCas);
-            impression.setBegin(text.indexOf("IMPRESSION") + 12);
-            impression.setEnd(text.length());
-            impression.addToIndexes();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        Class cls = AnnotationOper.getTypeClass("Impression").asSubclass(SectionBody.class);
+        Annotation impression = AnnotationFactory.createAnnotation(jCas, text.indexOf("IMPRESSION") + 12, text.length(), cls);
+        impression.addToIndexes();
+
         configurationData = new Object[]{FastNER_AE_General.PARAM_RULE_STR, "@fastner\ntachycardia\t0\tEntity\tACTUAL",
                 FastNER_AE_General.PARAM_INCLUDE_SECTIONS, "SectionBody",
                 FastNER_AE_General.PARAM_MARK_PSEUDO, true,
@@ -267,24 +257,9 @@ public class FastNER_AE_GeneralTest {
         jCas.setDocumentText(text);
         SectionBody sectionBody = new SectionBody(jCas, 9, text.indexOf("IMPRESSION") - 1);
         sectionBody.addToIndexes();
-        try {
-            Class cls = Class.forName(DeterminantValueSet.checkNameSpace("Impression")).asSubclass(SectionBody.class);
-            Constructor<SectionBody> clsConstruct = cls.getConstructor(JCas.class);
-            SectionBody impression = clsConstruct.newInstance(jCas);
-            impression.setBegin(text.indexOf("IMPRESSION") + 12);
-            impression.setEnd(text.length());
-            impression.addToIndexes();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        Class cls = AnnotationOper.getTypeClass("Impression").asSubclass(SectionBody.class);
+        Annotation impression = AnnotationFactory.createAnnotation(jCas, text.indexOf("IMPRESSION") + 12, text.length(), cls);
+        impression.addToIndexes();
 
         annotationPrinter = createEngine(AnnotationPrinter.class, new Object[]{AnnotationPrinter.PARAM_TYPE_NAME, "SectionBody"});
         annotationPrinter.process(jCas);
@@ -445,28 +420,13 @@ public class FastNER_AE_GeneralTest {
 
 
     public void createAnnotation(String typeName, Class superClass, int begin, int end) {
-        try {
-            Class cls = Class.forName(DeterminantValueSet.checkNameSpace(typeName)).asSubclass(superClass);
-            Constructor<SectionBody> clsConstruct = cls.getConstructor(JCas.class);
-            Annotation annotation = clsConstruct.newInstance(jCas);
-            annotation.setBegin(begin);
-            annotation.setEnd(end);
-            annotation.addToIndexes();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        Class cls = AnnotationOper.getTypeClass(typeName).asSubclass(superClass);
+        Annotation annotation = AnnotationFactory.createAnnotation(jCas, begin,end, cls);
+        annotation.addToIndexes();
     }
 
     @Test
-    public void testAdditionalFeatures() throws ResourceInitializationException, AnalysisEngineProcessException {
+    public void testAdditionalFeatures() throws ResourceInitializationException, AnalysisEngineProcessException, ClassNotFoundException {
         String text = "HISTORY: a  fever of 103.8 , tachycardia in the 130s-150s , and initial hypertensive in the 140s .\nIMPRESSION: no fever currently.";
         String ruleStr = "@fastner\n" +
                 "@CONCEPT_FEATURES\tNewUmlsConcept\t\tCui\tPreferredText\n" +
@@ -485,17 +445,14 @@ public class FastNER_AE_GeneralTest {
                 configurationData);
         simpleParser_AE.process(jCas);
         fastNER_AE.process(jCas);
-        FSIndex annoIndex = jCas.getAnnotationIndex(Concept.type);
-        Iterator annoIter = annoIndex.iterator();
         ArrayList<Concept> concepts = new ArrayList<Concept>();
-        while (annoIter.hasNext()) {
-            concepts.add((Concept) annoIter.next());
-        }
+        concepts.addAll(JCasUtil.select(jCas, Concept.class));
         for (Concept concept : concepts) {
             System.out.println(concept);
         }
         assertTrue(concepts.size() == 2);
-        assertTrue(concepts.get(0).getClass().getSimpleName().equals("NewUmlsConcept"));
+        System.out.println(concepts.get(0).getClass());
+        assertTrue(concepts.get(0).getType().getShortName().equals("NewUmlsConcept"));
         assertTrue(concepts.get(0).toString().contains("C302837"));
         assertTrue(concepts.get(0).toString().contains("hyperthermia"));
     }

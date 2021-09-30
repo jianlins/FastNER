@@ -1,8 +1,6 @@
 package edu.utah.bmi.nlp.core;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 
 /**
  * Extend Rule to store additional attributes of rules
