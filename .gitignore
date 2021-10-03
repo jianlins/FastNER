@@ -3,3 +3,4 @@ FastNER.iml
 target
 classes
 data/output
+*.iml
