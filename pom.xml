@@ -24,7 +24,7 @@
     <version>1.4.0.0-SNAPSHOT</version>
     <properties>
         <ctakes.version>4.0.0</ctakes.version>
-        <nlp.core.veresion>1.4.0.0-SNAPSHOT</nlp.core.veresion>
+        <nlp.core.version>1.4.0.0-SNAPSHOT</nlp.core.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.3.50</kotlin.version>
     </properties>
@@ -209,7 +209,7 @@
         <dependency>
             <groupId>edu.utah.bmi.nlp</groupId>
             <artifactId>nlp-core</artifactId>
-            <version>${nlp.core.veresion}</version>
+            <version>${nlp.core.version}</version>
         </dependency>
         <dependency>
             <groupId>edu.utah.bmi.blulab</groupId>
