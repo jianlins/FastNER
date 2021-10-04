@@ -51,7 +51,7 @@ public class FastRuleWOG extends FastRule {
         initiate(ruleStr, caseSensitive);
     }
 
-    public FastRuleWOG(HashMap<Integer, NERRule> ruleStore) {
+    public FastRuleWOG(HashMap<Integer, Rule> ruleStore) {
         initiate(ruleStore);
     }
 

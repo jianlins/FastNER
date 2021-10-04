@@ -388,18 +388,18 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
             for (Span span : entry.getValue()) {
 //                System.out.println(getSpanType(span));
                 String conceptTypeName = entry.getKey();
-                NERRule rule = fastNER.getMatchedRuleString(span);
+                Rule rule = fastNER.getMatchedRuleString(span);
                 if (logRuleInfo) {
                     String ruleInfor = getRuleInfo(span);
                     if (getSpanType(span) == Determinants.ACTUAL) {
-                        saveConcept(jcas, conceptTypeName, ConceptTypeConstructors.get(conceptTypeName), span.begin, span.end, sectionName, ruleInfor, rule.attributes.toArray(new String[rule.attributes.size()]));
+                        saveConcept(jcas, conceptTypeName, ConceptTypeConstructors.get(conceptTypeName), span.begin, span.end, sectionName, ruleInfor, ((NERRule)rule).attributes.toArray(new String[((NERRule)rule).attributes.size()]));
                     } else if (markPseudo) {
                         savePseudoConcept(jcas, span, ruleInfor);
                     }
 
                 } else {
                     if (getSpanType(span) == Determinants.ACTUAL) {
-                        saveConcept(jcas, conceptTypeName, ConceptTypeConstructors.get(conceptTypeName), span.begin, span.end, sectionName, null, rule.attributes.toArray(new String[rule.attributes.size()]));
+                        saveConcept(jcas, conceptTypeName, ConceptTypeConstructors.get(conceptTypeName), span.begin, span.end, sectionName, null, ((NERRule)rule).attributes.toArray(new String[((NERRule)rule).attributes.size()]));
                     } else if (markPseudo) {
                         savePseudoConcept(jcas, span);
                     }

@@ -50,7 +50,7 @@ public class FastRuleFactory {
     public static Object[] buildRuleStore(String ruleStr, LinkedHashMap<String, TypeDefinition> typeDefinition,
                                           boolean caseSensitive, boolean constructRuleMap) {
         Object[] output = new Object[3];
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
         int strLength = ruleStr.trim().length();
         String testFileStr = ruleStr.trim().substring(strLength - 4).toLowerCase();
         File agnosticFile = new File(ruleStr);
@@ -162,7 +162,7 @@ public class FastRuleFactory {
         String concatenated = (String) output[2];
         boolean supportReplication = concatenated.indexOf("+") != -1 ? true : false;
         if (constructRuleMap) {
-            HashMap<Integer, NERRule> rules = (HashMap<Integer, NERRule>) output[0];
+            HashMap<Integer, Rule> rules = (HashMap<Integer, Rule>) output[0];
             switch (ruleType) {
                 case "FastCRuleCN":
                     fastRule = new FastCRuleCN(rules);
@@ -195,7 +195,7 @@ public class FastRuleFactory {
         FastRule fastRule = null;
         int strLength = ruleStr.trim().length();
         String testFileStr = ruleStr.trim().substring(strLength - 4).toLowerCase();
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
         boolean[] thisRuleType = new boolean[]{false, false, false, false, false, false};
         if (testFileStr.equals(".tsv") || testFileStr.equals(".csv") || testFileStr.equals("xlsx") || testFileStr.equals(".owl")) {
             thisRuleType = IOUtil.readAgnosticFile(ruleStr, rules, typeDefinition, caseSensitive, thisRuleType);

@@ -62,7 +62,7 @@ public class FastRuleWG extends FastRuleWOG {
         super(ruleStr, caseSensitive);
     }
 
-    public FastRuleWG(HashMap<Integer, NERRule> ruleStore) {
+    public FastRuleWG(HashMap<Integer, Rule> ruleStore) {
         super(ruleStore);
     }
 

@@ -31,7 +31,7 @@ public class FastCRuleCN extends FastCRuleSB {
     }
 
 
-    public FastCRuleCN(HashMap<Integer, NERRule> ruleStore) {
+    public FastCRuleCN(HashMap<Integer, Rule> ruleStore) {
         super(ruleStore);
     }
 

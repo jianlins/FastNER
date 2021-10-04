@@ -59,7 +59,7 @@ public class FastCNERTest {
 
     @Test
     public void testProcessString() throws Exception {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
 
 //        (\c.)\n+	0.5	rule5
 //        (\c)\e	0.5	rule3
@@ -90,7 +90,7 @@ public class FastCNERTest {
 
     @Test
     public void test3() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
         rules.put(0, new NERRule(0, "b\\c+)d", "TEST", 0.1, ACTUAL));
 //        ruleStore.add(new NERRule(0, "ccd", "TEST", 0.1, ACTUAL));
 
@@ -118,7 +118,7 @@ public class FastCNERTest {
 
     @Test
     public void test3_5() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
 //        rules.put(0,new NERRule(0, "b\\c+)d", "TEST", 0.1, ACTUAL));
         rules.put(0, new NERRule(0, "bc+)d", "TEST", 0.1, ACTUAL));
 //        ruleStore.add(new NERRule(0, "ccd", "TEST", 0.1, ACTUAL));
@@ -157,7 +157,7 @@ public class FastCNERTest {
     }
 
     public void test4() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
         rules.put(0, new NERRule(0, "b\\c+)D", "TEST", 0.1, ACTUAL));
 //        ruleStore.add(new NERRule(0, "ccd", "TEST", 0.1, ACTUAL));
 
@@ -199,7 +199,7 @@ public class FastCNERTest {
     }
 
     public void test5() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
         rules.put(0, new NERRule(0, "c(\\d[|\\d][|\\d][|\\d])", "TEST", 0.1, ACTUAL));
 //        ruleStore.add(new NERRule(0, "ccd", "TEST", 0.1, ACTUAL));
 
@@ -235,7 +235,7 @@ public class FastCNERTest {
 
 
     public void test6() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
 //        ruleStore.add(new NERRule(0, "\\C[\\c+|\\C+] [|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][Division|divsion|ICU|SCIU|CCU|DEPARTMENT|Department|department|Dept|DEPT]", "TEST", 0.1, ACTUAL));
 //        ruleStore.add(new NERRule(0, "ccd", "TEST", 0.1, ACTUAL));
 
@@ -263,7 +263,7 @@ public class FastCNERTest {
     }
 
     public void test7() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
 //        ruleStore.add(new NERRule(0, "\\C[\\c+|\\C+] [|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][Division|divsion|ICU|SCIU|CCU|DEPARTMENT|Department|department|Dept|DEPT]", "TEST", 0.1, ACTUAL));
 //        ruleStore.add(new NERRule(0, "ccd", "TEST", 0.1, ACTUAL));
 
@@ -286,7 +286,7 @@ public class FastCNERTest {
 
 
     public void test8() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
 //        ruleStore.add(new NERRule(0, "\\C[debug\\c+|\\C+] [|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][Division|divsion|ICU|SCIU|CCU|DEPARTMENT|Department|department|Dept|DEPT]", "TEST", 0.1, ACTUAL));
 //        ruleStore.add(new NERRule(0, "ccd", "TEST", 0.1, ACTUAL));
 
@@ -310,7 +310,7 @@ public class FastCNERTest {
     }
 
     public void test9() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
 //        ruleStore.add(new NERRule(0, "\\C[debug\\c+|\\C+] [|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][Division|divsion|ICU|SCIU|CCU|DEPARTMENT|Department|department|Dept|DEPT]", "TEST", 0.1, ACTUAL));
 //        ruleStore.add(new NERRule(0, "ccd", "TEST", 0.1, ACTUAL));
 
@@ -332,7 +332,7 @@ public class FastCNERTest {
     }
 
     public void test10() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
 //        ruleStore.add(new NERRule(0, "\\C[debug\\c+|\\C+] [|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][|\\C\\c+ |\\C+ ][Division|divsion|ICU|SCIU|CCU|DEPARTMENT|Department|department|Dept|DEPT]", "TEST", 0.1, ACTUAL));
 //        ruleStore.add(new NERRule(0, "ccd", "TEST", 0.1, ACTUAL));
 
@@ -353,7 +353,7 @@ public class FastCNERTest {
     }
 
     public void test11() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
         rules.put(0, new NERRule(0, "[([|\\c+|\\C+]\\d\\d)]", "TEST", 0.1, ACTUAL));
         FastCNER fcrp = new FastCNER(rules);
         fcrp.setMaxRepeatLength(30);
@@ -368,7 +368,7 @@ public class FastCNERTest {
     }
 
     public void test12() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
         rules.put(0, new NERRule(0, "\\[([|\\c+|\\C+]\\d\\d+)\\]", "TEST", 0.1, ACTUAL));
         FastCNER fcrp = new FastCNER(rules);
         fcrp.setMaxRepeatLength(30);
@@ -384,7 +384,7 @@ public class FastCNERTest {
 
     public void test13() {
 
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
         rules.put(0, new NERRule(0, "([|\\c+|\\C+] \\d\\d+)", "TEST", 0.1, ACTUAL));
         FastCNER fcrp;
         String input = "Vital signs temperature 100.6 .\n";
@@ -426,7 +426,7 @@ public class FastCNERTest {
 
     public void test14() {
 
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
         rules.put(0, new NERRule(0, "patient", "TEST", 0.1, ACTUAL));
         FastCNER fcrp = new FastCNER(rules);
         fcrp.setMaxRepeatLength(30);

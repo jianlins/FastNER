@@ -16,10 +16,7 @@
 
 package edu.utah.bmi.nlp.fastner;
 
-import edu.utah.bmi.nlp.core.DeterminantValueSet;
-import edu.utah.bmi.nlp.core.NERRule;
-import edu.utah.bmi.nlp.core.SimpleParser;
-import edu.utah.bmi.nlp.core.Span;
+import edu.utah.bmi.nlp.core.*;
 import edu.utah.bmi.nlp.fastcner.FastCRuleSB;
 import org.junit.jupiter.api.Test;
 
@@ -218,7 +215,7 @@ public class FastRuleWGNTest {
     @Test
     public void processSpans9() throws Exception {
         String rule = "\\d+ \\) [year|years] old";
-        ArrayList<NERRule> rules = new FastCRuleSB(rule).expandSB(new NERRule(0, rule, "CLUE", DeterminantValueSet.Determinants.ACTUAL, new ArrayList<>()));
+        ArrayList<Rule> rules = new FastCRuleSB(rule).expandSB(new NERRule(0, rule, "CLUE", DeterminantValueSet.Determinants.ACTUAL, new ArrayList<>()));
         System.out.println(rules);
     }
 

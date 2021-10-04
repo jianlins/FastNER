@@ -38,8 +38,8 @@ public class FastCRuleSBTest {
     public void expandSB() throws Exception {
 //        FastCRuleSB fcruleSB = new FastCRuleSB("src/test/resources/ruleStore/crule_test.tsv");
         FastCRuleSB fcruleSB = new FastCRuleSB("conf/crule_test.xlsx");
-        ArrayList<NERRule> rules=fcruleSB.expandSB(new NERRule(1,"ab[c|d]e[f|g|h]","R1", 1.5, DeterminantValueSet.Determinants.ACTUAL));
-        for(Map.Entry<Integer, NERRule> ent:fcruleSB.ruleStore.entrySet()){
+        ArrayList<Rule> rules=fcruleSB.expandSB(new NERRule(1,"ab[c|d]e[f|g|h]","R1", 1.5, DeterminantValueSet.Determinants.ACTUAL));
+        for(Map.Entry<Integer, Rule> ent:fcruleSB.ruleStore.entrySet()){
             System.out.println(ent.getValue());
         }
 
@@ -49,7 +49,7 @@ public class FastCRuleSBTest {
 
     @Test
     public void test() {
-        HashMap<Integer,NERRule>rules=new HashMap<>();
+        HashMap<Integer, Rule>rules=new HashMap<>();
         rules.put(1,new NERRule(1,"ab\\[c|d\\]e[f|g|h]","R1", 1.5, DeterminantValueSet.Determinants.ACTUAL));
         FastCRuleSB fcruleSB = new FastCRuleSB(rules);
         fcruleSB.printRulesMap();
@@ -58,7 +58,7 @@ public class FastCRuleSBTest {
 
     @Test
     public void test2() {
-        HashMap<Integer,NERRule>rules=new HashMap<>();
+        HashMap<Integer, Rule>rules=new HashMap<>();
         rules.put(1,new NERRule(1,"abc","R1", 1.5, DeterminantValueSet.Determinants.PSEUDO));
         rules.put(2,new NERRule(2,"bc","R1", 1, DeterminantValueSet.Determinants.ACTUAL));
         rules.put(3,new NERRule(3,"b","R2", 1, DeterminantValueSet.Determinants.ACTUAL));

@@ -22,6 +22,7 @@ import edu.utah.blulab.domainontology.Variable;
 import edu.utah.bmi.nlp.core.DeterminantValueSet;
 import edu.utah.bmi.nlp.core.DeterminantValueSet.Determinants;
 import edu.utah.bmi.nlp.core.NERRule;
+import edu.utah.bmi.nlp.core.Rule;
 import edu.utah.bmi.nlp.core.TypeDefinition;
 import edu.utah.bmi.nlp.fastcner.UnicodeChecker;
 import org.apache.commons.csv.CSVFormat;
@@ -52,8 +53,8 @@ public class IOUtil {
     public static Logger logger = edu.utah.bmi.nlp.core.IOUtil.getLogger(IOUtil.class);
 
     @Deprecated
-    public static HashMap<Integer, NERRule> parseRuleStr(String ruleStr, String splitter, boolean caseSensitive) {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+    public static HashMap<Integer, Rule> parseRuleStr(String ruleStr, String splitter, boolean caseSensitive) {
+        HashMap<Integer, Rule> rules = new HashMap<>();
         int strLength = ruleStr.trim().length();
         String testFileStr = ruleStr.trim().substring(strLength - 4).toLowerCase();
         boolean[] thisRuleType = new boolean[]{false, false, false};
@@ -66,7 +67,7 @@ public class IOUtil {
         return rules;
     }
 
-    public static boolean[] readOwlFile(String owlFileName, HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive, boolean[] ruleSupports) {
+    public static boolean[] readOwlFile(String owlFileName, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive, boolean[] ruleSupports) {
         int ruleType = 0;
         int id = 0;
         try {
@@ -117,7 +118,7 @@ public class IOUtil {
     }
 
 
-    public static boolean[] readOwlDirectory(String owlFileDirectory, HashMap<Integer, NERRule> rules, boolean caseSensitive) {
+    public static boolean[] readOwlDirectory(String owlFileDirectory, HashMap<Integer, Rule> rules, boolean caseSensitive) {
         Collection<File> files = FileUtils.listFiles(new File(owlFileDirectory), new String[]{"owl"}, true);
         LinkedHashMap<String, TypeDefinition> typeDefinition = new LinkedHashMap<>();
         boolean[] thisRuleType = new boolean[]{false, false, false};
@@ -127,13 +128,13 @@ public class IOUtil {
         return thisRuleType;
     }
 
-    public static boolean[] readAgnosticFile(String agnosticFileName, HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive) {
+    public static boolean[] readAgnosticFile(String agnosticFileName, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive) {
         boolean[] thisRuleType = new boolean[]{false, false, false, false, false, false};
         readAgnosticFile(agnosticFileName, rules, typeDefinition, caseSensitive, thisRuleType);
         return thisRuleType;
     }
 
-    public static boolean[] readAgnosticFile(String agnosticFileName, HashMap<Integer, NERRule> rules,
+    public static boolean[] readAgnosticFile(String agnosticFileName, HashMap<Integer, Rule> rules,
                                              LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive,
                                              boolean[] thisRuleType) {
         File agnosticFile = new File(agnosticFileName);
@@ -161,7 +162,7 @@ public class IOUtil {
 //    }
 
 
-    public static boolean[] readXLSXRuleFile(String xlsxFileName, HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive, boolean[] ruleSupports) {
+    public static boolean[] readXLSXRuleFile(String xlsxFileName, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive, boolean[] ruleSupports) {
         try {
             FileInputStream inputStream = new FileInputStream(new File(xlsxFileName));
             Workbook workbook = new XSSFWorkbook(inputStream);
@@ -187,7 +188,7 @@ public class IOUtil {
         return ruleSupports;
     }
 
-    public static boolean[] readCSVFile(String csvFileName, HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, CSVFormat csvFormat, boolean caseSensitive, boolean[] ruleSupports) {
+    public static boolean[] readCSVFile(String csvFileName, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, CSVFormat csvFormat, boolean caseSensitive, boolean[] ruleSupports) {
         try {
             Iterable<CSVRecord> recordsIterator = CSVParser.parse(new File(csvFileName), StandardCharsets.UTF_8, csvFormat);
             ruleSupports = readCSV(recordsIterator, rules, typeDefinition, caseSensitive, ruleSupports);
@@ -199,7 +200,7 @@ public class IOUtil {
         return ruleSupports;
     }
 
-    public static boolean[] readCSVString(String csvString, HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, String splitter, boolean caseSensitive, boolean[] ruleSupports) {
+    public static boolean[] readCSVString(String csvString, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, String splitter, boolean caseSensitive, boolean[] ruleSupports) {
         CSVFormat csvFormat = CSVFormat.DEFAULT;
         if (splitter.equals("\t")) {
             csvFormat = CSVFormat.TDF;
@@ -208,7 +209,7 @@ public class IOUtil {
         return ruleSupports;
     }
 
-    public static boolean[] readCSVString(String csvString, HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, CSVFormat csvFormat, boolean caseSensitive, boolean[] ruleSupports) {
+    public static boolean[] readCSVString(String csvString, HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, CSVFormat csvFormat, boolean caseSensitive, boolean[] ruleSupports) {
         try {
             Iterable<CSVRecord> recordsIterator = CSVParser.parse(csvString, csvFormat);
             ruleSupports = readCSV(recordsIterator, rules, typeDefinition, caseSensitive, ruleSupports);
@@ -220,7 +221,7 @@ public class IOUtil {
         return ruleSupports;
     }
 
-    private static boolean[] readCSV(Iterable<CSVRecord> recordsIterator, HashMap<Integer, NERRule> rules,
+    private static boolean[] readCSV(Iterable<CSVRecord> recordsIterator, HashMap<Integer, Rule> rules,
                                      LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive, boolean[] ruleSupports) {
         int id = 0;
         for (CSVRecord record : recordsIterator) {
@@ -238,7 +239,7 @@ public class IOUtil {
     }
 
     private static boolean[] parseCells(ArrayList<String> cells, int id, HashMap<
-            Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive,
+            Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, boolean caseSensitive,
                                         boolean[] ruleSupports) {
         if (cells.get(0).startsWith("#") || cells.get(0).trim().length() == 0)
             return ruleSupports;
@@ -302,7 +303,7 @@ public class IOUtil {
     }
 
 
-    private static boolean[] addRule(HashMap<Integer, NERRule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, NERRule rule, boolean[] ruleSupports) {
+    private static boolean[] addRule(HashMap<Integer, Rule> rules, LinkedHashMap<String, TypeDefinition> typeDefinition, NERRule rule, boolean[] ruleSupports) {
 //        support grouping
         if (ruleSupports[1] == false && rule.rule.indexOf("(") != -1) {
             ruleSupports[1] = true;

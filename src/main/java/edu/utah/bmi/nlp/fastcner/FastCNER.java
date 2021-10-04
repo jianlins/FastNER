@@ -43,12 +43,12 @@ public class FastCNER extends FastNER {
         initiate(ruleFile, true, constructRuleMap);
     }
 
-    public FastCNER(HashMap<Integer, NERRule> ruleStore) {
+    public FastCNER(HashMap<Integer, Rule> ruleStore) {
         initiate(ruleStore);
 
     }
 
-    protected void initiate(HashMap<Integer, NERRule> ruleStore) {
+    protected void initiate(HashMap<Integer, Rule> ruleStore) {
         fastRule = new FastCRuleSB(ruleStore);
     }
 

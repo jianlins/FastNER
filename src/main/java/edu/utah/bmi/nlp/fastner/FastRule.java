@@ -46,7 +46,7 @@ public abstract class FastRule {
     protected boolean removePseudo = true;
     protected HashMap rulesMap = new HashMap();
     protected final Determinants END = Determinants.END;
-    public HashMap<Integer, NERRule> ruleStore = new HashMap<>();
+    public HashMap<Integer, Rule> ruleStore = new HashMap<>();
 
     protected BiFunction<ArrayList, Integer, Integer> getSpanBegin, getSpanEnd, getBeginId, getEndId;
     protected BiFunction<ArrayList, Integer, String> getSpanText, getStringText;
@@ -56,24 +56,24 @@ public abstract class FastRule {
 
     }
 
-    public FastRule(HashMap<Integer, NERRule> ruleStore) {
+    public FastRule(HashMap<Integer, Rule> ruleStore) {
         initiate(ruleStore);
     }
 
     public void initiate(String ruleStr, boolean caseSensitive) {
-        ruleStore = (HashMap<Integer, NERRule>) FastRuleFactory.buildRuleStore(ruleStr, null, caseSensitive, true)[0];
+        ruleStore = (HashMap<Integer, Rule>) FastRuleFactory.buildRuleStore(ruleStr, null, caseSensitive, true)[0];
         initiate(ruleStore);
     }
 
 
-    public void initiate(HashMap<Integer, NERRule> ruleStore) {
+    public void initiate(HashMap<Integer, Rule> ruleStore) {
         rulesMap.clear();
         this.ruleStore = ruleStore;
-        for (Map.Entry<Integer, NERRule> ent : ruleStore.entrySet()) {
-            NERRule rule = ent.getValue();
+        for (Map.Entry<Integer, Rule> ent : ruleStore.entrySet()) {
+            Rule rule = ent.getValue();
             if (rule.rule.indexOf("[") != -1) {
-                ArrayList<NERRule> rules = expandSB(rule);
-                for (NERRule subrule : rules) {
+                ArrayList<Rule> rules = expandSB(rule);
+                for (Rule subrule : rules) {
                     addRule(subrule);
                 }
             } else {
@@ -84,8 +84,8 @@ public abstract class FastRule {
     }
 
 
-    public ArrayList<NERRule> expandSB(NERRule rule) {
-        ArrayList<NERRule> expandedRules = new ArrayList<>();
+    public ArrayList<Rule> expandSB(Rule rule) {
+        ArrayList<Rule> expandedRules = new ArrayList<>();
         ArrayList<StringBuilder> ruleStringBuilders = new ArrayList<>();
         String ruleString = rule.rule;
         ruleStringBuilders.add(new StringBuilder());
@@ -244,7 +244,7 @@ public abstract class FastRule {
     }
 
 
-    public NERRule getRule(int pos) {
+    public Rule getRule(int pos) {
         return ruleStore.get(pos);
     }
 
@@ -265,7 +265,7 @@ public abstract class FastRule {
         }
     }
 
-    public HashMap<Integer, NERRule> getRuleStore() {
+    public HashMap<Integer, Rule> getRuleStore() {
         return ruleStore;
     }
 

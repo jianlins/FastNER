@@ -52,7 +52,7 @@ public class FastCRuleCNTest {
 
     @Test
     public void testSquareBracket() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
         rules.put(1, new NERRule(1, "胸[痛|闷]", "R1", 1.5, DeterminantValueSet.Determinants.ACTUAL));
         FastCNER fastCNER = new FastCNER(rules);
         FastRule.logger.setLevel(Level.FINER);
@@ -65,7 +65,7 @@ public class FastCRuleCNTest {
 
     @Test
     public void testPseudo() {
-        HashMap<Integer, NERRule> rules = new HashMap<>();
+        HashMap<Integer, Rule> rules = new HashMap<>();
         rules.put(1, new NERRule(1, "无心前区不适", "R1", 1.5, DeterminantValueSet.Determinants.PSEUDO));
         rules.put(2, new NERRule(2, "心前区不适", "R1", 1, DeterminantValueSet.Determinants.ACTUAL));
         rules.put(2, new NERRule(2, "胸痛", "R1", 1, DeterminantValueSet.Determinants.ACTUAL));
