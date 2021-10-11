@@ -64,7 +64,7 @@ public class FastCRuleSBTest {
         rules.put(3,new NERRule(3,"b","R2", 1, DeterminantValueSet.Determinants.ACTUAL));
         FastCNER fcruleSB = new FastCNER(rules);
         fcruleSB.printRulesMap();
-        HashMap<String, ArrayList<Span>> res = fcruleSB.processString("a ab bc.");
+        HashMap<String, ArrayList<Span>> res = fcruleSB.processString("a abc bc.");
         for (Map.Entry<String, ArrayList<Span>>entry: res.entrySet()){
             System.out.println(entry.getValue());
         }
