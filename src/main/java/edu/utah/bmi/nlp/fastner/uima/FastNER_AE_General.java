@@ -100,7 +100,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
 //    need to make sure the corresponding types (descriptor and Java classes) are available.
     protected HashMap<String, Constructor<? extends Annotation>> ConceptTypeClasses = new HashMap<String, Constructor<? extends Annotation>>();
     protected HashSet<String> includeSections = new HashSet<>();
-    protected HashSet<Class> includeSectionClasses = new LinkedHashSet<>();
+    protected HashSet<Class<? extends Annotation>> includeSectionClasses = new LinkedHashSet<>();
     protected HashSet<String> excludeSections = new HashSet<>();
     protected Class<? extends Annotation> SentenceType, TokenType;
     protected Constructor<? extends Annotation> SentenceTypeConstructor;
@@ -341,11 +341,8 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
     protected int indexSections(JCas jCas, IntervalST<String> sectionTree) {
         int totalSections = 0;
         if (includeSections.size() > 0) {
-            for (Class sectionCls: includeSectionClasses) {
-                FSIndex annoIndex = jCas.getAnnotationIndex(sectionCls);
-                Iterator annoIter = annoIndex.iterator();
-                while (annoIter.hasNext()) {
-                    Annotation section = (Annotation) annoIter.next();
+            for (Class<? extends Annotation> sectionCls: includeSectionClasses) {
+                for  (Annotation section: JCasUtil.select(jCas, sectionCls)) {
                     String sectionName = section.getType().getName();
                     if (excludeSections.size() ==0 || !excludeSections.contains(sectionName)) {
                         sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
@@ -357,8 +354,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
 //          if sections are defined as subclass of SectionBody or SectionHeader
             FSIndex annoIndex = jCas.getAnnotationIndex(SectionBody.class);
             Iterator annoIter = annoIndex.iterator();
-            while (annoIter.hasNext()) {
-                Annotation section = (Annotation) annoIter.next();
+            for  (Annotation section: JCasUtil.select(jCas, SectionBody.class)) {
                 String sectionName = section.getType().getName();
                 if (forceAssignSections) {
                     sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
@@ -368,10 +364,7 @@ public class FastNER_AE_General extends JCasAnnotator_ImplBase implements RuleBa
                 totalSections++;
             }
             //add section header as well.
-            annoIndex = jCas.getAnnotationIndex(SectionHeader.class);
-            annoIter = annoIndex.iterator();
-            while (annoIter.hasNext()) {
-                Annotation section = (Annotation) annoIter.next();
+            for  (Annotation section: JCasUtil.select(jCas,SectionHeader.class)) {
                 String sectionName = section.getType().getShortName();
                 if (forceAssignSections)
                     sectionTree.put(new Interval1D(section.getBegin(), section.getEnd()), sectionName);
