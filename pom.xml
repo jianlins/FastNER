@@ -207,7 +207,7 @@
         <dependency>
             <groupId>edu.utah.bmi.blulab</groupId>
             <artifactId>domainontology</artifactId>
-            <version>2016.12.2</version>
+            <version>2021-12-14</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
